@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>資料4</title>
+<style>
+  html, body { margin: 0; height: 100%; width: 100%; overflow: hidden; position: fixed; font-family: sans-serif; }
+  body { background: url("haikei.jpg") no-repeat center -95px/cover; display: flex; flex-direction: column; }
+  .main-content { flex-grow: 1; display: flex; justify-content: center; align-items: center; padding: 10px; padding-bottom: 80px; }
+  .content-box { width: 90%; max-width: 380px; background: rgba(255, 255, 255, 0.92); padding: 20px; border-radius: 15px; text-align: center; }
+  .laptop-img { width: 140px; margin: 10px 0; }
+  .input-area { display: flex; justify-content: center; gap: 8px; margin: 15px 0; }
+  #a { width: 150px; height: 40px; font-size: 18px; text-align: center; border: 2px solid #333; border-radius: 8px; }
+  .ok-btn { height: 44px; padding: 0 20px; background: #222; color: white; border: none; border-radius: 8px; font-weight: bold; }
+  .hint-list { display: flex; flex-direction: column; gap: 8px; }
+  .hint-btn { width: 100%; padding: 12px; border: none; border-radius: 10px; background: #607d8b; color: white; font-weight: bold; }
+  .ans-btn { background: #d32f2f; }
+  .hint-display { display: none; margin-top: 15px; align-items: flex-start; gap: 10px; text-align: left; }
+  .chara { width: 55px; height: 55px; border-radius: 50%; flex-shrink: 0; }
+  .bubble { padding: 10px; border-radius: 10px; color: white; position: relative; font-size: 13px; }
+  .riha { background:#2196f3; } .riha:before{content:"";position:absolute;left:-10px;top:10px;border:10px solid transparent;border-right:10px solid #2196f3;}
+  .hiro { background:#4caf50; } .hiro:before{content:"";position:absolute;left:-10px;top:10px;border:10px solid transparent;border-right:10px solid #4caf50;}
+  .seinan { background:#9c27b0; } .seinan:before{content:"";position:absolute;left:-10px;top:10px;border:10px solid transparent;border-right:10px solid #9c27b0;}
+</style>
+</head>
+<body>
+<div class="main-content">
+  <div class="content-box">
+    <h3>企画資料を開けろ</h3>
+    <div style="font-size:50px;">💻</div>
+    <div class="input-area">
+      <input id="a" type="text" placeholder="パスワード">
+      <button class="ok-btn" onclick="check()">OK</button>
+    </div>
+    <div class="hint-list">
+      <button class="hint-btn" onclick="showHint('h1')">ヒント1</button>
+      <button class="hint-btn" onclick="showHint('h2')">ヒント2</button>
+      <button class="hint-btn" onclick="showHint('h3')">ヒント3</button>
+      <button class="hint-btn ans-btn" onclick="askAnswer()">答えを見る</button>
+    </div>
+    <div id="hint_display" class="hint-display">
+      <img id="chara_img" class="chara" src="">
+      <div id="hint_text" class="bubble"></div>
+    </div>
+  </div>
+</div>
+<script>
+const qNo = 4;
+const correctAns = "rtu";
+const hintData = {
+  h1: { text: "r", img: "riha.png", type: "riha" },
+  h2: { text: "t", img: "hiro.png", type: "hiro" },
+  h3: { text: "u", img: "seinan.png", type: "seinan" },
+  a1: { text: "答えは「rtu」だよ！", img: "seinan.png", type: "seinan" }
+};
+function check() {
+  if(document.getElementById('a').value === correctAns) {
+    let prog = parseInt(localStorage.getItem("gameProgress") || 1);
+    if(prog === qNo) localStorage.setItem("gameProgress", qNo + 1);
+    alert("正解！");
+    location.href = "index.html";
+  } else { location.href = "fail.html"; }
+}
+function showHint(id){
+  const area = document.getElementById('hint_display');
+  area.style.display="flex";
+  document.getElementById('hint_text').innerText = hintData[id].text;
+  document.getElementById('chara_img').src = hintData[id].img;
+  document.getElementById('hint_text').className = "bubble " + hintData[id].type;
+}
+function askAnswer() { if(confirm("答えを見ますか？")) showHint('a1'); }
+</script>
+</body>
+</html>
