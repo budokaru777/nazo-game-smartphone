@@ -2,62 +2,97 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>正解</title>
 <style>
-  body { margin:0; height:100vh; background:url("haikei.jpg") center/cover; display:flex; justify-content:center; align-items:center; font-family:sans-serif; }
-  .box { background:rgba(255,255,255,0.95); padding:25px; border-radius:15px; text-align:center; width:80%; max-width:350px; box-shadow:0 10px 20px rgba(0,0,0,0.3); }
-  .clear-img { width:100%; border-radius:10px; margin-bottom:15px; }
-  button { width:100%; padding:15px; font-size:18px; font-weight:bold; background:#4caf50; color:white; border:none; border-radius:10px; cursor:pointer; }
-</style>
-</head>
-<body>
-<div class="box">
-  <img src="クリア画面.png" class="clear-img">
-  <h2>正解！</h2>
-  <p>新しい資料が追加されたようだ。</p>
-  <button onclick="goNext()">資料一覧へ</button>
-</div>
-<script>
-function goNext(){
-  const lastPage = localStorage.getItem("returnPage") || "question1.html";
-  const solvedNo = parseInt(lastPage.replace(/[^0-9]/g, ""));
-  let prog = parseInt(localStorage.getItem("gameProgress") || 1);
-  if(solvedNo >= prog) { localStorage.setItem("gameProgress", solvedNo + 1); }
-  location.href = localStorage.getItem("nextPage") || "documents.html";
-}
-</script>
-</body>
-</html>    border-radius: 10px;
-    cursor: pointer;
-    box-shadow: 0 4px 0 #388e3c;
+  body { 
+    margin: 0; 
+    height: 100vh; 
+    background: url("haikei.jpg") no-repeat center/cover; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    font-family: sans-serif; 
   }
-  .next-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #388e3c; }
+  
+  .box { 
+    background: rgba(255, 255, 255, 0.95); 
+    padding: 30px 25px; 
+    border-radius: 20px; 
+    text-align: center; 
+    width: 85%; 
+    max-width: 360px; 
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4); 
+  }
+
+  .clear-img { 
+    width: 100%; 
+    height: auto;
+    border-radius: 12px; 
+    margin-bottom: 20px; 
+  }
+
+  h2 {
+    color: #2e7d32;
+    font-size: 22px;
+    margin-bottom: 10px;
+  }
+
+  p {
+    font-size: 15px;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 25px;
+  }
+
+  .next-btn { 
+    width: 100%; 
+    padding: 18px; 
+    font-size: 18px; 
+    font-weight: bold; 
+    background: #4caf50; 
+    color: white; 
+    border: none; 
+    border-radius: 12px; 
+    cursor: pointer; 
+    box-shadow: 0 5px 0 #388e3c; /* 立体感のある影 */
+    transition: all 0.1s;
+    outline: none;
+  }
+
+  /* ボタンを押した時の動き */
+  .next-btn:active { 
+    transform: translateY(3px); 
+    box-shadow: 0 2px 0 #388e3c; 
+  }
 </style>
 </head>
 <body>
 
 <div class="box">
   <img src="クリア画面.png" class="clear-img" alt="正解">
-  <h2>正解だ！<br>本誌に戻って物語を進めよう。</h2>
-  <button class="next-btn" onclick="goNext()">次へ進む</button>
+  <h2>正解だ！</h2>
+  <p>新しい資料が追加されたようだ。<br>本誌に戻って物語を進めよう。</p>
+  <button class="next-btn" onclick="goNext()">本誌（資料一覧）へ</button>
 </div>
 
 <script>
 function goNext() {
-  // 現在の問題番号を取得（question1.htmlなら1）
+  // 元のページ情報から現在の問題番号を抽出
   const lastPage = localStorage.getItem("returnPage") || "question1.html";
   const currentQNo = parseInt(lastPage.replace(/[^0-9]/g, "")) || 1;
 
-  // 進行度を更新して資料一覧を解放
+  // 進行度を1進める（現在の問題以上の進行度にする）
   let prog = parseInt(localStorage.getItem("gameProgress") || 1);
   if (prog <= currentQNo) {
     localStorage.setItem("gameProgress", currentQNo + 1);
   }
 
-  // index.html（検索ページ）に戻る
-  location.href = "index.html";
+  // documents.html（資料一覧）へ戻る
+  // もしindexに戻したければここを "index.html" に書き換えてください
+  location.href = "documents.html";
 }
 </script>
+
 </body>
 </html>
