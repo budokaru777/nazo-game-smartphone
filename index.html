@@ -2,20 +2,25 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>スマホメニュー</title>
 
 <style>
-body {
+/* 画面全体の固定 */
+html, body {
   margin: 0;
-  height: 100vh;
-  overflow: hidden;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden; /* スクロールを完全に禁止 */
+  position: fixed; /* キーボードによる押し上げ対策 */
+}
+
+body {
   font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
-  
   background: url("haikei.jpg") no-repeat;
   background-position: center -95px; 
   background-size: cover;
-  
   display: flex;
   flex-direction: column;
 }
@@ -69,21 +74,23 @@ body {
   flex-grow: 1;
 }
 
-/* タスクバー：検索フォーム */
+/* タスクバー */
 .taskbar {
   position: fixed;
   bottom: 0;
+  left: 0;
   width: 100%;
-  height: 60px; /* 入力しやすいように少し高さを確保 */
+  height: 60px;
   background: rgba(0, 0, 0, 0.85);
   display: flex;
   justify-content: center;
   align-items: center;
   padding-bottom: env(safe-area-inset-bottom);
   box-sizing: border-box;
+  z-index: 100;
 }
 
-/* 検索フォームのスタイル */
+/* 検索フォーム */
 .search-form {
   width: 92%;
   display: flex;
@@ -94,10 +101,14 @@ body {
   border: 0.5px solid rgba(255, 255, 255, 0.2);
 }
 
-.search-icon {
+.search-btn {
+  background: none;
+  border: none;
   color: white;
   margin-right: 8px;
   font-size: 14px;
+  cursor: pointer;
+  padding: 0;
 }
 
 .search-input {
@@ -105,8 +116,9 @@ body {
   background: transparent;
   border: none;
   color: white;
-  font-size: 14px;
+  font-size: 16px; /* 16px未満だとiPhoneでズームされるのを防止 */
   outline: none;
+  appearance: none;
 }
 
 .search-input::placeholder {
@@ -150,11 +162,24 @@ body {
 <div class="main-content"></div>
 
 <div class="taskbar">
-  <form class="search-form" action="https://www.google.com/search" method="get">
-    <span class="search-icon">🔍</span>
-    <input type="text" name="q" class="search-input" placeholder="検索ワードを入力..." autocomplete="off">
+  <form class="search-form" onsubmit="doSearch(event)">
+    <button type="submit" class="search-btn">🔍</button>
+    <input type="text" id="searchInput" class="search-input" placeholder="検索ワードを入力..." autocomplete="off">
   </form>
 </div>
+
+<script>
+function doSearch(event) {
+  event.preventDefault(); // 画面リロードを防ぐ
+  const query = document.getElementById('searchInput').value;
+  if (query.trim() !== "") {
+    // 新しいタブでGoogle検索を開く（元の画面を維持）
+    window.open("https://www.google.com/search?q=" + encodeURIComponent(query), "_blank");
+    // 入力欄をクリアしてキーボードを閉じる（任意）
+    document.getElementById('searchInput').blur();
+  }
+}
+</script>
 
 </body>
 </html>
