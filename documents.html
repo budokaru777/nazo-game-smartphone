@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>資料一覧</title>
+<style>
+  body { margin:0; padding:20px; font-family:sans-serif; background:#f0f0f0; }
+  .file-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .file-item { text-align: center; cursor: pointer; text-decoration: none; color: #333; }
+  .file-item img { width: 60px; display: block; margin: 0 auto 5px; }
+  .file-label { font-size: 12px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<div class="file-grid" id="fileGrid">
+  </div>
+
+<script>
+  // 現在の進行度を取得（デフォルトは1）
+  let progress = localStorage.getItem("gameProgress") || 1;
+
+  const grid = document.getElementById("fileGrid");
+
+  for (let i = 1; i <= progress; i++) {
+    if (i > 6) break; // 最大6まで
+    
+    const a = document.createElement("a");
+    a.href = "question" + i + ".html"; // 資料1ならquestion1.htmlへ
+    a.className = "file-item";
+    a.innerHTML = `
+      <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png">
+      <div class="file-label">資料${i}</div>
+    `;
+    grid.appendChild(a);
+  }
+</script>
+</body>
+</html>
