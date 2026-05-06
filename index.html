@@ -6,21 +6,27 @@
 <title>スマホメニュー</title>
 
 <style>
-/* 画面全体の固定 */
-html, body {
+/* 画面全体の固定ルールを修正 */
+html {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
-  overflow: hidden; /* スクロールを完全に禁止 */
-  position: fixed; /* キーボードによる押し上げ対策 */
-}
-
-body {
+  overflow: hidden;
   font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
-  background: url("haikei.jpg") no-repeat;
+  
+  /* 背景設定を確実なものに修正 */
+  background-image: url("haikei.jpg"); /* ここを実際のファイル名に合わせてください */
+  background-repeat: no-repeat;
   background-position: center -95px; 
   background-size: cover;
+  background-attachment: fixed; /* 背景を固定 */
+  
   display: flex;
   flex-direction: column;
 }
@@ -33,6 +39,7 @@ body {
   padding-top: 20px;
   width: 100%;
   z-index: 10;
+  flex-shrink: 0; /* 潰れないように固定 */
 }
 
 .icon-box {
@@ -71,7 +78,7 @@ body {
 }
 
 .main-content {
-  flex-grow: 1;
+  flex-grow: 1; /* ここが空白スペースを確保 */
 }
 
 /* タスクバー */
@@ -90,7 +97,6 @@ body {
   z-index: 100;
 }
 
-/* 検索フォーム */
 .search-form {
   width: 92%;
   display: flex;
@@ -108,7 +114,6 @@ body {
   margin-right: 8px;
   font-size: 14px;
   cursor: pointer;
-  padding: 0;
 }
 
 .search-input {
@@ -116,13 +121,8 @@ body {
   background: transparent;
   border: none;
   color: white;
-  font-size: 16px; /* 16px未満だとiPhoneでズームされるのを防止 */
+  font-size: 16px; /* ズーム防止 */
   outline: none;
-  appearance: none;
-}
-
-.search-input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
 }
 </style>
 </head>
@@ -164,18 +164,16 @@ body {
 <div class="taskbar">
   <form class="search-form" onsubmit="doSearch(event)">
     <button type="submit" class="search-btn">🔍</button>
-    <input type="text" id="searchInput" class="search-input" placeholder="検索ワードを入力..." autocomplete="off">
+    <input type="text" id="searchInput" class="search-input" placeholder="検索..." autocomplete="off">
   </form>
 </div>
 
 <script>
 function doSearch(event) {
-  event.preventDefault(); // 画面リロードを防ぐ
+  event.preventDefault();
   const query = document.getElementById('searchInput').value;
   if (query.trim() !== "") {
-    // 新しいタブでGoogle検索を開く（元の画面を維持）
     window.open("https://www.google.com/search?q=" + encodeURIComponent(query), "_blank");
-    // 入力欄をクリアしてキーボードを閉じる（任意）
     document.getElementById('searchInput').blur();
   }
 }
