@@ -13,78 +13,83 @@
     display: flex; 
     justify-content: center; 
     align-items: flex-start; 
-    padding-top: 5px; /* ★極限まで上に */
+    padding-top: 0px; 
   }
   
   .content-box { 
     width: 92%; 
     max-width: 380px; 
     background: rgba(255, 255, 255, 0.95); 
-    padding: 5px 10px; /* ★内側の余白を最小に */
+    padding: 10px 15px; 
     border-radius: 15px; 
     text-align: center; 
     box-shadow: 0 8px 20px rgba(0,0,0,0.4); 
-    margin-top: -10px; /* ★枠ごと上に突き抜けさせる */
+    /* ★全体の開始位置を今の10倍（大幅に）上に上げる */
+    margin-top: -60px; 
   }
 
-  /* タイトルを小さくして箱に被せる */
   h3 {
     margin: 0 !important;
     font-size: 14px;
     color: #444;
+    /* タイトルを箱にしっかり重ねてスペース節約 */
     position: relative;
-    top: 15px; /* ★箱の上に少し重ねる */
+    top: 25px; 
     z-index: 5;
   }
   
   .hako-img { 
     width: 300px; 
     height: auto; 
-    margin: 0 auto -35px auto; /* ★下の余白を「-35px」にして次を食い込ませる */
+    /* ★箱の下側を大幅にカットして、入力欄をググッと上に引き寄せる */
+    margin: 0 auto -65px auto; 
     display: block;
     position: relative;
     z-index: 1;
   }
   
+  /* 入力欄とボタンの隙間：少し広げて「押しやすさ」を確保 */
   .input-area { 
     display: flex; 
     justify-content: center; 
-    gap: 5px; 
-    margin: 0 0 5px 0; /* ★箱にめり込ませる */
+    gap: 10px; 
+    margin-bottom: 20px; /* ★ここを少し広げて読みやすくしました */
     position: relative;
     z-index: 10;
   }
   
-  #a { width: 110px; height: 35px; font-size: 18px; border: 2px solid #333; border-radius: 8px; text-align: center; background: white; }
-  .ok-btn { height: 39px; padding: 0 12px; background: #222; color: white; border: none; border-radius: 8px; font-weight: bold; }
+  #a { width: 120px; height: 40px; font-size: 20px; border: 2px solid #333; border-radius: 8px; text-align: center; background: white; }
+  .ok-btn { height: 44px; padding: 0 15px; background: #222; color: white; border: none; border-radius: 8px; font-weight: bold; }
   
+  /* ヒントボタン同士の隙間：ここも少し余裕を持たせました */
   .hint-list { 
     display: flex; 
     flex-direction: column; 
-    gap: 1px; /* ★隙間ほぼゼロ */
+    gap: 8px; /* ★3pxから8pxに広げ、タップしやすく調整 */
   }
   
   .hint-btn { 
     width: 100%; 
-    padding: 5px; /* ★ボタンを極薄に */
+    padding: 10px; /* ★少し厚みを戻して「ボタン感」を出しました */
     border: none; 
-    border-radius: 6px; 
+    border-radius: 8px; 
     background: #607d8b; 
     color: white; 
-    font-size: 12px; 
+    font-size: 13px; 
     font-weight: bold; 
   }
   .ans-btn { background: #d32f2f; }
   
+  /* 顔と吹き出しのエリア */
   .hint-display-area { 
     display: none; 
-    margin-top: 2px; /* ★スキマゼロ */
+    margin-top: 15px; 
     align-items: flex-start; 
-    gap: 5px; 
+    gap: 10px; 
     text-align: left; 
   }
-  .chara { width: 45px; height: 45px; border-radius: 50%; border: 1px solid #ccc; flex-shrink: 0; }
-  .bubble { padding: 6px 10px; border-radius: 10px; color: white; font-size: 12px; line-height: 1.2; max-width: 80%; position: relative; }
+  .chara { width: 50px; height: 50px; border-radius: 50%; border: 1px solid #ccc; flex-shrink: 0; }
+  .bubble { padding: 10px; border-radius: 10px; color: white; font-size: 13px; line-height: 1.4; max-width: 75%; position: relative; }
   .riha { background:#2196f3; } .riha:before{content:"";position:absolute;left:-10px;top:10px;border:10px solid transparent;border-right:10px solid #2196f3;}
   .hiro { background:#4caf50; } .hiro:before{content:"";position:absolute;left:-10px;top:10px;border:10px solid transparent;border-right:10px solid #4caf50;}
   .seinan { background:#9c27b0; } .seinan:before{content:"";position:absolute;left:-10px;top:10px;border:10px solid transparent;border-right:10px solid #9c27b0;}
@@ -97,16 +102,16 @@
     <img src="hako.png" class="hako-img">
     <div class="input-area"><input id="a" type="text" placeholder="入力..."><button class="ok-btn" onclick="check()">OK</button></div>
     <div class="hint-list">
-      <button class="hint-btn" onclick="showHint('h1')">ヒント1</button>
-      <button class="hint-btn" onclick="showHint('h2')">ヒント2</button>
-      <button class="hint-btn" onclick="showHint('h3')">ヒント3</button>
+      <button class="hint-btn" onclick="showHint('h1')">ヒント1を見る</button>
+      <button class="hint-btn" onclick="showHint('h2')">ヒント2を見る</button>
+      <button class="hint-btn" onclick="showHint('h3')">ヒント3を見る</button>
       <button class="hint-btn ans-btn" onclick="askAnswer()">答えを見る</button>
     </div>
     <div id="hint_display" class="hint-display-area"><img id="chara_img" class="chara"><div id="hint_text" class="bubble"></div></div>
   </div>
 </div>
 <script>
-// スクリプトは同じなので省略
+// JavaScriptは変更なし
 const qNo = 1; const correctAns = "4969"; 
 const hintData = {
   h1: { text: "6が3回", img: "riha.png", type: "riha" },
