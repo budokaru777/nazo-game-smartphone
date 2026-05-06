@@ -9,11 +9,9 @@
 body {
   margin: 0;
   height: 100vh;
-  /* 画面の高さ100%を維持してスクロールさせない */
   overflow: hidden;
   font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
   
-  /* 背景画像：-250pxでかなり上に突き抜けさせています。画像の中心〜下部がメインで見える設定です */
   background: url("haikei.jpg") no-repeat;
   background-position: center -95px; 
   background-size: cover;
@@ -22,7 +20,7 @@ body {
   flex-direction: column;
 }
 
-/* アイコンコンテナ：画面上部に配置 */
+/* アイコンコンテナ */
 .menu-container {
   display: flex;
   justify-content: center;
@@ -67,36 +65,52 @@ body {
   text-align: center;
 }
 
-/* 中央のメインエリア：ここを広くとっています */
 .main-content {
   flex-grow: 1;
 }
 
-/* タスクバー：画面の一番下に固定 */
+/* タスクバー：検索フォーム */
 .taskbar {
-  position: fixed; /* 画面下部に固定 */
+  position: fixed;
   bottom: 0;
   width: 100%;
-  height: 50px;
+  height: 60px; /* 入力しやすいように少し高さを確保 */
   background: rgba(0, 0, 0, 0.85);
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-bottom: env(safe-area-inset-bottom); /* iPhone等のノッチ対策 */
+  padding-bottom: env(safe-area-inset-bottom);
   box-sizing: border-box;
 }
 
-.search-bar {
+/* 検索フォームのスタイル */
+.search-form {
   width: 92%;
-  height: 34px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 17px;
   display: flex;
   align-items: center;
-  padding-left: 15px;
-  color: white;
-  font-size: 13px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 5px 15px;
   border: 0.5px solid rgba(255, 255, 255, 0.2);
+}
+
+.search-icon {
+  color: white;
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+.search-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 14px;
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
 }
 </style>
 </head>
@@ -113,7 +127,7 @@ body {
 
   <a href="answer.html" class="icon-box">
     <div class="icon-image">
-      <img src="https://cdn-icons-png.flaticon.com/512/943/943147.png" alt="answer">
+      <img src="https://cdn-icons-png.flaticon.com/512/3503/3503827.png" alt="answer">
     </div>
     <div class="icon-label">回答する</div>
   </a>
@@ -136,9 +150,10 @@ body {
 <div class="main-content"></div>
 
 <div class="taskbar">
-  <div class="search-bar">
-    🔍 検索
-  </div>
+  <form class="search-form" action="https://www.google.com/search" method="get">
+    <span class="search-icon">🔍</span>
+    <input type="text" name="q" class="search-input" placeholder="検索ワードを入力..." autocomplete="off">
+  </form>
 </div>
 
 </body>
