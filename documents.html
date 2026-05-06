@@ -3,78 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>資料フォルダ</title>
+<title>資料一覧</title>
 <style>
-  html, body { margin: 0; padding: 0; height: 100%; width: 100%; font-family: sans-serif; background: #f0f0f0; }
+  html, body { margin: 0; padding: 0; height: 100%; width: 100%; font-family: sans-serif; background: #e0e0e0; }
   .header { background: #333; color: white; padding: 15px; text-align: center; font-weight: bold; }
-  .folder-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    padding: 20px;
-  }
-  .doc-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
-    color: #333;
-    position: relative;
-  }
+  .folder-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 25px; }
+  .doc-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #333; position: relative; }
   .doc-icon {
-    width: 60px;
-    height: 70px;
-    background: #fff;
-    border: 2px solid #ddd;
-    border-radius: 5px;
-    position: relative;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 24px;
+    width: 65px; height: 80px; background: #fff; border: 1px solid #bbb; border-radius: 4px;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.15); display: flex; justify-content: center; align-items: center; font-size: 30px;
   }
-  .doc-icon:before { /* 書類っぽく角を折る */
-    content: ""; position: absolute; top: -2px; right: -2px;
-    border-width: 0 15px 15px 0; border-style: solid; border-color: transparent #f0f0f0 transparent transparent;
-  }
-  .doc-label { margin-top: 8px; font-size: 12px; font-weight: bold; text-align: center; }
-  
-  /* ロック状態のスタイル */
-  .locked { opacity: 0.4; pointer-events: none; filter: grayscale(1); }
-  .lock-mark { position: absolute; top: 20px; font-size: 20px; }
+  .doc-label { margin-top: 10px; font-size: 11px; font-weight: bold; text-align: center; overflow-wrap: break-word; width: 80px; }
+  .locked { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
+  .lock-mark { position: absolute; top: 25px; font-size: 24px; z-index: 2; }
 </style>
 </head>
 <body>
-
-<div class="header">共有ストレージ - 資料一覧</div>
-
+<div class="header">共有ストレージ</div>
 <div class="folder-grid" id="grid">
   <a href="question1.html" class="doc-item" id="doc1">
     <div class="doc-icon">📄</div>
     <div class="doc-label">資料_01</div>
   </a>
-
   <script>
-    const titles = ["", "資料_01", "資料_02", "資料_03", "資料_04", "資料_05", "資料_06"];
-    // ローカルストレージから進行度を取得（なければ1）
     const progress = parseInt(localStorage.getItem("gameProgress") || 1);
-
     for (let i = 2; i <= 6; i++) {
       let isLocked = i > progress;
       document.write(`
-        <a href="question${i}.html" class="doc-item ${isLocked ? 'locked' : ''}" id="doc${i}">
+        <a href="question${i}.html" class="doc-item ${isLocked ? 'locked' : ''}">
           <div class="doc-icon">📄${isLocked ? '<span class="lock-mark">🔒</span>' : ''}</div>
-          <div class="doc-label">${titles[i]}</div>
+          <div class="doc-label">資料_0${i}</div>
         </a>
       `);
     }
   </script>
 </div>
-
-<div style="text-align:center; margin-top:30px;">
-  <button onclick="location.href='index.html'" style="padding:10px 20px; border-radius:20px; border:1px solid #999;">戻る</button>
+<div style="text-align:center; margin-top:20px;">
+  <button onclick="location.href='index.html'" style="padding:10px 20px; border-radius:20px; border:none; background:#666; color:white;">戻る</button>
 </div>
-
 </body>
 </html>
