@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>資料一覧</title>
+<title>資料フォルダ</title>
 <style>
   html, body { margin: 0; padding: 0; height: 100%; width: 100%; font-family: sans-serif; background: #e0e0e0; }
   .header { background: #333; color: white; padding: 15px; text-align: center; font-weight: bold; }
@@ -13,20 +13,24 @@
     width: 65px; height: 80px; background: #fff; border: 1px solid #bbb; border-radius: 4px;
     box-shadow: 2px 2px 8px rgba(0,0,0,0.15); display: flex; justify-content: center; align-items: center; font-size: 30px;
   }
-  .doc-label { margin-top: 10px; font-size: 11px; font-weight: bold; text-align: center; overflow-wrap: break-word; width: 80px; }
+  .doc-label { margin-top: 10px; font-size: 11px; font-weight: bold; text-align: center; width: 80px; }
   .locked { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
   .lock-mark { position: absolute; top: 25px; font-size: 24px; z-index: 2; }
 </style>
 </head>
 <body>
 <div class="header">共有ストレージ</div>
-<div class="folder-grid" id="grid">
-  <a href="question1.html" class="doc-item" id="doc1">
+<div class="folder-grid">
+  <a href="question1.html" class="doc-item">
     <div class="doc-icon">📄</div>
     <div class="doc-label">資料_01</div>
   </a>
+
   <script>
+    // 進行度（gameProgress）を取得。未クリアなら1。
     const progress = parseInt(localStorage.getItem("gameProgress") || 1);
+    
+    // 資料2〜6を生成
     for (let i = 2; i <= 6; i++) {
       let isLocked = i > progress;
       document.write(`
