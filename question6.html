@@ -1,19 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>資料</title>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; position: fixed; font-family: sans-serif; }
+  body { background: url("haikei.jpg") no-repeat center -95px/cover; display: flex; flex-direction: column; }
+  .main-content { flex-grow: 1; display: flex; justify-content: center; align-items: center; padding-bottom: 60px; }
+  .content-box { width: 88%; max-width: 380px; background: rgba(255, 255, 255, 0.95); padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+  
+  /* 箱の画像を大きく設定 */
+  .hako-img { width: 180px; height: auto; margin: 5px 0; }
+  
+  /* 入力エリアとヒントを上に詰める */
+  .input-area { display: flex; justify-content: center; gap: 8px; margin: 5px 0 10px 0; }
+  #a { width: 120px; height: 40px; font-size: 20px; border: 2px solid #333; border-radius: 8px; text-align: center; }
+  .ok-btn { height: 44px; padding: 0 15px; background: #222; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+  
+  .hint-list { display: flex; flex-direction: column; gap: 5px; }
+  .hint-btn { width: 100%; padding: 10px; border: none; border-radius: 8px; background: #607d8b; color: white; font-size: 13px; font-weight: bold; cursor: pointer; }
+  .ans-btn { background: #d32f2f; }
+  
+  .hint-display-area { display: none; margin-top: 10px; align-items: flex-start; gap: 10px; text-align: left; }
+  .chara { width: 50px; height: 50px; border-radius: 50%; border: 1px solid #ccc; flex-shrink: 0; }
+  .bubble { padding: 10px; border-radius: 10px; color: white; font-size: 13px; line-height: 1.4; max-width: 70%; position: relative; }
+  .riha { background:#2196f3; } .riha:before{content:"";position:absolute;left:-10px;top:10px;border:10px solid transparent;border-right:10px solid #2196f3;}
+  .hiro { background:#4caf50; } .hiro:before{content:"";position:absolute;left:-10px;top:10px;border:10px solid transparent;border-right:10px solid #4caf50;}
+  .seinan { background:#9c27b0; } .seinan:before{content:"";position:absolute;left:-10px;top:10px;border:10px solid transparent;border-right:10px solid #9c27b0;}
+</style>
+</head>
+<body>
+<div class="main-content">
+  <div class="content-box">
+    <h3 id="qTitle" style="margin:0 0 5px 0;">タイトル</h3>
+    <img src="hako.png" class="hako-img">
+    <div class="input-area"><input id="a" type="text" placeholder="入力..."><button class="ok-btn" onclick="check()">OK</button></div>
+    <div class="hint-list">
+      <button class="hint-btn" onclick="showHint('h1')">ヒント1を見る</button>
+      <button class="hint-btn" onclick="showHint('h2')">ヒント2を見る</button>
+      <button class="hint-btn" onclick="showHint('h3')">ヒント3を見る</button>
+      <button class="hint-btn ans-btn" onclick="askAnswer()">答えを見る</button>
+    </div>
+    <div id="hint_display" class="hint-display-area"><img id="chara_img" class="chara"><div id="hint_text" class="bubble"></div></div>
+  </div>
+</div>
 <script>
-const qNo = 6; const correctAns = "＝＝＝をかける"; 
+// ★★★ ここを書き換え ★★★
+const qNo = 6; 
+const correctAns = "＝＝＝をかける"; // 必要に応じて正しい答えに書き換えてください
+document.getElementById("qTitle").innerText = "調理法を導き出せ";
 const hintData = {
   h1: { text: "資料", img: "riha.png", type: "riha" },
   h2: { text: "SNS", img: "hiro.png", type: "hiro" },
   h3: { text: "音声と写真", img: "seinan.png", type: "seinan" },
-  a1: { text: "答えは「＝＝＝をかける」だよ！", img: "seinan.png", type: "seinan" }
+  a1: { text: "答えは「" + correctAns + "」だよ！", img: "seinan.png", type: "seinan" }
 };
+// ★★★★★★★★★★★★★★
+
 function check() {
   if(document.getElementById('a').value === correctAns) {
-    localStorage.setItem("nextPage", "clear.html"); // 最後だけクリア画面へ
-    localStorage.setItem("returnPage", "question6.html");
+    localStorage.setItem("nextPage", qNo === 6 ? "clear.html" : "documents.html");
+    localStorage.setItem("returnPage", "question" + qNo + ".html");
     location.href = "back.html";
   } else {
-    localStorage.setItem("returnPage", "question6.html");
+    localStorage.setItem("returnPage", "question" + qNo + ".html");
     location.href = "fail.html";
   }
 }
+function showHint(id){
+  document.getElementById('hint_display').style.display="flex";
+  document.getElementById('hint_text').innerText = hintData[id].text;
+  document.getElementById('chara_img').src = hintData[id].img;
+  document.getElementById('hint_text').className = "bubble " + hintData[id].type;
+}
+function askAnswer(){ if(confirm("答えを見ますか？")) showHint('a1'); }
 </script>
+</body>
+</html>
