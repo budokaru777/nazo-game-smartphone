@@ -7,14 +7,58 @@
 <style>
   html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; position: fixed; font-family: sans-serif; }
   body { background: url("haikei.jpg") no-repeat center -95px/cover; display: flex; flex-direction: column; }
-  .main-content { flex-grow: 1; display: flex; justify-content: center; align-items: center; padding-bottom: 60px; }
-  .content-box { width: 88%; max-width: 380px; background: rgba(255, 255, 255, 0.95); padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
-  .hako-img { width: 180px; height: auto; margin: 5px 0; }
+  
+  /* 【変更点1】上寄せにするため align-items を flex-start に変更、padding-top を追加 */
+  .main-content { 
+    flex-grow: 1; 
+    display: flex; 
+    justify-content: center; 
+    align-items: flex-start; /* center から変更 */
+    padding-top: 30px; /* 上部の余白を追加 */
+    padding-bottom: 60px; 
+  }
+  
+  /* 【変更点2】padding を少し詰めてコンパクトに */
+  .content-box { 
+    width: 88%; 
+    max-width: 380px; 
+    background: rgba(255, 255, 255, 0.95); 
+    padding: 15px; /* 20px などから少し縮小 */
+    border-radius: 15px; 
+    text-align: center; 
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4); 
+  }
+  
+  /* 【変更点3】箱の画像の width を 180px から 220px に拡大 */
+  .hako-img { 
+    width: 220px; /* 拡大 */
+    height: auto; 
+    margin: 5px 0; 
+  }
+  
   .input-area { display: flex; justify-content: center; gap: 8px; margin: 5px 0 10px 0; }
   #a { width: 120px; height: 40px; font-size: 20px; border: 2px solid #333; border-radius: 8px; text-align: center; }
   .ok-btn { height: 44px; padding: 0 15px; background: #222; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-  .hint-list { display: flex; flex-direction: column; gap: 5px; }
-  .hint-btn { width: 100%; padding: 10px; border: none; border-radius: 8px; background: #607d8b; color: white; font-size: 13px; font-weight: bold; cursor: pointer; }
+  
+  /* 【変更点4】ヒントリストの gap（間隔）を 5px から 3px に詰める */
+  .hint-list { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 3px; /* 縮小 */
+  }
+  
+  /* 【変更点5】ヒントボタンの padding を 10px から 8px に詰める */
+  .hint-btn { 
+    width: 100%; 
+    padding: 8px; /* 縮小 */
+    border: none; 
+    border-radius: 8px; 
+    background: #607d8b; 
+    color: white; 
+    font-size: 13px; 
+    font-weight: bold; 
+    cursor: pointer; 
+  }
   .ans-btn { background: #d32f2f; }
   .hint-display-area { display: none; margin-top: 10px; align-items: flex-start; gap: 10px; text-align: left; }
   .chara { width: 50px; height: 50px; border-radius: 50%; border: 1px solid #ccc; flex-shrink: 0; }
@@ -27,7 +71,7 @@
 <body>
 <div class="main-content">
   <div class="content-box">
-    <h3>小箱を開けろ</h3>
+    <h3 style="margin:0 0 5px 0;">小箱を開けろ</h3>
     <img src="hako.png" class="hako-img">
     <div class="input-area"><input id="a" type="text" placeholder="入力..."><button class="ok-btn" onclick="check()">OK</button></div>
     <div class="hint-list">
@@ -40,6 +84,7 @@
   </div>
 </div>
 <script>
+// (スクリプト部分は変更なし)
 const qNo = 1; 
 const correctAns = "4969"; 
 const hintData = {
@@ -51,7 +96,6 @@ const hintData = {
 
 function check() {
   if(document.getElementById('a').value === correctAns) {
-    // 次に飛ぶページを documents.html に指定
     localStorage.setItem("nextPage", "documents.html");
     localStorage.setItem("returnPage", "question1.html");
     location.href = "back.html";
