@@ -27,40 +27,41 @@
 <body>
 <div class="main-content">
   <div class="content-box">
-    <h3 style="margin:0;">小箱を開けろ</h3>
+    <h3>小箱を開けろ</h3>
     <img src="hako.png" class="q-img">
     <div class="input-area">
       <input id="a" type="text" pattern="[0-9]*" inputmode="numeric" placeholder="数字">
       <button class="ok-btn" onclick="check()">OK</button>
     </div>
     <div class="hint-list">
-      <button class="hint-btn" onclick="showHint('h1')">ヒント1を見る</button>
-      <button class="hint-btn" onclick="showHint('h2')">ヒント2を見る</button>
-      <button class="hint-btn" onclick="showHint('h3')">ヒント3を見る</button>
+      <button class="hint-btn" onclick="showHint('h1')">ヒント1</button>
+      <button class="hint-btn" onclick="showHint('h2')">ヒント2</button>
+      <button class="hint-btn" onclick="showHint('h3')">ヒント3</button>
       <button class="hint-btn ans-btn" onclick="askAnswer()">答えを見る</button>
     </div>
     <div id="hint_display" class="hint-display">
-      <img id="chara_img" class="chara" src="">
+      <img id="chara_img" class="chara">
       <div id="hint_text" class="bubble"></div>
     </div>
   </div>
 </div>
 <script>
-const qNo = 1;
-const correctAns = "4969";
+const qNo = 1; const correctAns = "4969";
 const hintData = {
   h1: { text: "6が3回", img: "riha.png", type: "riha" },
   h2: { text: "ハホヘ", img: "hiro.png", type: "hiro" },
   h3: { text: "あいうえお表", img: "seinan.png", type: "seinan" },
-  a1: { text: "答えは " + correctAns + " だよ！", img: "seinan.png", type: "seinan" }
+  a1: { text: "答えは「4969」だよ！", img: "seinan.png", type: "seinan" }
 };
 function check() {
   if(document.getElementById('a').value === correctAns) {
-    let prog = parseInt(localStorage.getItem("gameProgress") || 1);
-    if(prog === qNo) localStorage.setItem("gameProgress", qNo + 1);
-    alert("正解！");
-    location.href = "index.html";
-  } else { location.href = "fail.html"; }
+    localStorage.setItem("nextPage", "index.html");
+    localStorage.setItem("returnPage", "question1.html");
+    location.href = "back.html";
+  } else {
+    localStorage.setItem("returnPage", "question1.html");
+    location.href = "fail.html";
+  }
 }
 function showHint(id){
   const area = document.getElementById('hint_display');
