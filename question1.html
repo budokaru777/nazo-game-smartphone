@@ -21,7 +21,6 @@
 
   .hako-img { width: 100%; max-width: 280px; height: auto; margin-bottom: 15px; }
 
-  /* 入力欄とOKボタンを横並びにする */
   .input-row { 
     display: flex; 
     justify-content: center; 
@@ -49,7 +48,6 @@
     cursor: pointer; 
   }
 
-  /* ヒントセクションのレイアウト */
   .hint-section { 
     display: flex; 
     flex-direction: column; 
@@ -64,22 +62,25 @@
     position: relative;
   }
 
-  /* ヒントアイコン（丸） */
+  /* アイコン部分：画像が表示されるように調整 */
   .hint-icon { 
-    width: 40px; 
-    height: 40px; 
+    width: 45px; 
+    height: 45px; 
     border-radius: 50%; 
-    background: #ddd; 
+    background: #fff; 
     display: flex; 
     justify-content: center; 
     align-items: center; 
-    font-size: 12px; 
-    font-weight: bold; 
     flex-shrink: 0;
-    border: 1px solid #999;
+    border: 1px solid #ccc;
+    overflow: hidden; /* 画像が丸からはみ出ないように */
+  }
+  .hint-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 枠いっぱいに綺麗に表示 */
   }
 
-  /* ヒントを見るボタン */
   .hint-btn { 
     flex: 1; 
     max-width: 140px;
@@ -93,10 +94,9 @@
     cursor: pointer; 
   }
 
-  /* LINE風吹き出し（右側に出る） */
   .bubble-msg { 
     display: none; 
-    background: #75ef66; /* LINE風の緑色 */
+    background: #75ef66; 
     padding: 8px 12px; 
     border-radius: 12px; 
     font-size: 12px; 
@@ -127,19 +127,19 @@
 
   <div class="hint-section">
     <div class="hint-row">
-      <div class="hint-icon" style="background:#bbdefb;">リセ</div>
+      <div class="hint-icon"><img src="riha.png" alt="riha"></div>
       <button class="hint-btn" onclick="showBubble('h1')">ヒント1を見る</button>
       <div id="h1" class="bubble-msg">6が3回だよ</div>
     </div>
 
     <div class="hint-row">
-      <div class="hint-icon" style="background:#c8e6c9;">ヒロ</div>
+      <div class="hint-icon"><img src="hiro.png" alt="hiro"></div>
       <button class="hint-btn" onclick="showBubble('h2')">ヒント2を見る</button>
       <div id="h2" class="bubble-msg">ハホヘを見て</div>
     </div>
 
     <div class="hint-row">
-      <div class="hint-icon" style="background:#e1bee7;">セイ</div>
+      <div class="hint-icon"><img src="seinan.png" alt="seinan"></div>
       <button class="hint-btn" onclick="showBubble('h3')">ヒント3を見る</button>
       <div id="h3" class="bubble-msg">あいうえお表！</div>
     </div>
@@ -151,7 +151,7 @@
 </div>
 
 <script>
-const correctAns = "4965"; // ラフ画に合わせて修正
+const correctAns = "4965";
 
 function check() {
   const val = document.getElementById('a').value;
@@ -163,11 +163,8 @@ function check() {
   }
 }
 
-// 吹き出しを表示する関数
 function showBubble(id) {
-  // 一旦全部消す
   document.querySelectorAll('.bubble-msg').forEach(b => b.style.display = 'none');
-  // 指定したものだけ出す
   document.getElementById(id).style.display = 'block';
 }
 
