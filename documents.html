@@ -2,32 +2,79 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>資料一覧</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>資料フォルダ</title>
 <style>
-  body { margin:0; padding:20px; font-family:sans-serif; background:url("haikei.jpg") center/cover fixed; }
-  .file-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
-  .file-item { text-align: center; cursor: pointer; text-decoration: none; color: white; text-shadow: 1px 1px 2px #000; }
-  .file-item img { width: 60px; background: rgba(255,255,255,0.8); border-radius: 10px; padding: 5px; }
-  .file-label { font-size: 12px; font-weight: bold; margin-top: 5px; }
+  html, body { margin: 0; padding: 0; height: 100%; width: 100%; font-family: sans-serif; background: #f0f0f0; }
+  .header { background: #333; color: white; padding: 15px; text-align: center; font-weight: bold; }
+  .folder-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 20px;
+  }
+  .doc-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+    position: relative;
+  }
+  .doc-icon {
+    width: 60px;
+    height: 70px;
+    background: #fff;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    position: relative;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+  }
+  .doc-icon:before { /* 書類っぽく角を折る */
+    content: ""; position: absolute; top: -2px; right: -2px;
+    border-width: 0 15px 15px 0; border-style: solid; border-color: transparent #f0f0f0 transparent transparent;
+  }
+  .doc-label { margin-top: 8px; font-size: 12px; font-weight: bold; text-align: center; }
+  
+  /* ロック状態のスタイル */
+  .locked { opacity: 0.4; pointer-events: none; filter: grayscale(1); }
+  .lock-mark { position: absolute; top: 20px; font-size: 20px; }
 </style>
 </head>
 <body>
-<div class="file-grid" id="fileGrid"></div>
 
-<script>
-  // 進行度を取得（未プレイなら1）
-  const progress = parseInt(localStorage.getItem("gameProgress") || 1);
-  const grid = document.getElementById("fileGrid");
+<div class="header">共有ストレージ - 資料一覧</div>
 
-  for (let i = 1; i <= progress; i++) {
-    if (i > 6) break; 
-    const a = document.createElement("a");
-    a.href = "question" + i + ".html";
-    a.className = "file-item";
-    a.innerHTML = `<img src="https://cdn-icons-png.flaticon.com/512/716/716784.png"><div class="file-label">資料${i}</div>`;
-    grid.appendChild(a);
-  }
-</script>
+<div class="folder-grid" id="grid">
+  <a href="question1.html" class="doc-item" id="doc1">
+    <div class="doc-icon">📄</div>
+    <div class="doc-label">資料_01</div>
+  </a>
+
+  <script>
+    const titles = ["", "資料_01", "資料_02", "資料_03", "資料_04", "資料_05", "資料_06"];
+    // ローカルストレージから進行度を取得（なければ1）
+    const progress = parseInt(localStorage.getItem("gameProgress") || 1);
+
+    for (let i = 2; i <= 6; i++) {
+      let isLocked = i > progress;
+      document.write(`
+        <a href="question${i}.html" class="doc-item ${isLocked ? 'locked' : ''}" id="doc${i}">
+          <div class="doc-icon">📄${isLocked ? '<span class="lock-mark">🔒</span>' : ''}</div>
+          <div class="doc-label">${titles[i]}</div>
+        </a>
+      `);
+    }
+  </script>
+</div>
+
+<div style="text-align:center; margin-top:30px;">
+  <button onclick="location.href='index.html'" style="padding:10px 20px; border-radius:20px; border:1px solid #999;">戻る</button>
+</div>
+
 </body>
 </html>
