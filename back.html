@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>正解！</title>
+<style>
+  html, body { margin: 0; height: 100%; width: 100%; overflow: hidden; position: fixed; font-family: sans-serif; }
+  body { 
+    background: url("haikei.jpg") no-repeat center/cover;
+    display: flex; justify-content: center; align-items: center;
+  }
+  .box {
+    width: 85%;
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 25px 15px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+  .clear-img {
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    margin-bottom: 20px;
+  }
+  h2 { font-size: 18px; color: #333; margin-bottom: 20px; line-height: 1.4; }
+  .next-btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background: #4caf50; /* 成功の緑色 */
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #388e3c;
+  }
+  .next-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #388e3c; }
+</style>
+</head>
+<body>
+
+<div class="box">
+  <img src="クリア画面.png" class="clear-img" alt="正解">
+  <h2>正解だ！<br>本誌に戻って物語を進めよう。</h2>
+  <button class="next-btn" onclick="goNext()">次へ進む</button>
+</div>
+
+<script>
+function goNext() {
+  // 現在の問題番号を取得（question1.htmlなら1）
+  const lastPage = localStorage.getItem("returnPage") || "question1.html";
+  const currentQNo = parseInt(lastPage.replace(/[^0-9]/g, "")) || 1;
+
+  // 進行度を更新して資料一覧を解放
+  let prog = parseInt(localStorage.getItem("gameProgress") || 1);
+  if (prog <= currentQNo) {
+    localStorage.setItem("gameProgress", currentQNo + 1);
+  }
+
+  // index.html（検索ページ）に戻る
+  location.href = "index.html";
+}
+</script>
+</body>
+</html>
