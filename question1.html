@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>資料</title>
+<title>資料1</title>
 <style>
   html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; position: fixed; font-family: sans-serif; }
   body { background: url("haikei.jpg") no-repeat center -95px/cover; display: flex; flex-direction: column; }
@@ -13,7 +13,7 @@
   /* 箱の画像を大きく設定 */
   .hako-img { width: 180px; height: auto; margin: 5px 0; }
   
-  /* 入力エリアとヒントを上に詰める */
+  /* 入力とヒントを上に詰める */
   .input-area { display: flex; justify-content: center; gap: 8px; margin: 5px 0 10px 0; }
   #a { width: 120px; height: 40px; font-size: 20px; border: 2px solid #333; border-radius: 8px; text-align: center; }
   .ok-btn { height: 44px; padding: 0 15px; background: #222; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
@@ -33,7 +33,7 @@
 <body>
 <div class="main-content">
   <div class="content-box">
-    <h3 id="qTitle" style="margin:0 0 5px 0;">タイトル</h3>
+    <h3 style="margin:0 0 5px 0;">小箱を開けろ</h3>
     <img src="hako.png" class="hako-img">
     <div class="input-area"><input id="a" type="text" placeholder="入力..."><button class="ok-btn" onclick="check()">OK</button></div>
     <div class="hint-list">
@@ -46,25 +46,24 @@
   </div>
 </div>
 <script>
-// ★★★ ここを書き換え ★★★
 const qNo = 1; 
 const correctAns = "4969"; 
-document.getElementById("qTitle").innerText = "小箱を開けろ";
 const hintData = {
   h1: { text: "6が3回", img: "riha.png", type: "riha" },
   h2: { text: "ハホヘ", img: "hiro.png", type: "hiro" },
   h3: { text: "あいうえお表", img: "seinan.png", type: "seinan" },
   a1: { text: "答えは「" + correctAns + "」だよ！", img: "seinan.png", type: "seinan" }
 };
-// ★★★★★★★★★★★★★★
 
 function check() {
   if(document.getElementById('a').value === correctAns) {
-    localStorage.setItem("nextPage", qNo === 6 ? "clear.html" : "documents.html");
-    localStorage.setItem("returnPage", "question" + qNo + ".html");
+    // 正解時：仲介ページに戻る設定
+    localStorage.setItem("nextPage", "documents.html");
+    localStorage.setItem("returnPage", "question1.html");
     location.href = "back.html";
   } else {
-    localStorage.setItem("returnPage", "question" + qNo + ".html");
+    // 不正解時：問題に戻る設定
+    localStorage.setItem("returnPage", "question1.html");
     location.href = "fail.html";
   }
 }
