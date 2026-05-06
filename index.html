@@ -13,12 +13,14 @@
   .menu-container { display: flex; justify-content: center; gap: 8px; padding-top: 20px; z-index: 10; }
   .icon-box { display: flex; flex-direction: column; align-items: center; width: 22%; text-decoration: none; -webkit-tap-highlight-color: transparent; }
   .icon-image {
-    width: 50px; height: 50px; background: rgba(255, 255, 255, 0.9); border: 1px solid #444; border-radius: 10px;
-    display: flex; justify-content: center; align-items: center; margin-bottom: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    width: 55px; height: 55px; background: rgba(255, 255, 255, 0.9); border: 1px solid #444; border-radius: 12px;
+    display: flex; justify-content: center; align-items: center; margin-bottom: 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   }
-  .icon-image img { width: 30px; height: 30px; }
-  .icon-label { color: white; font-weight: bold; font-size: 10px; text-shadow: 1px 1px 3px #000; text-align: center; }
+  .icon-image img { width: 35px; height: 35px; }
+  .icon-label { color: white; font-weight: bold; font-size: 11px; text-shadow: 1px 1px 4px #000; text-align: center; }
+  
   .main-content { flex-grow: 1; }
+  
   .taskbar { position: fixed; bottom: 0; width: 100%; height: 60px; background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center; padding-bottom: env(safe-area-inset-bottom); }
   .search-form { width: 92%; display: flex; align-items: center; background: rgba(255, 255, 255, 0.15); border-radius: 20px; padding: 5px 15px; border: 0.5px solid rgba(255, 255, 255, 0.2); }
   .search-input { width: 100%; background: transparent; border: none; color: white; font-size: 16px; outline: none; }
@@ -31,11 +33,11 @@
     <div class="icon-image"><img src="https://cdn-icons-png.flaticon.com/512/716/716784.png"></div>
     <div class="icon-label">資料一覧</div>
   </a>
-  <a href="answer.html" class="icon-box">
+  <a href="question1.html" class="icon-box">
     <div class="icon-image"><img src="https://cdn-icons-png.flaticon.com/512/3503/3503827.png"></div>
     <div class="icon-label">回答する</div>
   </a>
-  <a href="howtoplay.html" class="icon-box">
+  <a href="manual.html" class="icon-box">
     <div class="icon-image"><img src="https://cdn-icons-png.flaticon.com/512/1828/1828940.png"></div>
     <div class="icon-label">遊び方</div>
   </a>
@@ -49,8 +51,8 @@
 
 <div class="taskbar">
   <form class="search-form" onsubmit="doSearch(event)">
-    <button type="submit" style="background:none; border:none; color:white;">🔍</button>
-    <input type="text" id="searchInput" class="search-input" placeholder="検索..." autocomplete="off">
+    <button type="submit" style="background:none; border:none; color:white; font-size:18px;">🔍</button>
+    <input type="text" id="searchInput" class="search-input" placeholder="Googleで検索..." autocomplete="off">
   </form>
 </div>
 
