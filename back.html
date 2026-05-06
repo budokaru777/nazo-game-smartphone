@@ -3,67 +3,74 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>正解！</title>
+<title>資料1</title>
 <style>
   html, body { margin: 0; height: 100%; width: 100%; overflow: hidden; position: fixed; font-family: sans-serif; }
-  body { 
-    background: url("haikei.jpg") no-repeat center/cover;
-    display: flex; justify-content: center; align-items: center;
-  }
-  .box {
-    width: 85%;
-    max-width: 400px;
-    background: rgba(255, 255, 255, 0.95);
-    padding: 25px 15px;
-    border-radius: 20px;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  }
-  .clear-img {
-    width: 100%;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    margin-bottom: 20px;
-  }
-  h2 { font-size: 18px; color: #333; margin-bottom: 20px; line-height: 1.4; }
-  .next-btn {
-    width: 100%;
-    padding: 15px;
-    font-size: 18px;
-    font-weight: bold;
-    color: white;
-    background: #4caf50; /* 成功の緑色 */
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    box-shadow: 0 4px 0 #388e3c;
-  }
-  .next-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #388e3c; }
+  body { background: url("haikei.jpg") no-repeat center -95px/cover; display: flex; flex-direction: column; }
+  .main-content { flex-grow: 1; display: flex; justify-content: center; align-items: center; padding: 10px; padding-bottom: 80px; }
+  .content-box { width: 90%; max-width: 380px; background: rgba(255, 255, 255, 0.92); padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+  .q-img { width: 130px; margin: 10px 0; }
+  .input-area { display: flex; justify-content: center; gap: 8px; margin: 15px 0; }
+  #a { width: 120px; height: 40px; font-size: 22px; text-align: center; border: 2px solid #333; border-radius: 8px; }
+  .ok-btn { height: 44px; padding: 0 20px; background: #222; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+  .hint-list { display: flex; flex-direction: column; gap: 8px; }
+  .hint-btn { width: 100%; padding: 12px; border: none; border-radius: 10px; background: #607d8b; color: white; font-weight: bold; cursor: pointer; }
+  .ans-btn { background: #d32f2f; }
+  .hint-display { display: none; margin-top: 15px; align-items: flex-start; gap: 10px; text-align: left; }
+  .chara { width: 55px; height: 55px; border-radius: 50%; border: 1px solid #ccc; flex-shrink: 0; }
+  .bubble { padding: 10px; border-radius: 10px; color: white; position: relative; font-size: 13px; line-height: 1.5; max-width: 70%; }
+  .riha { background:#2196f3; } .riha:before{content:"";position:absolute;left:-10px;top:10px;border:10px solid transparent;border-right:10px solid #2196f3;}
+  .hiro { background:#4caf50; } .hiro:before{content:"";position:absolute;left:-10px;top:10px;border:10px solid transparent;border-right:10px solid #4caf50;}
+  .seinan { background:#9c27b0; } .seinan:before{content:"";position:absolute;left:-10px;top:10px;border:10px solid transparent;border-right:10px solid #9c27b0;}
 </style>
 </head>
 <body>
-
-<div class="box">
-  <img src="クリア画面.png" class="clear-img" alt="正解">
-  <h2>正解だ！<br>本誌に戻って物語を進めよう。</h2>
-  <button class="next-btn" onclick="goNext()">次へ進む</button>
+<div class="main-content">
+  <div class="content-box">
+    <h3>小箱を開けろ</h3>
+    <img src="hako.png" class="q-img">
+    <div class="input-area">
+      <input id="a" type="text" pattern="[0-9]*" inputmode="numeric" placeholder="数字">
+      <button class="ok-btn" onclick="check()">OK</button>
+    </div>
+    <div class="hint-list">
+      <button class="hint-btn" onclick="showHint('h1')">ヒント1</button>
+      <button class="hint-btn" onclick="showHint('h2')">ヒント2</button>
+      <button class="hint-btn" onclick="showHint('h3')">ヒント3</button>
+      <button class="hint-btn ans-btn" onclick="askAnswer()">答えを見る</button>
+    </div>
+    <div id="hint_display" class="hint-display">
+      <img id="chara_img" class="chara">
+      <div id="hint_text" class="bubble"></div>
+    </div>
+  </div>
 </div>
-
 <script>
-function goNext() {
-  // 現在の問題番号を取得（question1.htmlなら1）
-  const lastPage = localStorage.getItem("returnPage") || "question1.html";
-  const currentQNo = parseInt(lastPage.replace(/[^0-9]/g, "")) || 1;
-
-  // 進行度を更新して資料一覧を解放
-  let prog = parseInt(localStorage.getItem("gameProgress") || 1);
-  if (prog <= currentQNo) {
-    localStorage.setItem("gameProgress", currentQNo + 1);
+const qNo = 1; const correctAns = "4969";
+const hintData = {
+  h1: { text: "6が3回", img: "riha.png", type: "riha" },
+  h2: { text: "ハホヘ", img: "hiro.png", type: "hiro" },
+  h3: { text: "あいうえお表", img: "seinan.png", type: "seinan" },
+  a1: { text: "答えは「4969」だよ！", img: "seinan.png", type: "seinan" }
+};
+function check() {
+  if(document.getElementById('a').value === correctAns) {
+    localStorage.setItem("nextPage", "index.html");
+    localStorage.setItem("returnPage", "question1.html");
+    location.href = "back.html";
+  } else {
+    localStorage.setItem("returnPage", "question1.html");
+    location.href = "fail.html";
   }
-
-  // index.html（検索ページ）に戻る
-  location.href = "index.html";
 }
+function showHint(id){
+  const area = document.getElementById('hint_display');
+  area.style.display="flex";
+  document.getElementById('hint_text').innerText = hintData[id].text;
+  document.getElementById('chara_img').src = hintData[id].img;
+  document.getElementById('hint_text').className = "bubble " + hintData[id].type;
+}
+function askAnswer() { if(confirm("答えを見ますか？")) showHint('a1'); }
 </script>
 </body>
 </html>
