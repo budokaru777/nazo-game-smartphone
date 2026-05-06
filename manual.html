@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>遊びかた</title>
+<style>
+  body { margin: 0; background: #f4f4f4; font-family: sans-serif; color: #333; line-height: 1.6; }
+  .header { background: #333; color: white; text-align: center; padding: 15px; font-weight: bold; position: sticky; top: 0; z-index: 100; }
+  
+  .container { padding: 20px; max-width: 500px; margin: 0 auto; background: white; min-height: 100vh; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+  
+  .step { margin-bottom: 30px; border-bottom: 2px dashed #eee; padding-bottom: 20px; }
+  .step-num { display: inline-block; background: #4caf50; color: white; padding: 2px 12px; border-radius: 20px; font-size: 14px; margin-bottom: 10px; }
+  .step-title { font-weight: bold; font-size: 18px; display: block; margin-bottom: 10px; }
+  
+  .manual-img { width: 100%; border-radius: 10px; border: 1px solid #ddd; margin-bottom: 10px; }
+  
+  .point-box { background: #fff9c4; padding: 10px; border-radius: 8px; font-size: 14px; border-left: 5px solid #fbc02d; }
+  
+  .back-btn { 
+    display: block; width: 100%; padding: 15px; background: #607d8b; color: white; 
+    text-align: center; text-decoration: none; border-radius: 10px; font-weight: bold; margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">遊びかた説明書</div>
+
+<div class="container">
+  
+  <div class="step">
+    <span class="step-num">STEP 1</span>
+    <span class="step-title">資料を読み解く</span>
+    <p>「資料一覧」から手に入れた資料を確認しましょう。物語を進めるヒントが隠されています。</p>
+  </div>
+
+  <div class="step">
+    <span class="step-num">STEP 2</span>
+    <span class="step-title">謎を解き、キーワードを入力</span>
+    <p>資料をもとに答えを導き出し、入力欄に半角数字（または指定された文字）で入力して「OK」を押しましょう。</p>
+  </div>
+
+  <div class="step">
+    <span class="step-num">STEP 3</span>
+    <span class="step-title">困ったらヒントを活用</span>
+    <p>各キャラクターのアイコンを押すと、LINE風の吹き出しでヒントを教えてくれます。どうしても分からない時は「答えを見る」も使えます。</p>
+    <div class="point-box">※答えを見ると楽しみが減ってしまうので、最後の手段にしましょう！</div>
+  </div>
+
+  <div class="step">
+    <span class="step-num">STEP 4</span>
+    <span class="step-title">本誌へ戻る</span>
+    <p>正解すると、新しい資料が解放されます。画面の指示に従って本誌（物語）へ戻り、次の謎へ進みましょう。</p>
+  </div>
+
+  <a href="javascript:history.back()" class="back-btn">戻る</a>
+</div>
+
+</body>
+</html>
