@@ -2,55 +2,20 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>失敗...</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>不正解</title>
 <style>
-  html, body { margin: 0; height: 100%; width: 100%; overflow: hidden; position: fixed; font-family: sans-serif; }
-  body { 
-    background: url("haikei.jpg") no-repeat center/cover;
-    display: flex; justify-content: center; align-items: center;
-  }
-  .box {
-    width: 85%;
-    max-width: 400px;
-    background: rgba(255, 255, 255, 0.95);
-    padding: 25px 15px;
-    border-radius: 20px;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  }
-  .fail-img {
-    width: 100%;
-    border-radius: 10px;
-    margin-bottom: 20px;
-  }
-  h2 { font-size: 18px; color: #d32f2f; margin-bottom: 20px; }
-  .back-btn {
-    width: 100%;
-    padding: 15px;
-    font-size: 16px;
-    font-weight: bold;
-    color: white;
-    background: #333;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-  }
+  body { margin:0; height:100vh; background:url("haikei.jpg") center/cover; display:flex; justify-content:center; align-items:center; font-family:sans-serif; }
+  .box { background:rgba(255,255,255,0.95); padding:25px; border-radius:15px; text-align:center; width:80%; max-width:350px; }
+  .fail-img { width:100%; border-radius:10px; margin-bottom:15px; }
+  button { width:100%; padding:15px; font-size:16px; background:#333; color:white; border:none; border-radius:10px; }
 </style>
 </head>
 <body>
-
 <div class="box">
-  <img src="失敗画面.png" class="fail-img" alt="失敗">
-  <h2>入力が違うようだ…</h2>
-  <button class="back-btn" onclick="goBack()">もう一度考える</button>
+  <img src="失敗画面.png" class="fail-img">
+  <h2 style="color:#d32f2f;">入力が違うようだ…</h2>
+  <button onclick="location.href=localStorage.getItem('returnPage')">戻って考え直す</button>
 </div>
-
-<script>
-function goBack() {
-  // 元の問題ページに戻る
-  location.href = localStorage.getItem("returnPage") || "index.html";
-}
-</script>
 </body>
 </html>
