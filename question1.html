@@ -19,42 +19,41 @@
   .content-box { 
     width: 95%; 
     max-width: 400px; 
-    /* ★背景の白を少し薄くし、境界線を消してさらに上への一体感を出す */
     background: rgba(255, 255, 255, 0.9); 
     padding: 0px 10px 15px 10px; 
     border-radius: 15px; 
     text-align: center; 
-    /* ★今の10倍のさらに4倍、つまり「かつてないほど上」へ */
-    margin-top: -140px; 
+    /* 画面最上部へ配置 */
+    margin-top: -100px; 
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
   }
 
   h3 {
     margin: 0 !important;
-    font-size: 12px;
-    color: #666;
+    font-size: 14px;
+    color: #444;
     position: relative;
-    top: 150px; /* ★タイトルをあえて箱の下まで逃がす */
+    top: 110px; /* タイトルを箱の下に配置 */
     z-index: 5;
   }
   
   .hako-img { 
     width: 300px; 
     height: auto; 
-    /* ★箱の下半分を完全に無視して次の要素を吸い上げる */
-    margin: 0 auto -110px auto; 
+    /* 下のマージンを0にして、次の入力欄と密着させる */
+    margin: 0 auto 0 auto; 
     display: block;
     position: relative;
     z-index: 1;
     filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
   }
   
-  /* 入力欄：箱に完全にかぶる勢いで上に配置 */
+  /* 【重要】入力エリア：箱の真下にピタッと配置 */
   .input-area { 
     display: flex; 
     justify-content: center; 
     gap: 10px; 
-    margin-bottom: 25px; 
+    margin: 0px 0 20px 0; /* 上の隙間を0に、下のボタンとの隙間を20pxに */
     position: relative;
     z-index: 10;
   }
@@ -62,7 +61,6 @@
   #a { width: 120px; height: 40px; font-size: 20px; border: 2px solid #333; border-radius: 8px; text-align: center; background: white; }
   .ok-btn { height: 44px; padding: 0 15px; background: #222; color: white; border: none; border-radius: 8px; font-weight: bold; }
   
-  /* ヒントボタン：押しやすさを保ちつつ、位置は高いまま */
   .hint-list { 
     display: flex; 
     flex-direction: column; 
@@ -81,7 +79,6 @@
   }
   .ans-btn { background: #d32f2f; }
   
-  /* ヒント表示エリア */
   .hint-display-area { 
     display: none; 
     margin-top: 15px; 
@@ -112,7 +109,6 @@
   </div>
 </div>
 <script>
-// JavaScript部分はロジック維持のため変更なし
 const qNo = 1; const correctAns = "4969"; 
 const hintData = {
   h1: { text: "6が3回", img: "riha.png", type: "riha" },
