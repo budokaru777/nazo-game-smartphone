@@ -2,25 +2,125 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ALL CLEAR</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>GAME CLEAR!!</title>
 <style>
+  html, body { margin: 0; padding: 0; min-height: 100%; font-family: sans-serif; }
   body { 
-    margin: 0; height: 100vh; 
-    background: #000; color: gold; 
-    display: flex; flex-direction: column; 
-    justify-content: center; align-items: center;
-    font-family: serif;
-    text-align: center;
+    background: url("haikei.jpg") no-repeat center top/cover; 
+    background-attachment: fixed; 
+    display: flex; 
+    justify-content: center; 
+    align-items: flex-start; 
+    padding: 30px 10px; 
+    box-sizing: border-box; 
   }
-  .title { font-size: 40px; letter-spacing: 5px; margin-bottom: 10px; }
-  .msg { font-size: 18px; color: white; }
+  
+  .content-box { 
+    width: 100%; max-width: 380px; 
+    background: rgba(255, 255, 255, 0.96); 
+    padding: 30px 20px; 
+    border-radius: 25px; 
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4); 
+    box-sizing: border-box;
+    border: 3px solid #ffb300; /* 金色の豪華な枠線 */
+  }
+
+  /* お祝いのタイトルアニメーション */
+  h1 { 
+    color: #ff9100; 
+    font-size: 24px; 
+    margin: 0 0 10px 0; 
+    font-weight: bold; 
+    text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 0 4px 8px rgba(0,0,0,0.2);
+    animation: celebrate 1s ease-in-out infinite alternate;
+  }
+  @keyframes celebrate {
+    0% { transform: scale(0.98); }
+    100% { transform: scale(1.04); color: #ff3d00; }
+  }
+
+  .thank-text { 
+    font-size: 14px; 
+    color: #424242; 
+    line-height: 1.6; 
+    margin-bottom: 25px; 
+    font-weight: bold; 
+  }
+
+  /* クリア記念画像（fin.png）の表示エリア */
+  .fin-image-container {
+    width: 100%;
+    background: #fff;
+    border-radius: 15px;
+    padding: 8px;
+    box-sizing: border-box;
+    margin-bottom: 25px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+  }
+  .fin-img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    display: block;
+    animation: fadeInImg 1.5s ease-in-out;
+  }
+  @keyframes fadeInImg {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* タイトルに戻る（リセット）ボタン */
+  .restart-btn {
+    display: block; 
+    width: 100%; 
+    padding: 14px;
+    background: linear-gradient(135deg, #ffb300, #ff6f00); 
+    color: white; 
+    border: none; 
+    border-radius: 12px;
+    font-size: 15px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    text-decoration: none;
+    box-sizing: border-box; 
+    box-shadow: 0 4px 0 #b35c00;
+    transition: background 0.2s;
+  }
+  .restart-btn:active { 
+    transform: translateY(2px); 
+    box-shadow: 0 2px 0 #b35c00; 
+  }
 </style>
 </head>
 <body>
-  <div class="title">CASE CLOSED</div>
-  <div class="msg">すべての謎を解き明かした！</div>
-  <br>
-  <button onclick="location.href='index.html'" style="background:none; border:1px solid gold; color:gold; padding:10px 20px; cursor:pointer;">TOPに戻る</button>
+
+<div class="content-box">
+  <h1>🎉 GAME CLEAR !! 🎉</h1>
+  
+  <div class="thank-text">
+    無事にすべての謎を解き明かし、<br>
+    ぬいぐるみの呪いを解くことができました！<br>
+    プレイしていただきありがとうございました！
+  </div>
+  
+  <div class="fin-image-container">
+    <img src="fin.png" class="fin-img" alt="THANK YOU FOR PLAYING!!">
+  </div>
+
+  <button class="restart-btn" onclick="resetAndGoHome()">タイトルメニューに戻る</button>
+</div>
+
+<script>
+function resetAndGoHome() {
+  if (confirm("ゲームをクリア状態からリセットして、最初から遊び直しますか？")) {
+    // 進行度を初期状態に戻してindex.htmlへ
+    localStorage.setItem("gameProgress", "1");
+    location.href = "index.html";
+  }
+}
+</script>
+
 </body>
 </html>
