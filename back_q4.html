@@ -3,49 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>正解 - 生徒会企画資料</title>
+<title>正解 - アクセス成功</title>
 <style>
   body { margin: 0; height: 100vh; background: url("haikei.jpg") no-repeat center/cover; display: flex; justify-content: center; align-items: center; font-family: sans-serif; }
-  .box { background: rgba(255, 255, 255, 0.95); padding: 25px; border-radius: 20px; text-align: center; width: 85%; max-width: 360px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); max-height: 90vh; overflow-y: auto; }
+  .box { background: rgba(255, 255, 255, 0.95); padding: 30px 20px; border-radius: 20px; text-align: center; width: 85%; max-width: 360px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
   
-  h2 { color: #2e7d32; font-size: 22px; margin-top: 0; margin-bottom: 10px; }
-  .clear-img { width: 100%; height: auto; border-radius: 12px; margin-bottom: 15px; }
+  h2 { color: #2e7d32; font-size: 22px; margin-top: 0; margin-bottom: 20px; }
+  .clear-img { width: 80px; height: auto; margin-bottom: 20px; }
   
-  /* 企画資料表示エリア */
-  .document-container { 
-    background: #fff; 
-    border: 2px solid #2e7d32; 
-    padding: 10px; 
-    border-radius: 10px; 
-    margin-bottom: 20px; 
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
-  }
-  .doc-label { font-size: 12px; font-weight: bold; color: #1b5e20; margin-bottom: 8px; display: block; }
-  
-  /* siryou.png の表示スタイル */
-  .siryou-img { 
-    width: 100%; 
-    height: auto; 
-    border-radius: 5px; 
-    display: block;
-  }
+  .info-text { font-size: 14px; color: #333; line-height: 1.6; margin-bottom: 25px; }
 
-  .next-btn { width: 100%; padding: 16px; font-size: 16px; font-weight: bold; background: #2e7d32; color: white; border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 5px 0 #1b5e20; transition: all 0.1s; outline: none; }
-  .next-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #1b5e20; }
+  /* 企画資料を見るための特別ボタン */
+  .view-doc-btn { 
+    display: block; width: 100%; padding: 18px; margin-bottom: 15px;
+    background: #1b5e20; color: white; border: none; border-radius: 12px;
+    font-size: 16px; font-weight: bold; cursor: pointer; text-decoration: none;
+    box-shadow: 0 4px 0 #0a3311; box-sizing: border-box;
+  }
+  .view-doc-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #0a3311; }
+
+  /* 漫画へ戻るボタン（通常デザイン） */
+  .next-btn { 
+    width: 100%; padding: 14px; font-size: 14px; font-weight: bold; 
+    background: #607d8b; color: white; border: none; border-radius: 12px; 
+    cursor: pointer; outline: none; transition: opacity 0.2s;
+  }
 </style>
 </head>
 <body>
 
 <div class="box">
   <img src="クリア画面.png" class="clear-img" alt="正解">
-  <h2>ロック解除成功！</h2>
+  <h2>ACCESS GRANTED</h2>
   
-  <div class="document-container">
-    <span class="doc-label">【極秘】生徒会 企画立案資料</span>
-    <img src="siryou.png" class="siryou-img" alt="生徒会企画資料">
-  </div>
+  <p class="info-text">
+    パソコンのロックを解除しました。<br>
+    生徒会の極秘ドライブへアクセス可能です。
+  </p>
 
-  <button class="next-btn" onclick="goNext()">漫画・資料一覧へ戻る</button>
+  <a href="view_document.html" class="view-doc-btn">📁 企画立案資料を閲覧する</a>
+
+  <button class="next-btn" onclick="goNext()">本誌（資料一覧）に戻る</button>
 </div>
 
 <script>
@@ -55,7 +53,6 @@ function goNext() {
   if (prog <= 4) {
     localStorage.setItem("gameProgress", 5);
   }
-  // 資料一覧（または漫画に戻るためのページ）へ
   location.href = "documents.html";
 }
 </script>
