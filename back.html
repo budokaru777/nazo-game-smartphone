@@ -17,50 +17,80 @@
   
   .box { 
     background: rgba(255, 255, 255, 0.95); 
-    padding: 30px 25px; 
+    padding: 25px 20px; 
     border-radius: 20px; 
     text-align: center; 
     width: 85%; 
     max-width: 360px; 
     box-shadow: 0 15px 35px rgba(0,0,0,0.4); 
+    box-sizing: border-box;
   }
 
   .clear-img { 
     width: 100%; 
     height: auto;
     border-radius: 12px; 
-    margin-bottom: 20px; 
+    margin-bottom: 15px; 
   }
 
   h2 {
     color: #2e7d32;
     font-size: 22px;
-    margin-bottom: 10px;
+    margin: 0 0 15px 0;
+    font-weight: bold;
   }
 
-  p {
-    font-size: 15px;
-    color: #555;
-    line-height: 1.6;
-    margin-bottom: 25px;
+  /* 警告・注意エリアのスタイル */
+  .warning-box {
+    background: #fff3e0;
+    border: 2px solid #ff9800;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+
+  .warning-title {
+    color: #e65100;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 6px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .warning-text {
+    font-size: 13px;
+    color: #333;
+    line-height: 1.5;
+    margin: 0;
+    font-weight: bold;
+  }
+
+  .highlight-red {
+    color: #d32f2f;
+    font-size: 14px;
+    background: linear-gradient(transparent 60%, #ffcdd2 60%);
   }
 
   .next-btn { 
     width: 100%; 
-    padding: 18px; 
-    font-size: 18px; 
+    padding: 16px; 
+    font-size: 16px; 
     font-weight: bold; 
     background: #4caf50; 
     color: white; 
     border: none; 
     border-radius: 12px; 
     cursor: pointer; 
-    box-shadow: 0 5px 0 #388e3c; /* 立体感のある影 */
+    box-shadow: 0 5px 0 #388e3c;
     transition: all 0.1s;
     outline: none;
   }
 
-  /* ボタンを押した時の動き */
   .next-btn:active { 
     transform: translateY(3px); 
     box-shadow: 0 2px 0 #388e3c; 
@@ -72,8 +102,16 @@
 <div class="box">
   <img src="クリア画面.png" class="clear-img" alt="正解">
   <h2>正解です！</h2>
-  <p><br>本誌に戻って物語を進めよう。</p>
-  <button class="next-btn" onclick="goNext()">資料一覧へ</button>
+  
+  <div class="warning-box">
+    <div class="warning-title">⚠️ 必ずお読みください</div>
+    <p class="warning-text">
+      ① ナゾが解けましたので、<span class="highlight-red">いったん本誌に戻って</span>物語を読み進めてください。<br><br>
+      ② 新しく解放された資料は、<span class="highlight-red">本誌で「〇〇の資料を見よ」と指示があるまで絶対に見てはいけません。</span>ネタバレに繋がる恐れがあります。
+    </p>
+  </div>
+
+  <button class="next-btn" onclick="goNext()">確認して資料一覧へ</button>
 </div>
 
 <script>
@@ -89,7 +127,6 @@ function goNext() {
   }
 
   // documents.html（資料一覧）へ戻る
-  // もしindexに戻したければここを "index.html" に書き換えてください
   location.href = "documents.html";
 }
 </script>
