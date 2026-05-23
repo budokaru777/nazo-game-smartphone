@@ -17,7 +17,7 @@
   h2 { color: #333; font-size: 18px; margin: 0 0 5px 0; }
   .q-number { font-size: 13px; color: #666; font-weight: bold; margin-bottom: 15px; }
 
-  /* 文字入力用（謎1, 3, 4） */
+  /* 文字入力用（謎1, 3, 4, 5） */
   .text-input-area { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
   #answerInput { flex: 1; height: 45px; font-size: 18px; border: 2px solid #333; border-radius: 10px; text-align: center; outline: none; }
 
@@ -37,7 +37,7 @@
 
 <div class="content-box">
   <h2>解答入力</h2>
-  <div class="q-number" id="displayQNo">対象の資料: なし</div>
+  <div class="q-number" id="displayQNo">対象 of 資料: なし</div>
   
   <div class="text-input-area" id="textUi">
     <input id="answerInput" type="text" placeholder="キーワードを入力">
@@ -72,11 +72,26 @@ if(lastPage === "question2.html") {
 
 function checkTextAnswer() {
   const input = document.getElementById('answerInput').value.trim();
-  if (lastPage === "question1.html" && input === "4965") { location.href = "back.html"; } 
-  else if (lastPage === "question3.html" && input === "生徒会室") { location.href = "back.html"; } 
+  
+  // 謎1の判定
+  if (lastPage === "question1.html" && input === "4965") { 
+    location.href = "back.html"; 
+  } 
+  // 謎3の判定
+  else if (lastPage === "question3.html" && input === "生徒会室") { 
+    location.href = "back.html"; 
+  } 
+  // 謎4の判定
   else if (lastPage === "question4.html" && (input === "shift" || input === "SHIFT" || input === "!")) {
-    location.href = "back_q4.html"; // 謎4専用画面へ
-  } else { location.href = "fail.html"; }
+    location.href = "back_q4.html"; 
+  } 
+  // 謎5の判定（追加分）
+  else if (lastPage === "question5.html" && input === "ダンスレッスン室") {
+    location.href = "back.html"; // 正解なら正解画面へ
+  } 
+  else { 
+    location.href = "fail.html"; 
+  }
 }
 
 function checkDragAnswer() {
@@ -86,7 +101,7 @@ function checkDragAnswer() {
   if(finalAns === "セイトカイノクツキー") { location.href = "back.html"; } else { location.href = "fail.html"; }
 }
 
-// ドラッグ制御
+// ドラッグ制御（PC）
 let dragged = null;
 document.addEventListener("dragstart", e => { if(e.target.classList.contains("chip")) dragged = e.target; });
 document.addEventListener("dragover", e => e.preventDefault());
@@ -97,6 +112,8 @@ document.addEventListener("drop", e => {
   if(slot && slot.children.length === 0) slot.appendChild(dragged);
   else if(pool) pool.appendChild(dragged);
 });
+
+// タッチ制御（スマホ）
 document.addEventListener("touchstart", e => { if(e.target.classList.contains("chip")) dragged = e.target; }, {passive:true});
 document.addEventListener("touchend", e => {
   if(!dragged) return;
