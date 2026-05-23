@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>生徒会資料閲覧</title>
+<style>
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; display: flex; flex-direction: column; }
+  
+  /* ヘッダーエリア */
+  .header {
+    background: rgba(30, 30, 30, 0.9);
+    color: #fff;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #444;
+    z-index: 10;
+  }
+  .header-title { font-size: 14px; font-weight: bold; }
+  .back-btn {
+    background: #444; color: #fff; border: none; padding: 8px 15px;
+    border-radius: 5px; font-size: 12px; cursor: pointer; text-decoration: none;
+  }
+
+  /* 画像表示エリア */
+  .image-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: auto; /* スクロール可能に */
+    padding: 10px;
+  }
+  .image-container img {
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  }
+</style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-title">siryou.png - プレビュー</div>
+    <a href="back_q4.html" class="back-btn">戻る</a>
+  </div>
+
+  <div class="image-container">
+    <img src="siryou.png" alt="生徒会企画資料">
+  </div>
+
+</body>
+</html>
