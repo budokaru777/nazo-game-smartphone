@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>新資料獲得！</title>
+<style>
+  html, body { margin: 0; padding: 0; min-height: 100%; font-family: sans-serif; }
+  body { background: url("haikei.jpg") no-repeat center top/cover; background-attachment: fixed; display: flex; justify-content: center; align-items: flex-start; padding: 20px 10px; box-sizing: border-box; }
+  
+  .content-box { 
+    width: 100%; max-width: 380px; background: rgba(255, 255, 255, 0.95); 
+    padding: 20px 15px; border-radius: 20px; text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3); box-sizing: border-box;
+  }
+
+  h2 { color: #1a237e; font-size: 16px; margin: 0 0 5px 0; font-weight: bold; }
+  .sub-title { font-size: 12px; color: #2e7d32; font-weight: bold; margin-bottom: 15px; }
+
+  /* 画像表示エリア（スマホ用に拡大時のはみ出しを制御） */
+  .image-container {
+    width: 100%;
+    background: #f5f5f5;
+    border-radius: 10px;
+    padding: 10px;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+    overflow: hidden;
+    position: relative;
+    touch-action: none;
+  }
+  
+  .img-wrapper {
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    will-change: transform;
+  }
+
+  .target-img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  /* 「次へ」ボタンのスタイル */
+  .next-stage-btn {
+    display: block; width: 100%; padding: 13px;
+    background: #1a237e; color: white; border: none; border-radius: 10px;
+    font-size: 15px; font-weight: bold; cursor: pointer; text-decoration: none;
+    box-sizing: border-box; box-shadow: 0 3px 0 #0d1348;
+  }
+  .next-stage-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #0d1348; }
+</style>
+</head>
+<body>
+
+<div class="content-box">
+  <h2>🔓 新しい手がかり資料を解放！</h2>
+  <div class="sub-title">📄 生徒会企画資料（siryou9.png）</div>
+  
+  <div class="image-container" id="zoomContainer">
+    <div class="img-wrapper" id="imgWrapper">
+      <img id="mainImage" src="siryou9.png" class="target-img" alt="生徒会企画資料">
+    </div>
+  </div>
+
+  <button class="next-stage-btn" onclick="advanceStage()">次へ進む ▶</button>
+</div>
+
+<script>
+// 「次へ進む」が押されたときに初めて進行度を5に更新してback.htmlへ送る
+function advanceStage() {
+  localStorage.setItem("gameProgress", "5");
+  location.href = "back.html";
+}
+
+// --- スマホ用ピンチズーム＆スムーズドラッグ制御ロジック ---
+const container = document.getElementById('zoomContainer');
+const wrapper = document.getElementById('imgWrapper');
+
+let scale = 1;
+let pointX = 0;
+let pointY = 0;
+let startX = 0;
+let startY = 0;
+let isPanning = false;
+let lastTap = 0;
+
+function updateTransform() {
+  if (scale < 1) scale = 1;
+  if (scale > 4) scale = 4;
+  if (scale === 1) {
+    pointX = 0;
+    pointY = 0;
+  }
+  wrapper.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+}
+
+container.addEventListener('touchstart', (e) => {
+  if (e.targetTouches.length === 1) {
+    isPanning = true;
+    startX = e.targetTouches[0].clientX - pointX;
+    startY = e.targetTouches[0].clientY - pointY;
+    
+    const now = window.performance.now();
+    if (now - lastTap < 300) {
+      scale = (scale === 1) ? 2.5 : 1;
+      updateTransform();
+      isPanning = false;
+    }
+    lastTap = now;
+  } else if (e.targetTouches.length === 2) {
+    isPanning = false;
+    container.dataset.startDist = getDistance(e.targetTouches);
+    container.dataset.startScale = scale;
+  }
+}, { passive: true });
+
+container.addEventListener('touchmove', (e) => {
+  if (isPanning && scale > 1) {
+    pointX = e.targetTouches[0].clientX - startX;
+    pointY = e.targetTouches[0].clientY - startY;
+    updateTransform();
+  } else if (e.targetTouches.length === 2) {
+    const dist = getDistance(e.targetTouches);
+    const startDist = parseFloat(container.dataset.startDist);
+    const startScale = parseFloat(container.dataset.startScale);
+    
+    if (startDist > 0) {
+      scale = startScale * (dist / startDist);
+      updateTransform();
+    }
+  }
+}, { passive: true });
+
+container.addEventListener('touchend', (e) => {
+  isPanning = false;
+  if (e.targetTouches.length < 2) {
+    container.dataset.startDist = "0";
+  }
+});
+
+function getDistance(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+</script>
+
+</body>
+</html>
