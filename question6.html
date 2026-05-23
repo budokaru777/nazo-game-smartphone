@@ -9,133 +9,41 @@
   body { background: url("haikei.jpg") no-repeat center -95px/cover; background-attachment: fixed; display: flex; justify-content: center; align-items: flex-start; padding: 15px 10px; box-sizing: border-box; }
   
   .content-box { 
-    width: 100%; 
-    max-width: 380px; 
-    background: rgba(255, 255, 255, 0.95); 
-    padding: 20px 15px; 
-    border-radius: 20px; 
-    text-align: center; 
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    box-sizing: border-box;
+    width: 100%; max-width: 380px; background: rgba(255, 255, 255, 0.95); 
+    padding: 20px 15px; border-radius: 20px; text-align: center; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3); box-sizing: border-box;
     max-height: 95vh; overflow-y: auto;
   }
 
   .q-title { font-size: 18px; font-weight: bold; color: #1a237e; margin-bottom: 5px; text-align: left; }
   .q-text { font-size: 15px; color: #333; text-align: left; margin-bottom: 15px; background: #f5f5f5; padding: 12px; border-radius: 8px; line-height: 1.5; font-weight: bold; }
 
-  /* ドラッグ＆ドロップ（解答入力）エリアのスタイル */
-  .answer-puzzle-area {
-    background: #f5f5f5; border: 2px solid #333; border-radius: 15px;
-    padding: 12px 10px; margin-bottom: 20px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
-  }
+  .answer-puzzle-area { background: #f5f5f5; border: 2px solid #333; border-radius: 15px; padding: 12px 10px; margin-bottom: 20px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
   .input-label { font-size: 13px; font-weight: bold; color: #333; margin-bottom: 8px; text-align: left; padding-left: 5px; }
   
-  /* 枠（スロット）の並び：文字を挟むためフレックスボックスに変更 */
-  .slots-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #b0bec5;
-    padding: 8px;
-    border-radius: 10px;
-    margin-bottom: 12px;
-    gap: 4px;
-  }
+  .slots-container { display: flex; align-items: center; justify-content: space-between; background: #b0bec5; padding: 8px; border-radius: 10px; margin-bottom: 12px; gap: 4px; }
   .slot { flex: 1; height: 45px; background: rgba(255,255,255,0.7); border: 2px dashed #455a64; border-radius: 8px; display: flex; justify-content: center; align-items: center; }
+  .fixed-text { font-size: 14px; font-weight: bold; color: #263238; padding: 0 2px; white-space: nowrap; }
   
-  /* 固定文字「を」のスタイル */
-  .fixed-text {
-    font-size: 14px;
-    font-weight: bold;
-    color: #263238;
-    padding: 0 2px;
-    white-space: nowrap;
-  }
-  
-  /* 選択肢（プール）の並び */
   .pool { background: #cfd8dc; padding: 8px; border-radius: 12px; margin-bottom: 15px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; min-height: 100px; }
-  
-  /* チップ（文字パーツ） */
-  .chip {
-    background: #fff; border: 2px solid #455a64; border-radius: 8px; padding: 8px 0;
-    font-size: 12px; font-weight: bold; color: #263238; cursor: grab; box-shadow: 0 3px 0 #b0bec5; touch-action: none; user-select: none;
-    text-align: center; width: 100%; box-sizing: border-box;
-  }
+  .chip { background: #fff; border: 2px solid #455a64; border-radius: 8px; padding: 8px 0; font-size: 12px; font-weight: bold; color: #263238; cursor: grab; box-shadow: 0 3px 0 #b0bec5; touch-action: none; user-select: none; text-align: center; width: 100%; box-sizing: border-box; }
   .chip:active { cursor: grabbing; }
 
-  /* 決定ボタン */
   .submit-large-btn { width: 100%; padding: 12px; background: #2e7d32; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 3px 0 #1b5e20; margin-bottom: 5px; }
   .submit-large-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #1b5e20; }
 
-  /* ヒントセクション（右寄せ） */
-  .hint-section { 
-    display: flex; 
-    flex-direction: column; 
-    gap: 12px; 
-    text-align: right;
-  }
-
-  .hint-row { 
-    display: flex; 
-    flex-direction: row-reverse; 
-    align-items: center; 
-    gap: 10px; 
-    justify-content: flex-start;
-  }
-
-  .hint-icon { 
-    width: 45px; 
-    height: 45px; 
-    border-radius: 50%; 
-    background: #fff; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    flex-shrink: 0;
-    border: 1px solid #ccc;
-    overflow: hidden;
-  }
+  .hint-section { display: flex; flex-direction: column; gap: 12px; text-align: right; }
+  .hint-row { display: flex; flex-direction: row-reverse; align-items: center; gap: 10px; justify-content: flex-start; }
+  .hint-icon { width: 45px; height: 45px; border-radius: 50%; background: #fff; display: flex; justify-content: center; align-items: center; flex-shrink: 0; border: 1px solid #ccc; overflow: hidden; }
   .hint-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .hint-btn { flex: 1; max-width: 130px; padding: 10px; border: 2px solid #607d8b; border-radius: 8px; background: white; color: #607d8b; font-size: 13px; font-weight: bold; cursor: pointer; }
 
-  .hint-btn { 
-    flex: 1; 
-    max-width: 130px;
-    padding: 10px; 
-    border: 2px solid #607d8b; 
-    border-radius: 8px; 
-    background: white; 
-    color: #607d8b; 
-    font-size: 13px; 
-    font-weight: bold; 
-    cursor: pointer; 
-  }
-
-  .bubble-msg { 
-    display: none; 
-    background: #75ef66; 
-    padding: 8px 12px; 
-    border-radius: 12px; 
-    font-size: 12px; 
-    color: #000; 
-    position: relative; 
-    max-width: 140px;
-    line-height: 1.3;
-    text-align: left;
-  }
-  .bubble-msg::before {
-    content: ""; position: absolute; right: -10px; top: 12px;
-    border: 5px solid transparent; border-left: 10px solid #75ef66;
-  }
+  .bubble-msg { display: none; background: #75ef66; padding: 8px 12px; border-radius: 12px; font-size: 12px; color: #000; position: relative; max-width: 140px; line-height: 1.3; text-align: left; }
+  .bubble-msg::before { content: ""; position: absolute; right: -10px; top: 12px; border: 5px solid transparent; border-left: 10px solid #75ef66; }
 
   .ans-row { margin-top: 5px; }
   .ans-btn { width: 100%; background: #d32f2f !important; color: white !important; border: none !important; padding: 12px; border-radius: 8px; }
-
-  .back-menu-btn {
-    display: block; width: 100%; padding: 12px; margin-top: 15px;
-    background: #333; color: white; border: none; border-radius: 8px;
-    font-size: 14px; font-weight: bold; cursor: pointer; text-decoration: none;
-    box-sizing: border-box;
-  }
+  .back-menu-btn { display: block; width: 100%; padding: 12px; margin-top: 15px; background: #333; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; text-decoration: none; box-sizing: border-box; }
 </style>
 </head>
 <body>
@@ -175,19 +83,16 @@
       <button class="hint-btn" onclick="showBubble('h1')">ヒント1を見る</button>
       <div id="h1" class="bubble-msg">企画書に書いてある方法はダミーだよ。正しい方法は、動画の中に…</div>
     </div>
-
     <div class="hint-row">
       <div class="hint-icon"><img src="seinan.png" alt="seinan"></div>
       <button class="hint-btn" onclick="showBubble('h2')">ヒント2を見る</button>
       <div id="h2" class="bubble-msg">動画の最初のノイズの中に、うっすら文字が見える箇所がないかしら？</div>
     </div>
-
     <div class="hint-row">
       <div class="hint-icon"><img src="riha.png" alt="riha"></div>
       <button class="hint-btn" onclick="showBubble('h3')">ヒント3を見る</button>
       <div id="h3" class="bubble-msg">「なまえ」「ごかい」「よぶ」って見えたような気がする！</div>
     </div>
-
     <div class="ans-row">
       <button class="hint-btn ans-btn" onclick="askAnswer()">答えを見る</button>
     </div>
@@ -197,10 +102,8 @@
 </div>
 
 <script>
-// 直前ページ情報を保存
 localStorage.setItem("returnPage", "question6.html");
 
-// 答えの判定ロジック
 function checkPuzzleAnswer() {
   const s1 = document.getElementById("slot1");
   const s2 = document.getElementById("slot2");
@@ -210,11 +113,11 @@ function checkPuzzleAnswer() {
   let t2 = s2.children.length > 0 ? s2.children[0].innerText : "";
   let t3 = s3.children.length > 0 ? s3.children[0].innerText : "";
 
-  // 間に「を」が入るので、文字を結合した時に「名前5回呼ぶ」になれば正解
   let finalAns = t1 + t2 + t3;
 
   if (finalAns === "名前5回呼ぶ") {
-    location.href = "back.html";
+    // ★ パズル正解：ミニゲームページ（minigame.html）へ進む
+    location.href = "minigame.html";
   } else {
     location.href = "fail.html";
   }
@@ -231,44 +134,26 @@ function askAnswer() {
   }
 }
 
-// ドラッグ＆ドロップ／タッチ操作の物理移動制御ロジック
 let dragged = null;
-
-// PC用のドラッグイベント
-document.addEventListener("dragstart", e => {
-  if(e.target.classList.contains("chip")) { dragged = e.target; }
-});
+document.addEventListener("dragstart", e => { if(e.target.classList.contains("chip")) { dragged = e.target; } });
 document.addEventListener("dragover", e => e.preventDefault());
 document.addEventListener("drop", e => {
   e.preventDefault();
   const slot = e.target.closest(".slot");
   const pool = e.target.closest("#ansPool");
-  if(slot && slot.children.length === 0) {
-    slot.appendChild(dragged);
-  } else if(pool) {
-    pool.appendChild(dragged);
-  }
+  if(slot && slot.children.length === 0) { slot.appendChild(dragged); }
+  else if(pool) { pool.appendChild(dragged); }
 });
-
-// スマホ・タブレット用のタッチ（タップ移動）イベント
-document.addEventListener("touchstart", e => {
-  if(e.target.classList.contains("chip")) { dragged = e.target; }
-}, {passive:true});
-
+document.addEventListener("touchstart", e => { if(e.target.classList.contains("chip")) { dragged = e.target; } }, {passive:true});
 document.addEventListener("touchend", e => {
   if(!dragged) return;
   const touch = e.changedTouches[0];
   const target = document.elementFromPoint(touch.clientX, touch.clientY);
   const slot = target ? target.closest(".slot") : null;
-  
-  if(slot && slot.children.length === 0) {
-    slot.appendChild(dragged);
-  } else {
-    document.getElementById("ansPool").appendChild(dragged);
-  }
+  if(slot && slot.children.length === 0) { slot.appendChild(dragged); }
+  else { document.getElementById("ansPool").appendChild(dragged); }
   dragged = null;
 });
 </script>
-
 </body>
 </html>
