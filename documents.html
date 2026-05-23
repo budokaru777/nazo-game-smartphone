@@ -36,66 +36,39 @@
 </div>
 
 <script>
+// 現在プレイヤーが「どの謎（1〜6）」に挑戦しているかを取得（デフォルトは謎1）
 const progress = parseInt(localStorage.getItem("gameProgress") || "1");
 const documentList = document.getElementById("documentList");
 
-// 資料解禁の最新マスタデータ
-const allDocuments = [
-  {
-    stage: 1,
-    files: [
-      { name: "siryou1.png", title: "人物情報①", icon: "👤" },
-      { name: "siryou2.png", title: "ことねのスマホ内の写真", icon: "📱" }
-    ]
-  },
-  {
-    stage: 2,
-    files: [
-      { name: "siryou3.png", title: "ヌイニウム簡易報告資料", icon: "📄" },
-      { name: "siryou4.png", title: "人物情報②", icon: "👤" },
-      { name: "siryou5.png", title: "清夏のストーリー", icon: "📝" }
-    ]
-  },
-  {
-    stage: 3,
-    files: [
-      { name: "siryou6.png", title: "人物情報③", icon: "👤" },
-      { name: "siryou7.png", title: "生徒会スケジュール表1", icon: "📅" },
-      { name: "siryou8.png", title: "生徒会スケジュール表2", icon: "📅" }
-    ]
-  },
-  {
-    stage: 4, // 謎4解く前は新規なし
-    files: []
-  },
-  {
-    stage: 5, // 謎5の段階で解禁されるもの
-    files: [
-      { name: "siryou9.png", title: "生徒会企画資料", icon: "📁" },
-      { name: "siryou10.png", title: "人物情報⑤", icon: "👤" } // 追加
-    ]
-  },
-  {
-    stage: 6, // 謎6は新規なし
-    files: []
-  }
+// すべての資料のマスターリスト
+const allFiles = [
+  { name: "siryou1.png", title: "人物情報①", icon: "👤", availableFrom: 1 },
+  { name: "siryou2.png", title: "ことねのスマホ内の写真", icon: "📱", availableFrom: 1 },
+  { name: "siryou3.png", title: "ヌイニウム簡易報告資料", icon: "📄", availableFrom: 2 },
+  { name: "siryou4.png", title: "人物情報②", icon: "👤", availableFrom: 2 },
+  { name: "siryou5.png", title: "清夏のストーリー", icon: "📝", availableFrom: 2 },
+  { name: "siryou6.png", title: "人物情報③", icon: "👤", availableFrom: 3 },
+  { name: "siryou7.png", title: "生徒会スケジュール表1", icon: "📅", availableFrom: 3 },
+  { name: "siryou8.png", title: "生徒会スケジュール表2", icon: "📅", availableFrom: 3 },
+  { name: "siryou9.png", title: "生徒会企画資料", icon: "📁", availableFrom: 5 }, // 謎4クリア後（＝謎5開始時）から出現
+  { name: "siryou10.png", title: "人物情報⑤", icon: "👤", availableFrom: 5 }
 ];
 
 let htmlContent = "";
-allDocuments.forEach(group => {
-  if (progress >= group.stage) {
-    group.files.forEach(file => {
-      htmlContent += `
-        <div class="doc-card" onclick="viewDocument('${file.name}')">
-          <div class="doc-icon">${file.icon}</div>
-          <div class="doc-info">
-            <div class="doc-file">${file.name}</div>
-            <div class="doc-title">${file.title}</div>
-          </div>
-          <div style="color: #ccc; font-size: 18px;">➔</div>
+
+// 現在の進行度（progress）以下の資料をすべてループで回して生成
+allFiles.forEach(file => {
+  if (progress >= file.availableFrom) {
+    htmlContent += `
+      <div class="doc-card" onclick="viewDocument('${file.name}')">
+        <div class="doc-icon">${file.icon}</div>
+        <div class="doc-info">
+          <div class="doc-file">${file.name}</div>
+          <div class="doc-title">${file.title}</div>
         </div>
-      `;
-    });
+        <div style="color: #ccc; font-size: 18px;">➔</div>
+      </div>
+    `;
   }
 });
 
@@ -104,9 +77,10 @@ if(htmlContent === "") {
 }
 documentList.innerHTML = htmlContent;
 
+// 確実に画像表示用ページ（view_document.html）へ引き渡す処理
 function viewDocument(fileName) {
   localStorage.setItem("returnPage", "documents.html");
-  localStorage.setItem("viewingImage", fileName);
+  localStorage.setItem("viewingImage", fileName); // 確実にLocalStorageに書き込む
   location.href = "view_document.html";
 }
 </script>
