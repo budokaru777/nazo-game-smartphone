@@ -23,14 +23,6 @@
   .q-title { font-size: 18px; font-weight: bold; color: #1a237e; margin-bottom: 5px; text-align: left; }
   .q-text { font-size: 15px; color: #333; text-align: left; margin-bottom: 15px; background: #f5f5f5; padding: 12px; border-radius: 8px; line-height: 1.5; font-weight: bold; }
 
-  /* 現在見られる資料の一覧エリアのスタイル */
-  .unlocked-docs-area {
-    background: #f1f8e9; border: 1px solid #c5e1a5; border-radius: 10px;
-    padding: 10px; margin-bottom: 15px; text-align: left;
-  }
-  .unlocked-docs-title { font-size: 12px; font-weight: bold; color: #33691e; margin-bottom: 6px; border-bottom: 1px dashed #c5e1a5; padding-bottom: 3px; }
-  .unlocked-doc-item { font-size: 11px; color: #424242; line-height: 1.5; font-family: monospace; }
-
   /* ドラッグ＆ドロップ（解答入力）エリアのスタイル */
   .answer-puzzle-area {
     background: #f5f5f5; border: 2px solid #333; border-radius: 15px;
@@ -152,11 +144,6 @@
   <div class="q-title">謎６</div>
   <div class="q-text">問題文：<br>ぬいぐるみの呪いを解く正しい方法を並べ替えてください</div>
 
-  <div class="unlocked-docs-area">
-    <div class="unlocked-docs-title">💡 現在使える手がかり資料</div>
-    <div id="unlockedDocsList"></div>
-  </div>
-
   <div class="answer-puzzle-area">
     <div class="input-label">🧩 パーツを枠内にドラッグして並べてください：</div>
     
@@ -212,28 +199,6 @@
 <script>
 // 直前ページ情報を保存
 localStorage.setItem("returnPage", "question6.html");
-
-// 手がかり資料の一覧を動的に結合して表示するロジック
-const progress = parseInt(localStorage.getItem("gameProgress") || "1");
-
-const docData = [
-  { stage: 1, files: ["siryou1.png : 人物情報①", "siryou2.png : ことねのスマホ内の写真"] },
-  { stage: 2, files: ["siryou3.png : ヌイニウム簡易報告資料", "siryou4.png : 人物情報②", "siryou5.png : 清夏のストーリー"] },
-  { stage: 3, files: ["siryou6.png : 人物情報③", "siryou7.png : 生徒会スケジュール表1", "siryou8.png : 生徒会スケジュール表2"] },
-  { stage: 4, files: [] },
-  { stage: 5, files: ["siryou9.png : 生徒会企画資料", "siryou10.png : 人物情報⑤"] },
-  { stage: 6, files: [] }
-];
-
-let docListHtml = "";
-docData.forEach(group => {
-  if (progress >= group.stage) {
-    group.files.forEach(fInfo => {
-      docListHtml += `<div class="unlocked-doc-item">📄 ${fInfo}</div>`;
-    });
-  }
-});
-document.getElementById("unlockedDocsList").innerHTML = docListHtml || '<div class="unlocked-doc-item" style="color:#999;">利用可能な資料がありません</div>';
 
 // 答えの判定ロジック
 function checkPuzzleAnswer() {
