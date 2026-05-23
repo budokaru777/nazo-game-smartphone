@@ -3,84 +3,111 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>資料一覧</title>
+<title>手がかり資料一覧</title>
 <style>
-  html, body { margin: 0; padding: 0; min-height: 100%; font-family: sans-serif; background: #f5f5f5; }
-  body { background: url("haikei.jpg") no-repeat center top/cover; background-attachment: fixed; padding: 20px 10px; box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; min-height: 100%; font-family: sans-serif; }
+  body { background: url("haikei.jpg") no-repeat center top/cover; background-attachment: fixed; display: flex; justify-content: center; align-items: flex-start; padding: 20px 10px; box-sizing: border-box; }
   
-  .container { width: 100%; max-width: 400px; margin: 0 auto; background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 20px 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); box-sizing: border-box; }
-  h2 { text-align: center; color: #333; margin-top: 0; font-size: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
-  
-  .doc-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
-  
-  .doc-card { display: flex; align-items: center; background: #fff; border: 1px solid #ddd; border-radius: 12px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.1s; }
-  .doc-card:active { transform: scale(0.98); }
-  
-  .doc-icon { width: 50px; height: 50px; background: #e0f7fa; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 24px; margin-right: 12px; flex-shrink: 0; }
-  .doc-info { flex-grow: 1; text-align: left; }
-  .doc-file { font-size: 11px; color: #777; font-family: monospace; }
-  .doc-title { font-size: 14px; font-weight: bold; color: #333; margin-top: 2px; }
+  .content-box { 
+    width: 100%; max-width: 380px; background: rgba(255, 255, 255, 0.95); 
+    padding: 20px 15px; border-radius: 20px; text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3); box-sizing: border-box;
+  }
 
-  .back-btn { display: block; width: 100%; padding: 14px; background: #333; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: bold; text-align: center; cursor: pointer; text-decoration: none; box-sizing: border-box; }
+  h2 { color: #1a237e; font-size: 18px; margin: 0 0 15px 0; border-bottom: 2px solid #1a237e; padding-bottom: 5px; }
+
+  /* 資料リスト全体のスタイル */
+  .docs-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; text-align: left; }
+  
+  /* 各資料アイテム */
+  .doc-card {
+    background: #ffffff; border: 1px solid #c5e1a5; border-radius: 10px;
+    padding: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    display: flex; align-items: center; justify-content: space-between;
+    text-decoration: none; color: #333; transition: background 0.2s;
+  }
+  .doc-card:hover { background: #f1f8e9; }
+  
+  .doc-info { display: flex; flex-direction: column; gap: 2px; }
+  .doc-filename { font-size: 11px; color: #757575; font-family: monospace; }
+  .doc-title { font-size: 14px; font-weight: bold; color: #2e7d32; }
+  
+  /* 開くボタンマーク */
+  .open-arrow { font-size: 16px; color: #81c784; font-weight: bold; }
+
+  /* まだ解放されていない状態の表示 */
+  .no-docs-msg { text-align: center; color: #999; font-size: 13px; padding: 20px 0; }
+
+  .back-btn { display: block; width: 100%; padding: 12px; background: #607d8b; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; text-decoration: none; box-sizing: border-box; }
 </style>
 </head>
 <body>
 
-<div class="container">
-  <h2>手がかり資料一覧</h2>
+<div class="content-box">
+  <h2>📄 手がかり資料一覧</h2>
   
-  <div class="doc-list" id="documentList">
-    </div>
+  <div class="docs-list" id="documentsContainer"></div>
 
-  <button class="back-btn" onclick="location.href='index.html'">メインメニューに戻る</button>
+  <button class="back-btn" onclick="location.href='index.html'">メニューに戻る</button>
 </div>
 
 <script>
-// 現在プレイヤーが「どの謎（1〜6）」に挑戦しているかを取得（デフォルトは謎1）
+// 現在のゲーム進行度を取得（デフォルトは謎1の「1」）
 const progress = parseInt(localStorage.getItem("gameProgress") || "1");
-const documentList = document.getElementById("documentList");
 
-// すべての資料のマスターリスト
-const allFiles = [
-  { name: "siryou1.png", title: "人物情報①", icon: "👤", availableFrom: 1 },
-  { name: "siryou2.png", title: "ことねのスマホ内の写真", icon: "📱", availableFrom: 1 },
-  { name: "siryou3.png", title: "ヌイニウム簡易報告資料", icon: "📄", availableFrom: 2 },
-  { name: "siryou4.png", title: "人物情報②", icon: "👤", availableFrom: 2 },
-  { name: "siryou5.png", title: "清夏のストーリー", icon: "📝", availableFrom: 2 },
-  { name: "siryou6.png", title: "人物情報③", icon: "👤", availableFrom: 3 },
-  { name: "siryou7.png", title: "生徒会スケジュール表1", icon: "📅", availableFrom: 3 },
-  { name: "siryou8.png", title: "生徒会スケジュール表2", icon: "📅", availableFrom: 3 },
-  { name: "siryou9.png", title: "生徒会企画資料", icon: "📁", availableFrom: 5 }, // 謎4クリア後（＝謎5開始時）から出現
-  { name: "siryou10.png", title: "人物情報⑤", icon: "👤", availableFrom: 5 }
+// 指定された資料の解放スケジュールデータ
+const docData = [
+  { stage: 1, files: [
+    { name: "siryou1.png", desc: "人物情報①" },
+    { name: "siryou2.png", desc: "ことねのスマホ内の写真" }
+  ]},
+  { stage: 2, files: [
+    { name: "siryou3.png", desc: "ヌイニウム簡易報告資料" },
+    { name: "siryou4.png", desc: "人物情報②" },
+    { name: "siryou5.png", desc: "清夏のストーリー" }
+  ]},
+  { stage: 3, files: [
+    { name: "siryou6.png", desc: "人物情報③" },
+    { name: "siryou7.png", desc: "生徒会スケジュール表1" },
+    { name: "siryou8.png", desc: "生徒会スケジュール表2" }
+  ]},
+  { stage: 4, files: [] }, // 謎4のタイミングでは新規追加なし
+  { stage: 5, files: [
+    { name: "siryou9.png", desc: "生徒会企画資料" },
+    { name: "siryou10.png", desc: "人物情報⑤" }
+  ]},
+  { stage: 6, files: [] }  // 謎6のタイミングでは新規追加なし
 ];
 
 let htmlContent = "";
+let hasAnyDoc = false;
 
-// 現在の進行度（progress）以下の資料をすべてループで回して生成
-allFiles.forEach(file => {
-  if (progress >= file.availableFrom) {
-    htmlContent += `
-      <div class="doc-card" onclick="viewDocument('${file.name}')">
-        <div class="doc-icon">${file.icon}</div>
-        <div class="doc-info">
-          <div class="doc-file">${file.name}</div>
-          <div class="doc-title">${file.title}</div>
-        </div>
-        <div style="color: #ccc; font-size: 18px;">➔</div>
-      </div>
-    `;
+// 進行度に応じて、解放されている資料カードを生成
+docData.forEach(group => {
+  if (progress >= group.stage) {
+    group.files.forEach(file => {
+      hasAnyDoc = true;
+      // 各画像ファイルに直接リンク（別タブか同タブで画像を開く設定）
+      htmlContent += `
+        <a href="${file.name}" target="_blank" class="doc-card">
+          <div class="doc-info">
+            <span class="doc-title">📄 ${file.desc}</span>
+            <span class="doc-filename">${file.name}</span>
+          </div>
+          <div class="open-arrow">▶</div>
+        </a>
+      `;
+    });
   }
 });
 
-if(htmlContent === "") {
-  htmlContent = `<p style="text-align:center; color:#666; font-size:14px; padding:20px 0;">閲覧可能な資料がありません。</p>`;
+// もし1つも解放されていない場合のフォールバック（基本的には謎1時点で2つ見られます）
+if (!hasAnyDoc) {
+  htmlContent = '<div class="no-docs-msg">現在利用可能な資料はありません。</div>';
 }
-documentList.innerHTML = htmlContent;
 
-// 【修正箇所】URLの「?後ろ」にファイル名を直接乗せて強制的に画面遷移させる関数
-function viewDocument(fileName) {
-  location.href = "view_document.html?" + fileName;
-}
+document.getElementById("documentsContainer").innerHTML = htmlContent;
 </script>
+
 </body>
 </html>
