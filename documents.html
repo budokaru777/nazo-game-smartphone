@@ -77,11 +77,9 @@ if(htmlContent === "") {
 }
 documentList.innerHTML = htmlContent;
 
-// 確実に画像表示用ページ（view_document.html）へ引き渡す処理
+// 【修正箇所】URLの「?後ろ」にファイル名を直接乗せて強制的に画面遷移させる関数
 function viewDocument(fileName) {
-  localStorage.setItem("returnPage", "documents.html");
-  localStorage.setItem("viewingImage", fileName); // 確実にLocalStorageに書き込む
-  location.href = "view_document.html";
+  location.href = "view_document.html?" + fileName;
 }
 </script>
 </body>
