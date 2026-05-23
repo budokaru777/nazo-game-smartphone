@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -69,43 +69,37 @@
 </div>
 
 <script>
-// 直前に見ていた問題のページを取得
 const lastPage = localStorage.getItem("returnPage") || "question1.html";
 
-// 画面の「現在の対象：資料_0X」の表示を自動更新
 const qNoMatch = lastPage.match(/\d+/);
 document.getElementById("displayQNo").innerText = `現在の対象：資料_0${qNoMatch ? qNoMatch[0] : '?'}`;
 
-// 資料2(question2)から来た場合のみ、ドラッグUIに自動で切り替える
 if(lastPage === "question2.html") {
   document.getElementById("textUi").style.display = "none";
   document.getElementById("dragUi").style.display = "block";
   document.getElementById("dragSubmitBtn").style.display = "block";
 }
 
-// 【謎1、謎3、謎4などの、通常の文字入力判定】
 function checkTextAnswer() {
   const input = document.getElementById('answerInput').value.trim();
   
-  // --- 謎1の判定 ---
+  // 謎1の判定
   if (lastPage === "question1.html" && input === "4965") {
     location.href = "back.html";
   } 
-  // --- 謎3の判定 ---
+  // 謎3の判定
   else if (lastPage === "question3.html" && input === "生徒会室") {
     location.href = "back.html";
   } 
-  // --- 謎4の判定（shift, SHIFT, ! のどれでも正解になります） ---
+  // 謎4の判定（正解画面 back_q4.html へ飛ばす）
   else if (lastPage === "question4.html" && (input === "shift" || input === "SHIFT" || input === "!")) {
-    location.href = "back_q4.html"; // 謎4専用：生徒会の企画資料画面へ
+    location.href = "back_q4.html";
   } 
-  // --- 不正解 ---
   else {
     location.href = "fail.html";
   }
 }
 
-// 【謎2専用のドラッグ並び順判定】
 function checkDragAnswer() {
   const slots = document.querySelectorAll(".slots .slot");
   let finalAns = "";
@@ -123,7 +117,7 @@ function checkDragAnswer() {
   }
 }
 
-// --- ドラッグ＆ドロップ制御（PC） ---
+// ドラッグ＆ドロップ（PC）
 let dragged = null;
 document.addEventListener("dragstart", e => { if(e.target.classList.contains("chip")) { dragged = e.target; } });
 document.addEventListener("dragover", e => e.preventDefault());
@@ -135,7 +129,7 @@ document.addEventListener("drop", e => {
   else if(pool) pool.appendChild(dragged);
 });
 
-// --- タッチイベント制御（スマホ） ---
+// タッチ（スマホ）
 document.addEventListener("touchstart", e => { if(e.target.classList.contains("chip")) dragged = e.target; }, {passive:true});
 document.addEventListener("touchend", e => {
   if(!dragged) return;
