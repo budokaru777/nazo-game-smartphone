@@ -3,45 +3,112 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>共有ストレージ</title>
+<title>資料一覧</title>
 <style>
-  html, body { margin: 0; padding: 0; height: 100%; width: 100%; font-family: sans-serif; background: #e0e0e0; }
-  .header { background: #333; color: white; padding: 15px; text-align: center; font-weight: bold; }
-  .folder-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 25px; }
-  .doc-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #333; position: relative; }
-  .doc-icon {
-    width: 65px; height: 80px; background: #fff; border: 1px solid #bbb; border-radius: 4px;
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.15); display: flex; justify-content: center; align-items: center; font-size: 30px;
-  }
-  .doc-label { margin-top: 10px; font-size: 11px; font-weight: bold; text-align: center; width: 80px; }
-  .locked { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
-  .lock-mark { position: absolute; top: 25px; font-size: 24px; z-index: 2; }
+  html, body { margin: 0; padding: 0; min-height: 100%; font-family: sans-serif; background: #f5f5f5; }
+  body { background: url("haikei.jpg") no-repeat center top/cover; background-attachment: fixed; padding: 20px 10px; box-sizing: border-box; }
+  
+  .container { width: 100%; max-width: 400px; margin: 0 auto; background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 20px 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); box-sizing: border-box; }
+  h2 { text-align: center; color: #333; margin-top: 0; font-size: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+  
+  .doc-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+  
+  .doc-card { display: flex; align-items: center; background: #fff; border: 1px solid #ddd; border-radius: 12px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.1s; }
+  .doc-card:active { transform: scale(0.98); }
+  
+  .doc-icon { width: 50px; height: 50px; background: #e0f7fa; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 24px; margin-right: 12px; flex-shrink: 0; }
+  .doc-info { flex-grow: 1; text-align: left; }
+  .doc-file { font-size: 11px; color: #777; font-family: monospace; }
+  .doc-title { font-size: 14px; font-weight: bold; color: #333; margin-top: 2px; }
+
+  .back-btn { display: block; width: 100%; padding: 14px; background: #333; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: bold; text-align: center; cursor: pointer; text-decoration: none; box-sizing: border-box; }
 </style>
 </head>
 <body>
-<div class="header">共有ストレージ</div>
-<div class="folder-grid">
-  <a href="question1.html" class="doc-item">
-    <div class="doc-icon">📄</div>
-    <div class="doc-label">資料_01</div>
-  </a>
 
-  <script>
-    // 進行度を取得。なければ1。
-    const progress = parseInt(localStorage.getItem("gameProgress") || 1);
-    for (let i = 2; i <= 6; i++) {
-      let isLocked = i > progress;
-      document.write(`
-        <a href="question${i}.html" class="doc-item ${isLocked ? 'locked' : ''}">
-          <div class="doc-icon">📄${isLocked ? '<span class="lock-mark">🔒</span>' : ''}</div>
-          <div class="doc-label">資料_0${i}</div>
-        </a>
-      `);
-    }
-  </script>
+<div class="container">
+  <h2>手がかり資料一覧</h2>
+  
+  <div class="doc-list" id="documentList">
+    </div>
+
+  <button class="back-btn" onclick="location.href='index.html'">メインメニューに戻る</button>
 </div>
-<div style="text-align:center; margin-top:20px;">
-  <button onclick="location.href='index.html'" style="padding:10px 20px; border-radius:20px; border:none; background:#666; color:white;">戻る</button>
-</div>
+
+<script>
+const progress = parseInt(localStorage.getItem("gameProgress") || "1");
+const documentList = document.getElementById("documentList");
+
+// 資料解禁の最新マスタデータ
+const allDocuments = [
+  {
+    stage: 1,
+    files: [
+      { name: "siryou1.png", title: "人物情報①", icon: "👤" },
+      { name: "siryou2.png", title: "ことねのスマホ内の写真", icon: "📱" }
+    ]
+  },
+  {
+    stage: 2,
+    files: [
+      { name: "siryou3.png", title: "ヌイニウム簡易報告資料", icon: "📄" },
+      { name: "siryou4.png", title: "人物情報②", icon: "👤" },
+      { name: "siryou5.png", title: "清夏のストーリー", icon: "📝" }
+    ]
+  },
+  {
+    stage: 3,
+    files: [
+      { name: "siryou6.png", title: "人物情報③", icon: "👤" },
+      { name: "siryou7.png", title: "生徒会スケジュール表1", icon: "📅" },
+      { name: "siryou8.png", title: "生徒会スケジュール表2", icon: "📅" }
+    ]
+  },
+  {
+    stage: 4, // 謎4解く前は新規なし
+    files: []
+  },
+  {
+    stage: 5, // 謎5の段階で解禁されるもの
+    files: [
+      { name: "siryou9.png", title: "生徒会企画資料", icon: "📁" },
+      { name: "siryou10.png", title: "人物情報⑤", icon: "👤" } // 追加
+    ]
+  },
+  {
+    stage: 6, // 謎6は新規なし
+    files: []
+  }
+];
+
+let htmlContent = "";
+allDocuments.forEach(group => {
+  if (progress >= group.stage) {
+    group.files.forEach(file => {
+      htmlContent += `
+        <div class="doc-card" onclick="viewDocument('${file.name}')">
+          <div class="doc-icon">${file.icon}</div>
+          <div class="doc-info">
+            <div class="doc-file">${file.name}</div>
+            <div class="doc-title">${file.title}</div>
+          </div>
+          <div style="color: #ccc; font-size: 18px;">➔</div>
+        </div>
+      `;
+    });
+  }
+});
+
+if(htmlContent === "") {
+  htmlContent = `<p style="text-align:center; color:#666; font-size:14px; padding:20px 0;">閲覧可能な資料がありません。</p>`;
+}
+documentList.innerHTML = htmlContent;
+
+function viewDocument(fileName) {
+  localStorage.setItem("returnPage", "documents.html");
+  localStorage.setItem("viewingImage", fileName);
+  location.href = "view_document.html";
+}
+</script>
 </body>
 </html>
