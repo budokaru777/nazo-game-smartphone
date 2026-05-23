@@ -7,12 +7,28 @@
 <style>
   body { margin: 0; height: 100vh; background: url("haikei.jpg") no-repeat center/cover; display: flex; justify-content: center; align-items: center; font-family: sans-serif; }
   .box { background: rgba(255, 255, 255, 0.95); padding: 25px; border-radius: 20px; text-align: center; width: 85%; max-width: 360px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); max-height: 90vh; overflow-y: auto; }
+  
   h2 { color: #2e7d32; font-size: 22px; margin-top: 0; margin-bottom: 10px; }
   .clear-img { width: 100%; height: auto; border-radius: 12px; margin-bottom: 15px; }
   
-  /* 生徒会の秘密資料風のテキストボックス */
-  .document-box { background: #fafafa; border: 2px dashed #9e9e9e; padding: 15px; text-align: left; border-radius: 10px; margin-bottom: 20px; font-size: 13px; color: #333; line-height: 1.5; }
-  .doc-title { font-weight: bold; color: #1b5e20; text-align: center; margin-bottom: 8px; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
+  /* 企画資料表示エリア */
+  .document-container { 
+    background: #fff; 
+    border: 2px solid #2e7d32; 
+    padding: 10px; 
+    border-radius: 10px; 
+    margin-bottom: 20px; 
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+  }
+  .doc-label { font-size: 12px; font-weight: bold; color: #1b5e20; margin-bottom: 8px; display: block; }
+  
+  /* siryou.png の表示スタイル */
+  .siryou-img { 
+    width: 100%; 
+    height: auto; 
+    border-radius: 5px; 
+    display: block;
+  }
 
   .next-btn { width: 100%; padding: 16px; font-size: 16px; font-weight: bold; background: #2e7d32; color: white; border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 5px 0 #1b5e20; transition: all 0.1s; outline: none; }
   .next-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #1b5e20; }
@@ -24,12 +40,9 @@
   <img src="クリア画面.png" class="clear-img" alt="正解">
   <h2>ロック解除成功！</h2>
   
-  <div class="document-box">
-    <div class="doc-title">【極秘】生徒会 企画立案資料</div>
-    <p style="margin:0;">
-      ここに生徒会の企画資料の内容テキスト、あるいは画像を表示します。<br><br>
-      謎が解き明かされた。本誌の漫画に戻って物語を読み進めよう！
-    </p>
+  <div class="document-container">
+    <span class="doc-label">【極秘】生徒会 企画立案資料</span>
+    <img src="siryou.png" class="siryou-img" alt="生徒会企画資料">
   </div>
 
   <button class="next-btn" onclick="goNext()">漫画・資料一覧へ戻る</button>
@@ -37,12 +50,12 @@
 
 <script>
 function goNext() {
-  // 進行度を次の問題（謎5）に進める
+  // 進行度を謎5に進める
   let prog = parseInt(localStorage.getItem("gameProgress") || 1);
   if (prog <= 4) {
     localStorage.setItem("gameProgress", 5);
   }
-  // 資料一覧に戻す
+  // 資料一覧（または漫画に戻るためのページ）へ
   location.href = "documents.html";
 }
 </script>
