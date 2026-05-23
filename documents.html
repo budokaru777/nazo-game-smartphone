@@ -16,10 +16,8 @@
 
   h2 { color: #1a237e; font-size: 18px; margin: 0 0 15px 0; border-bottom: 2px solid #1a237e; padding-bottom: 5px; }
 
-  /* 資料リスト全体のスタイル */
   .docs-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; text-align: left; }
   
-  /* 各資料アイテム */
   .doc-card {
     background: #ffffff; border: 1px solid #c5e1a5; border-radius: 10px;
     padding: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
@@ -32,10 +30,7 @@
   .doc-filename { font-size: 11px; color: #757575; font-family: monospace; }
   .doc-title { font-size: 14px; font-weight: bold; color: #2e7d32; }
   
-  /* 開くボタンマーク */
   .open-arrow { font-size: 16px; color: #81c784; font-weight: bold; }
-
-  /* まだ解放されていない状態の表示 */
   .no-docs-msg { text-align: center; color: #999; font-size: 13px; padding: 20px 0; }
 
   .back-btn { display: block; width: 100%; padding: 12px; background: #607d8b; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; text-decoration: none; box-sizing: border-box; }
@@ -52,10 +47,8 @@
 </div>
 
 <script>
-// 現在のゲーム進行度を取得（デフォルトは謎1の「1」）
 const progress = parseInt(localStorage.getItem("gameProgress") || "1");
 
-// 指定された資料の解放スケジュールデータ
 const docData = [
   { stage: 1, files: [
     { name: "siryou1.png", desc: "人物情報①" },
@@ -71,25 +64,24 @@ const docData = [
     { name: "siryou7.png", desc: "生徒会スケジュール表1" },
     { name: "siryou8.png", desc: "生徒会スケジュール表2" }
   ]},
-  { stage: 4, files: [] }, // 謎4のタイミングでは新規追加なし
+  { stage: 4, files: [] },
   { stage: 5, files: [
     { name: "siryou9.png", desc: "生徒会企画資料" },
     { name: "siryou10.png", desc: "人物情報⑤" }
   ]},
-  { stage: 6, files: [] }  // 謎6のタイミングでは新規追加なし
+  { stage: 6, files: [] }
 ];
 
 let htmlContent = "";
 let hasAnyDoc = false;
 
-// 進行度に応じて、解放されている資料カードを生成
 docData.forEach(group => {
   if (progress >= group.stage) {
     group.files.forEach(file => {
       hasAnyDoc = true;
-      // 各画像ファイルに直接リンク（別タブか同タブで画像を開く設定）
+      // ★ ここで直接画像を開くのではなく、view.html にパラメータを渡して移動させます
       htmlContent += `
-        <a href="${file.name}" target="_blank" class="doc-card">
+        <a href="view.html?img=${file.name}&title=${encodeURIComponent(file.desc)}" class="doc-card">
           <div class="doc-info">
             <span class="doc-title">📄 ${file.desc}</span>
             <span class="doc-filename">${file.name}</span>
@@ -101,7 +93,6 @@ docData.forEach(group => {
   }
 });
 
-// もし1つも解放されていない場合のフォールバック（基本的には謎1時点で2つ見られます）
 if (!hasAnyDoc) {
   htmlContent = '<div class="no-docs-msg">現在利用可能な資料はありません。</div>';
 }
