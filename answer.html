@@ -17,19 +17,29 @@
   h2 { color: #333; font-size: 18px; margin: 0 0 5px 0; }
   .q-number { font-size: 13px; color: #666; font-weight: bold; margin-bottom: 15px; }
 
-  /* 文字入力用（謎1, 3, 4, 5） */
+  /* 通常入力用UI（謎1, 3, 4, 5用） */
   .text-input-area { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
   #answerInput { flex: 1; height: 45px; font-size: 18px; border: 2px solid #333; border-radius: 10px; text-align: center; outline: none; }
 
-  /* 謎2専用：ドラッグ＆ドロップ */
+  /* 謎2・謎6用：ドラッグ＆ドロップUI共通 */
   .drag-input-area { display: none; }
-  .slots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; background: #b0bec5; padding: 10px; border-radius: 10px; margin-bottom: 12px; }
-  .slot { height: 42px; background: rgba(255,255,255,0.7); border: 2px dashed #455a64; border-radius: 8px; display: flex; justify-content: center; align-items: center; }
-  .pool { background: #cfd8dc; padding: 10px; border-radius: 12px; margin-bottom: 20px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; min-height: 120px; }
-  .chip { background: #fff; border: 2px solid #455a64; border-radius: 8px; padding: 8px 0; font-size: 12px; font-weight: bold; color: #263238; cursor: grab; user-select: none; touch-action: none; }
+  .slots { display: grid; gap: 6px; background: #b0bec5; padding: 10px; border-radius: 10px; margin-bottom: 12px; }
+  .slot { height: 44px; background: rgba(255,255,255,0.7); border: 2px dashed #455a64; border-radius: 8px; display: flex; justify-content: center; align-items: center; }
+  
+  /* 穴埋めテキスト補助（謎6用） */
+  .phrase-text { font-size: 16px; font-weight: bold; color: #333; display: flex; justify-content: center; align-items: center; gap: 5px; }
+
+  .pool { background: #cfd8dc; padding: 10px; border-radius: 12px; margin-bottom: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; min-height: 100px; }
+  
+  .chip {
+    background: #fff; border: 2px solid #455a64; border-radius: 8px; padding: 10px 0;
+    font-size: 14px; font-weight: bold; color: #263238; cursor: grab; box-shadow: 0 3px 0 #b0bec5; touch-action: none; user-select: none;
+    text-align: center; width: 100%; box-sizing: border-box;
+  }
 
   .ok-btn { width: 70px; height: 45px; background: #333; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; }
   .submit-large-btn { display: none; width: 100%; padding: 14px; background: #2e7d32; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; margin-bottom: 15px; }
+
   .back-btn { display: block; width: 100%; padding: 12px; background: #607d8b; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; text-decoration: none; box-sizing: border-box; }
 </style>
 </head>
@@ -37,7 +47,7 @@
 
 <div class="content-box">
   <h2>解答入力</h2>
-  <div class="q-number" id="displayQNo">対象 of 資料: なし</div>
+  <div class="q-number" id="displayQNo">対象の資料: なし</div>
   
   <div class="text-input-area" id="textUi">
     <input id="answerInput" type="text" placeholder="キーワードを入力">
@@ -45,14 +55,21 @@
   </div>
 
   <div class="drag-input-area" id="dragUi">
-    <div class="slots">
+    
+    <div class="slots" id="slotsQ2" style="grid-template-columns: repeat(5, 1fr);">
       <div class="slot"></div><div class="slot"></div><div class="slot"></div><div class="slot"></div><div class="slot"></div>
     </div>
-    <div class="pool" id="ansPool">
-      <div class="chip">イノ</div><div class="chip">マチ</div><div class="chip">ハン</div><div class="chip">キタ</div><div class="chip">ライ</div>
-      <div class="chip">ママ</div><div class="chip">セイ</div><div class="chip">テマ</div><div class="chip">ケト</div><div class="chip">クツ</div>
-      <div class="chip">キー</div><div class="chip">アミ</div><div class="chip">ヒト</div><div class="chip">トカ</div><div class="chip">ニン</div>
+
+    <div class="slots id" id="slotsQ6" style="display:none; background: #bbdefb; padding: 15px 10px;">
+      <div class="phrase-text">
+        <div class="slot" style="width:75px; background:#fff;"></div> を 
+        <div class="slot" style="width:75px; background:#fff;"></div> 
+        <div class="slot" style="width:75px; background:#fff;"></div>
+      </div>
     </div>
+
+    <div class="pool" id="ansPool"></div>
+
     <button class="submit-large-btn" id="dragSubmitBtn" onclick="checkDragAnswer()">この並びで回答する</button>
   </div>
 
@@ -60,50 +77,79 @@
 </div>
 
 <script>
+// 直前に見ていた問題のページを取得
 const lastPage = localStorage.getItem("returnPage") || "question1.html";
+
+// 画面の「現在の対象：資料_0X」の表示を自動更新
 const qNoMatch = lastPage.match(/\d+/);
 document.getElementById("displayQNo").innerText = `現在の対象：資料_0${qNoMatch ? qNoMatch[0] : '?'}`;
 
+const poolContainer = document.getElementById("ansPool");
+
+// ★【UI分岐】資料2、資料6から来た場合、それぞれ専用のドラッグUIを組み立てる
 if(lastPage === "question2.html") {
   document.getElementById("textUi").style.display = "none";
   document.getElementById("dragUi").style.display = "block";
   document.getElementById("dragSubmitBtn").style.display = "block";
+  poolContainer.style.gridTemplateColumns = "repeat(5, 1fr)";
+  
+  // 謎2用の選択肢
+  const chipsQ2 = ["イノ","マチ","ハン","キタ","ライ","ママ","セイ","テマ","ケト","クツ","キー","アミ","ヒト","トカ","ニン"];
+  chipsQ2.forEach(txt => {
+    poolContainer.innerHTML += `<div class="chip">${txt}</div>`;
+  });
+} 
+else if(lastPage === "question6.html") {
+  document.getElementById("textUi").style.display = "none";
+  document.getElementById("dragUi").style.display = "block";
+  document.getElementById("slotsQ2").style.display = "none";
+  document.getElementById("slotsQ6").style.display = "block";
+  document.getElementById("dragSubmitBtn").style.display = "block";
+  poolContainer.style.gridTemplateColumns = "repeat(3, 1fr)";
+
+  // 謎6用の選択肢（①、②、③のご提示パーツ）
+  const chipsQ6 = ["頭", "お湯", "名前", "10回", "全体に", "5回", "呼ぶ", "なでる", "かける"];
+  chipsQ6.forEach(txt => {
+    poolContainer.innerHTML += `<div class="chip">${txt}</div>`;
+  });
 }
 
+// 【謎1, 3, 4, 5の文字入力判定】
 function checkTextAnswer() {
   const input = document.getElementById('answerInput').value.trim();
-  
-  // 謎1の判定
-  if (lastPage === "question1.html" && input === "4965") { 
-    location.href = "back.html"; 
+  if (lastPage === "question1.html" && input === "4965") { location.href = "back.html"; } 
+  else if (lastPage === "question3.html" && input === "生徒会室") { location.href = "back.html"; } 
+  else if (lastPage === "question4.html" && (input === "shift" || input === "SHIFT" || input === "!")) { location.href = "back_q4.html"; } 
+  else if (lastPage === "question5.html" && input === "ダンスレッスン室") { location.href = "back.html"; } 
+  else { location.href = "fail.html"; }
+}
+
+// 【謎2・謎6共通：ドラッグ並び順判定】
+function checkDragAnswer() {
+  if (lastPage === "question2.html") {
+    const slots = document.querySelectorAll("#slotsQ2 .slot");
+    let finalAns = "";
+    slots.forEach(slot => { if(slot.children.length > 0) finalAns += slot.children[0].innerText; });
+
+    if(finalAns === "セイトカイノクツキー") { location.href = "back.html"; } else { location.href = "fail.html"; }
   } 
-  // 謎3の判定
-  else if (lastPage === "question3.html" && input === "生徒会室") { 
-    location.href = "back.html"; 
-  } 
-  // 謎4の判定
-  else if (lastPage === "question4.html" && (input === "shift" || input === "SHIFT" || input === "!")) {
-    location.href = "back_q4.html"; 
-  } 
-  // 謎5の判定（追加分）
-  else if (lastPage === "question5.html" && input === "ダンスレッスン室") {
-    location.href = "back.html"; // 正解なら正解画面へ
-  } 
-  else { 
-    location.href = "fail.html"; 
+  else if (lastPage === "question6.html") {
+    const slots = document.querySelectorAll("#slotsQ6 .slot");
+    let finalAns = "";
+    slots.forEach(slot => { if(slot.children.length > 0) finalAns += slot.children[0].innerText; });
+
+    // 「名前」「5回」「呼ぶ」の順番で埋まっていれば正解！
+    if(finalAns === "名前5回呼ぶ") {
+      location.href = "back.html"; // 必要に応じてクリア後のエンディング等に書き換えてください
+    } else {
+      location.href = "fail.html";
+    }
   }
 }
 
-function checkDragAnswer() {
-  const slots = document.querySelectorAll(".slots .slot");
-  let finalAns = "";
-  slots.forEach(slot => { if(slot.children.length > 0) finalAns += slot.children[0].innerText; });
-  if(finalAns === "セイトカイノクツキー") { location.href = "back.html"; } else { location.href = "fail.html"; }
-}
-
-// ドラッグ制御（PC）
+// --- ドラッグ＆ドロップ共通制御（PC） ---
 let dragged = null;
-document.addEventListener("dragstart", e => { if(e.target.classList.contains("chip")) dragged = e.target; });
+document.addEventListener("dragstart", e => { if(e.target.classList.contains("chip")) { dragged = e.target; } });
 document.addEventListener("dragover", e => e.preventDefault());
 document.addEventListener("drop", e => {
   e.preventDefault();
@@ -113,7 +159,7 @@ document.addEventListener("drop", e => {
   else if(pool) pool.appendChild(dragged);
 });
 
-// タッチ制御（スマホ）
+// --- タッチイベント共通制御（スマホ） ---
 document.addEventListener("touchstart", e => { if(e.target.classList.contains("chip")) dragged = e.target; }, {passive:true});
 document.addEventListener("touchend", e => {
   if(!dragged) return;
