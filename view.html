@@ -16,7 +16,7 @@
 
   h2 { color: #333; font-size: 16px; margin: 0 0 15px 0; font-weight: bold; }
 
-  /* 画像表示エリア */
+  /* 画像表示エリア（スマホ用に拡大時のはみ出しを制御） */
   .image-container {
     width: 100%;
     background: #f5f5f5;
@@ -25,12 +25,27 @@
     box-sizing: border-box;
     margin-bottom: 20px;
     box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+    overflow: hidden; /* 拡大時に枠外を隠す */
+    position: relative;
+    touch-action: none; /* ブラウザ標準のスクロールやズームを無効化してJSで制御 */
   }
+  
+  .img-wrapper {
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    will-change: transform;
+  }
+
   .target-img {
     width: 100%;
     height: auto;
     border-radius: 5px;
     display: block;
+    user-select: none;
+    -webkit-user-drag: none;
   }
 
   /* 「元に戻る」ボタンのスタイル */
@@ -48,8 +63,10 @@
 <div class="content-box">
   <h2 id="docTitle">資料確認</h2>
   
-  <div class="image-container">
-    <img id="mainImage" src="" class="target-img" alt="手がかり資料">
+  <div class="image-container" id="zoomContainer">
+    <div class="img-wrapper" id="imgWrapper">
+      <img id="mainImage" src="" class="target-img" alt="手がかり資料">
+    </div>
   </div>
 
   <button class="back-docs-btn" onclick="location.href='documents.html'">◀ 資料一覧に戻る</button>
@@ -62,13 +79,100 @@ const imgName = urlParams.get('img');
 const docTitle = urlParams.get('title');
 
 if (imgName) {
-  // 画像とタイトルを画面にセット
   document.getElementById('mainImage').src = imgName;
   if (docTitle) {
     document.getElementById('docTitle').innerText = decodeURIComponent(docTitle);
   }
 } else {
   document.getElementById('docTitle').innerText = "エラー：資料が見つかりません";
+}
+
+// --- ★ スマホ用ピンチズーム＆スムーズドラッグ制御ロジック ---
+const container = document.getElementById('zoomContainer');
+const wrapper = document.getElementById('imgWrapper');
+
+let scale = 1;
+let pointX = 0;
+let pointY = 0;
+let startX = 0;
+let startY = 0;
+let isPanning = false;
+let evHistory = [];
+let lastTap = 0;
+
+// 変形リセット・適用関数
+function updateTransform() {
+  // 縮小しすぎを防ぐ
+  if (scale < 1) scale = 1;
+  // 拡大上限（4倍）
+  if (scale > 4) scale = 4;
+
+  // 1倍の時は位置を完全に中央にリセット
+  if (scale === 1) {
+    pointX = 0;
+    pointY = 0;
+  }
+
+  wrapper.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+}
+
+// タッチ開始
+container.addEventListener('touchstart', (e) => {
+  if (e.targetTouches.length === 1) {
+    // 1本指：ドラッグ移動の準備
+    isPanning = true;
+    startX = e.targetTouches[0].clientX - pointX;
+    startY = e.targetTouches[0].clientY - pointY;
+    
+    // ダブルタップ判定（ズーム切り替え）
+    const now = window.performance.now();
+    if (now - lastTap < 300) {
+      scale = (scale === 1) ? 2.5 : 1;
+      updateTransform();
+      isPanning = false;
+    }
+    lastTap = now;
+  } else if (e.targetTouches.length === 2) {
+    // 2本指：ピンチズームの準備
+    isPanning = false;
+    container.dataset.startDist = getDistance(e.targetTouches);
+    container.dataset.startScale = scale;
+  }
+}, { passive: true });
+
+// タッチ中移動
+container.addEventListener('touchmove', (e) => {
+  if (isPanning && scale > 1) {
+    // 拡大中のみ1本指ドラッグで移動可能にする
+    pointX = e.targetTouches[0].clientX - startX;
+    pointY = e.targetTouches[0].clientY - startY;
+    updateTransform();
+  } else if (e.targetTouches.length === 2) {
+    // ピンチズーム処理
+    const dist = getDistance(e.targetTouches);
+    const startDist = parseFloat(container.dataset.startDist);
+    const startScale = parseFloat(container.dataset.startScale);
+    
+    if (startDist > 0) {
+      scale = startScale * (dist / startDist);
+      updateTransform();
+    }
+  }
+}, { passive: true });
+
+// タッチ終了
+container.addEventListener('touchend', (e) => {
+  isPanning = false;
+  if (e.targetTouches.length < 2) {
+    container.dataset.startDist = "0";
+  }
+});
+
+// 2点間の距離計算（ピンチ用）
+function getDistance(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx * dx + dy * dy);
 }
 </script>
 
