@@ -23,16 +23,42 @@
   .q-title { font-size: 18px; font-weight: bold; color: #1a237e; margin-bottom: 5px; text-align: left; }
   .q-text { font-size: 15px; color: #333; text-align: left; margin-bottom: 15px; background: #f5f5f5; padding: 12px; border-radius: 8px; line-height: 1.5; font-weight: bold; }
 
-  /* 【新設】ドラッグ＆ドロップ（解答入力）エリアのスタイル */
+  /* 現在見られる資料の一覧エリアのスタイル */
+  .unlocked-docs-area {
+    background: #f1f8e9; border: 1px solid #c5e1a5; border-radius: 10px;
+    padding: 10px; margin-bottom: 15px; text-align: left;
+  }
+  .unlocked-docs-title { font-size: 12px; font-weight: bold; color: #33691e; margin-bottom: 6px; border-bottom: 1px dashed #c5e1a5; padding-bottom: 3px; }
+  .unlocked-doc-item { font-size: 11px; color: #424242; line-height: 1.5; font-family: monospace; }
+
+  /* ドラッグ＆ドロップ（解答入力）エリアのスタイル */
   .answer-puzzle-area {
     background: #f5f5f5; border: 2px solid #333; border-radius: 15px;
     padding: 12px 10px; margin-bottom: 20px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
   }
   .input-label { font-size: 13px; font-weight: bold; color: #333; margin-bottom: 8px; text-align: left; padding-left: 5px; }
   
-  /* 枠（スロット）の並び */
-  .slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: #b0bec5; padding: 8px; border-radius: 10px; margin-bottom: 12px; }
-  .slot { height: 45px; background: rgba(255,255,255,0.7); border: 2px dashed #455a64; border-radius: 8px; display: flex; justify-content: center; align-items: center; }
+  /* 枠（スロット）の並び：文字を挟むためフレックスボックスに変更 */
+  .slots-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #b0bec5;
+    padding: 8px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    gap: 4px;
+  }
+  .slot { flex: 1; height: 45px; background: rgba(255,255,255,0.7); border: 2px dashed #455a64; border-radius: 8px; display: flex; justify-content: center; align-items: center; }
+  
+  /* 固定文字「を」のスタイル */
+  .fixed-text {
+    font-size: 14px;
+    font-weight: bold;
+    color: #263238;
+    padding: 0 2px;
+    white-space: nowrap;
+  }
   
   /* 選択肢（プール）の並び */
   .pool { background: #cfd8dc; padding: 8px; border-radius: 12px; margin-bottom: 15px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; min-height: 100px; }
@@ -126,13 +152,19 @@
   <div class="q-title">謎６</div>
   <div class="q-text">問題文：<br>ぬいぐるみの呪いを解く正しい方法を並べ替えてください</div>
 
+  <div class="unlocked-docs-area">
+    <div class="unlocked-docs-title">💡 現在使える手がかり資料</div>
+    <div id="unlockedDocsList"></div>
+  </div>
+
   <div class="answer-puzzle-area">
     <div class="input-label">🧩 パーツを枠内にドラッグして並べてください：</div>
     
-    <div class="slots" id="slotsArea">
-      <div class="slot"></div>
-      <div class="slot"></div>
-      <div class="slot"></div>
+    <div class="slots-container" id="slotsArea">
+      <div class="slot" id="slot1"></div>
+      <div class="fixed-text">を</div>
+      <div class="slot" id="slot2"></div>
+      <div class="slot" id="slot3"></div>
     </div>
     
     <div class="pool" id="ansPool">
@@ -181,24 +213,44 @@
 // 直前ページ情報を保存
 localStorage.setItem("returnPage", "question6.html");
 
-// 【新設】答えの判定ロジック
-function checkPuzzleAnswer() {
-  const slots = document.querySelectorAll("#slotsArea .slot");
-  let finalAns = "";
-  
-  // 枠の中に入っている文字を左から順に結合
-  slots.forEach(slot => {
-    if(slot.children.length > 0) {
-      finalAns += slot.children[0].innerText;
-    }
-  });
+// 手がかり資料の一覧を動的に結合して表示するロジック
+const progress = parseInt(localStorage.getItem("gameProgress") || "1");
 
-  // 正解「名前5回呼ぶ」の判定
+const docData = [
+  { stage: 1, files: ["siryou1.png : 人物情報①", "siryou2.png : ことねのスマホ内の写真"] },
+  { stage: 2, files: ["siryou3.png : ヌイニウム簡易報告資料", "siryou4.png : 人物情報②", "siryou5.png : 清夏のストーリー"] },
+  { stage: 3, files: ["siryou6.png : 人物情報③", "siryou7.png : 生徒会スケジュール表1", "siryou8.png : 生徒会スケジュール表2"] },
+  { stage: 4, files: [] },
+  { stage: 5, files: ["siryou9.png : 生徒会企画資料", "siryou10.png : 人物情報⑤"] },
+  { stage: 6, files: [] }
+];
+
+let docListHtml = "";
+docData.forEach(group => {
+  if (progress >= group.stage) {
+    group.files.forEach(fInfo => {
+      docListHtml += `<div class="unlocked-doc-item">📄 ${fInfo}</div>`;
+    });
+  }
+});
+document.getElementById("unlockedDocsList").innerHTML = docListHtml || '<div class="unlocked-doc-item" style="color:#999;">利用可能な資料がありません</div>';
+
+// 答えの判定ロジック
+function checkPuzzleAnswer() {
+  const s1 = document.getElementById("slot1");
+  const s2 = document.getElementById("slot2");
+  const s3 = document.getElementById("slot3");
+  
+  let t1 = s1.children.length > 0 ? s1.children[0].innerText : "";
+  let t2 = s2.children.length > 0 ? s2.children[0].innerText : "";
+  let t3 = s3.children.length > 0 ? s3.children[0].innerText : "";
+
+  // 間に「を」が入るので、文字を結合した時に「名前5回呼ぶ」になれば正解
+  let finalAns = t1 + t2 + t3;
+
   if (finalAns === "名前5回呼ぶ") {
-    // 正解：謎6（ラスト）のため進行度は更新せず、共通のback.htmlへ遷移
     location.href = "back.html";
   } else {
-    // 不正解：fail.htmlへ遷移
     location.href = "fail.html";
   }
 }
@@ -210,11 +262,11 @@ function showBubble(id) {
 
 function askAnswer() {
   if(confirm("答えを見ますか？")) {
-    alert("答えは「名前」「5回」「呼ぶ」の順番です！");
+    alert("答えは「名前」を「5回」「呼ぶ」の順番です！");
   }
 }
 
-// 【新設】ドラッグ＆ドロップ／タッチ操作の物理移動制御ロジック
+// ドラッグ＆ドロップ／タッチ操作の物理移動制御ロジック
 let dragged = null;
 
 // PC用のドラッグイベント
