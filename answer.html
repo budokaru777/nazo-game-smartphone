@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>解答入力</title>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; position: fixed; font-family: sans-serif; }
+  body { background: url("haikei.jpg") no-repeat center -95px/cover; display: flex; justify-content: center; align-items: flex-start; }
+  
+  .content-box { 
+    width: 90%; 
+    max-width: 380px; 
+    background: rgba(255, 255, 255, 0.95); 
+    padding: 30px 20px; 
+    border-radius: 20px; 
+    text-align: center; 
+    margin-top: 40px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    box-sizing: border-box;
+  }
+
+  h2 {
+    color: #333;
+    font-size: 20px;
+    margin-bottom: 5px;
+  }
+
+  .q-number {
+    font-size: 14px;
+    color: #666;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  /* 鍵や小箱をイメージしたアイコン枠 */
+  .lock-icon-area {
+    font-size: 50px;
+    margin-bottom: 20px;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+
+  .input-row { 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 10px; 
+    margin-bottom: 25px; 
+  }
+
+  #answerInput { 
+    flex: 1; 
+    height: 48px; 
+    font-size: 20px; 
+    border: 2px solid #333; 
+    border-radius: 10px; 
+    text-align: center; 
+    outline: none;
+    box-sizing: border-box;
+  }
+
+  .ok-btn { 
+    width: 70px; 
+    height: 48px; 
+    background: #333; 
+    color: white; 
+    border: none; 
+    border-radius: 10px; 
+    font-weight: bold; 
+    font-size: 16px;
+    cursor: pointer; 
+    transition: background 0.2s;
+  }
+
+  .ok-btn:active {
+    background: #555;
+  }
+
+  .back-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background: #607d8b;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    box-sizing: border-box;
+  }
+</style>
+</head>
+<body>
+
+<div class="content-box">
+  <h2 id="displayTitle">解答入力</h2>
+  <div class="q-number" id="displayQNo">対象の資料: なし</div>
+  
+  <div class="lock-icon-area">🔐</div>
+
+  <div class="input-row">
+    <input id="answerInput" type="text" placeholder="キーワードを入力">
+    <button class="ok-btn" onclick="checkAnswer()">OK</button>
+  </div>
+
+  <button class="back-btn" onclick="goBackToQuestion()">元の資料に戻る</button>
+</div>
+
+<script>
+// 各問題（資料）の正解を設定する辞書データ
+// 資料を増やす場合は、ここに「'question2.html': '正解の文字',」のように追加していけます
+const answerKey = {
+  'question1.html': '4965',
+  'question2.html': 'てがみ',
+  'question3.html': '777',
+  'question4.html': 'ひみつ',
+  'question5.html': 'open',
+  'question6.html': 'らすと'
+};
+
+// プレイヤーが直前に見ていた資料のページを取得（デフォルトはquestion1）
+const lastPage = localStorage.getItem("returnPage") || "question1.html";
+
+// 画面表示を現在解いている問題番号に合わせる（例: question1.html -> 資料_01）
+const qNoMatch = lastPage.match(/\d+/);
+const qNoStr = qNoMatch ? `資料_0${qNoMatch[0]}` : "資料";
+document.getElementById("displayQNo").innerText = `現在の対象：${qNoStr}`;
+
+function checkAnswer() {
+  const userInput = document.getElementById('answerInput').value.trim();
+  
+  // 現在の問題に応じた正解を取得
+  const correctAns = answerKey[lastPage];
+
+  if (!correctAns) {
+    alert("エラー：対象の謎が見つかりません。資料一覧からもう一度やり直してください。");
+    return;
+  }
+
+  if (userInput === correctAns) {
+    // 全クリア判定（最後の問題である question6.html をクリアした場合）
+    if (lastPage === "question6.html") {
+      location.href = "clear.html"; // 全クリア画面へ（元のソースのCASE CLOSEDの画面）
+    } else {
+      location.href = "back.html";  // 通常の正解画面へ
+    }
+  } else {
+    location.href = "fail.html";    // 不正解画面へ
+  }
+}
+
+// 元の資料画面に戻るボタンの処理
+function goBackToQuestion() {
+  location.href = lastPage;
+}
+</script>
+
+</body>
+</html>
