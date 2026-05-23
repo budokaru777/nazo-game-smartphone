@@ -123,7 +123,7 @@ localStorage.setItem("returnPage", "question4.html");
 function checkAnswer() {
   const input = document.getElementById('answerInput').value.trim();
   
-  if (input === "shift" || input === "SHIFT" || input === "!") {
+  if (input === "Shift" || input === "SHIFT" || input === "!") {
     // 正解：進行度を「5」にして【back.html】へ遷移するように変更しました
     localStorage.setItem("gameProgress", "5");
     location.href = "back.html";
@@ -140,7 +140,7 @@ function showBubble(id) {
 
 function askAnswer() {
   if(confirm("答えを見ますか？")) {
-    alert("答えは「shift（!）」です！");
+    alert("答えは「Shift」です！");
   }
 }
 </script>
