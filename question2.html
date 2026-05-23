@@ -1,1 +1,241 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>資料2</title>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; position: fixed; font-family: sans-serif; }
+  body { background: url("haikei.jpg") no-repeat center -95px/cover; display: flex; justify-content: center; align-items: flex-start; }
+  
+  .content-box { 
+    width: 90%; 
+    max-width: 380px; 
+    background: rgba(255, 255, 255, 0.95); 
+    padding: 15px 15px; 
+    border-radius: 20px; 
+    text-align: center; 
+    margin-top: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    box-sizing: border-box;
+    max-height: 95vh;
+    overflow-y: auto;
+  }
 
+  .q-title { font-size: 16px; font-weight: bold; color: #1a237e; margin: 5px 0; text-align: left; line-height: 1.4; }
+  .q-text { font-size: 13px; color: #333; text-align: left; margin-bottom: 10px; background: #f5f5f5; padding: 8px; border-radius: 8px; }
+
+  /* ドラッグ＆ドロップエリアのスタイル */
+  .drag-container {
+    background: #efebe9;
+    padding: 10px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+  }
+  .hint-drag-text { font-size: 11px; color: #795548; font-weight: bold; margin-bottom: 5px; }
+
+  /* チップが並ぶグリッド */
+  .chip-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    user-select: none;
+  }
+
+  /* ドラッグ可能なボタン（チップ） */
+  .chip {
+    background: #fff;
+    border: 2px solid #795548;
+    border-radius: 8px;
+    padding: 8px 0;
+    font-size: 12px;
+    font-weight: bold;
+    color: #3e2723;
+    cursor: grab;
+    box-shadow: 0 3px 0 #d7ccc8;
+    transition: transform 0.1s;
+    touch-action: none; /* スマホのスクロール暴発防止 */
+  }
+  .chip:active { cursor: grabbing; transform: scale(0.95); }
+  .chip.dragging { opacity: 0.5; background: #d7ccc8; }
+
+  /* ヒントセクション（右寄せ） */
+  .hint-section { display: flex; flex-direction: column; gap: 10px; text-align: right; }
+  .hint-row { display: flex; flex-direction: row-reverse; align-items: center; gap: 8px; justify-content: flex-start; }
+  
+  .hint-icon { 
+    width: 40px; height: 40px; border-radius: 50%; background: #fff; 
+    display: flex; justify-content: center; align-items: center; flex-shrink: 0;
+    border: 1px solid #ccc; overflow: hidden;
+  }
+  .hint-icon img { width: 100%; height: 100%; object-fit: cover; }
+
+  .hint-btn { 
+    flex: 1; max-width: 120px; padding: 8px; border: 2px solid #607d8b; 
+    border-radius: 8px; background: white; color: #607d8b; font-size: 12px; font-weight: bold; cursor: pointer; 
+  }
+
+  .bubble-msg { 
+    display: none; background: #75ef66; padding: 8px 12px; border-radius: 12px; 
+    font-size: 11px; color: #000; position: relative; max-width: 130px; line-height: 1.3; text-align: left;
+  }
+  .bubble-msg::before {
+    content: ""; position: absolute; right: -10px; top: 10px;
+    border: 5px solid transparent; border-left: 10px solid #75ef66;
+  }
+
+  .ans-row { margin-top: 5px; }
+  .ans-btn { width: 100%; background: #d32f2f !important; color: white !important; border: none !important; padding: 10px; border-radius: 8px; font-size: 13px; }
+
+  .back-menu-btn {
+    display: block; width: 100%; padding: 10px; margin-top: 10px;
+    background: #333; color: white; border: none; border-radius: 8px;
+    font-size: 13px; font-weight: bold; cursor: pointer; text-decoration: none; box-sizing: border-box;
+  }
+</style>
+</head>
+<body>
+
+<div class="content-box">
+  <div class="q-title">謎２</div>
+  <div class="q-text">
+    手毬、咲季、ことねの３人のぬいぐるみ化の原因と考えられる共通点は？<br>
+    <span style="color:#795548; font-weight:bold;">（チップをドラッグして並び替えてみよう）</span>
+  </div>
+
+  <div class="drag-container">
+    <div class="hint-drag-text">▼ 指でスライドして並び替え</div>
+    <div class="chip-grid" id="chipGrid">
+      <div class="chip" draggable="true">イノ</div>
+      <div class="chip" draggable="true">マチ</div>
+      <div class="chip" draggable="true">ハン</div>
+      <div class="chip" draggable="true">キタ</div>
+      <div class="chip" draggable="true">ライ</div>
+      <div class="chip" draggable="true">ママ</div>
+      <div class="chip" draggable="true">セイ</div>
+      <div class="chip" draggable="true">テマ</div>
+      <div class="chip" draggable="true">ケト</div>
+      <div class="chip" draggable="true">クツ</div>
+      <div class="chip" draggable="true">キー</div>
+      <div class="chip" draggable="true">アミ</div>
+      <div class="chip" draggable="true">ヒト</div>
+      <div class="chip" draggable="true">トカ</div>
+      <div class="chip" draggable="true">ニン</div>
+    </div>
+  </div>
+
+  <div class="hint-section">
+    <div class="hint-row">
+      <div class="hint-icon"><img src="seinan.png" alt="seinan"></div>
+      <button class="hint-btn" onclick="showBubble('h1')">ヒント1を見る</button>
+      <div id="h1" class="bubble-msg">三人のぬいぐるみ化前に注目してみましょう</div>
+    </div>
+
+    <div class="hint-row">
+      <div class="hint-icon"><img src="hiro.png" alt="hiro"></div>
+      <button class="hint-btn" onclick="showBubble('h2')">ヒント2を見る</button>
+      <div id="h2" class="bubble-msg">みんながぬいぐるみになる前に共通して摂取してるものがないかな</div>
+    </div>
+
+    <div class="hint-row">
+      <div class="hint-icon"><img src="riha.png" alt="riha"></div>
+      <button class="hint-btn" onclick="showBubble('h3')">ヒント3を見る</button>
+      <div id="h3" class="bubble-msg">写真の情報から誰が作ったものかもわからないかな？</div>
+    </div>
+
+    <div class="ans-row">
+      <button class="hint-btn ans-btn" onclick="askAnswer()">答えを見る</button>
+    </div>
+  </div>
+
+  <button class="back-menu-btn" onclick="location.href='index.html'">メニューに戻って回答する</button>
+</div>
+
+<script>
+// 現在のページをローカルストレージに記憶
+localStorage.setItem("returnPage", "question2.html");
+
+function showBubble(id) {
+  document.querySelectorAll('.bubble-msg').forEach(b => b.style.display = 'none');
+  document.getElementById(id).style.display = 'block';
+}
+
+function askAnswer() {
+  if(confirm("答えを見ますか？")) {
+    alert("答えは「セイ トカ イノ クツ キー」です！");
+  }
+}
+
+// --- ドラッグ＆ドロップ処理（PC/スマホ両対応） ---
+const grid = document.getElementById('chipGrid');
+let draggedItem = null;
+
+grid.addEventListener('dragstart', (e) => {
+  if (e.target.classList.contains('chip')) {
+    draggedItem = e.target;
+    e.target.classList.add('dragging');
+  }
+});
+
+grid.addEventListener('dragend', (e) => {
+  if (e.target.classList.contains('chip')) {
+    e.target.classList.remove('dragging');
+    draggedItem = null;
+  }
+});
+
+grid.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  const target = e.target;
+  if (target.classList.contains('chip') && target !== draggedItem) {
+    const children = Array.from(grid.children);
+    const draggedIndex = children.indexOf(draggedItem);
+    const targetIndex = children.indexOf(target);
+    
+    if (draggedIndex < targetIndex) {
+      grid.insertBefore(draggedItem, target.nextSibling);
+    } else {
+      grid.insertBefore(draggedItem, target);
+    }
+  }
+});
+
+// スマホ（タッチイベント）用の簡易ドラッグシミュレーション
+grid.addEventListener('touchstart', (e) => {
+  const touch = e.touches[0];
+  const target = document.elementFromPoint(touch.clientX, touch.clientY);
+  if (target && target.classList.contains('chip')) {
+    draggedItem = target;
+    target.classList.add('dragging');
+  }
+}, {passive: true});
+
+grid.addEventListener('touchmove', (e) => {
+  if (!draggedItem) return;
+  const touch = e.touches[0];
+  const target = document.elementFromPoint(touch.clientX, touch.clientY);
+  
+  if (target && target.classList.contains('chip') && target !== draggedItem) {
+    const children = Array.from(grid.children);
+    const draggedIndex = children.indexOf(draggedItem);
+    const targetIndex = children.indexOf(target);
+    
+    if (draggedIndex < targetIndex) {
+      grid.insertBefore(draggedItem, target.nextSibling);
+    } else {
+      grid.insertBefore(draggedItem, target);
+    }
+  }
+});
+
+grid.addEventListener('touchend', () => {
+  if (draggedItem) {
+    draggedItem.classList.remove('dragging');
+    draggedItem = null;
+  }
+});
+</script>
+
+</body>
+</html>
