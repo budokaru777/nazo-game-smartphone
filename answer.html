@@ -9,159 +9,131 @@
   body { background: url("haikei.jpg") no-repeat center -95px/cover; display: flex; justify-content: center; align-items: flex-start; }
   
   .content-box { 
-    width: 90%; 
-    max-width: 380px; 
-    background: rgba(255, 255, 255, 0.95); 
-    padding: 30px 20px; 
-    border-radius: 20px; 
-    text-align: center; 
-    margin-top: 40px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    box-sizing: border-box;
+    width: 90%; max-width: 380px; background: rgba(255, 255, 255, 0.95); 
+    padding: 25px 15px; border-radius: 20px; text-align: center; margin-top: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3); box-sizing: border-box;
   }
 
-  h2 {
-    color: #333;
-    font-size: 20px;
-    margin-bottom: 5px;
+  h2 { color: #333; font-size: 18px; margin: 0 0 5px 0; }
+  .q-number { font-size: 13px; color: #666; font-weight: bold; margin-bottom: 15px; }
+
+  /* 通常入力用UI */
+  .text-input-area { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+  #answerInput { flex: 1; height: 45px; font-size: 18px; border: 2px solid #333; border-radius: 10px; text-align: center; outline: none; }
+
+  /* 謎2専用：ドラッグ＆ドロップUI */
+  .drag-input-area { display: none; }
+  .slots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; background: #b0bec5; padding: 10px; border-radius: 10px; margin-bottom: 12px; }
+  .slot { height: 42px; background: rgba(255,255,255,0.7); border: 2px dashed #455a64; border-radius: 8px; display: flex; justify-content: center; align-items: center; }
+  .pool { background: #cfd8dc; padding: 10px; border-radius: 12px; margin-bottom: 20px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; min-height: 120px; }
+  
+  .chip {
+    background: #fff; border: 2px solid #455a64; border-radius: 8px; padding: 8px 0;
+    font-size: 12px; font-weight: bold; color: #263238; cursor: grab; box-shadow: 0 3px 0 #b0bec5; touch-action: none; user-select: none;
   }
 
-  .q-number {
-    font-size: 14px;
-    color: #666;
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
+  .ok-btn { width: 70px; height: 45px; background: #333; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; }
+  .submit-large-btn { display: none; width: 100%; padding: 14px; background: #2e7d32; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; margin-bottom: 15px; }
 
-  /* 鍵や小箱をイメージしたアイコン枠 */
-  .lock-icon-area {
-    font-size: 50px;
-    margin-bottom: 20px;
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-  }
-
-  .input-row { 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    gap: 10px; 
-    margin-bottom: 25px; 
-  }
-
-  #answerInput { 
-    flex: 1; 
-    height: 48px; 
-    font-size: 20px; 
-    border: 2px solid #333; 
-    border-radius: 10px; 
-    text-align: center; 
-    outline: none;
-    box-sizing: border-box;
-  }
-
-  .ok-btn { 
-    width: 70px; 
-    height: 48px; 
-    background: #333; 
-    color: white; 
-    border: none; 
-    border-radius: 10px; 
-    font-weight: bold; 
-    font-size: 16px;
-    cursor: pointer; 
-    transition: background 0.2s;
-  }
-
-  .ok-btn:active {
-    background: #555;
-  }
-
-  .back-btn {
-    display: block;
-    width: 100%;
-    padding: 12px;
-    background: #607d8b;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    text-decoration: none;
-    box-sizing: border-box;
-  }
+  .back-btn { display: block; width: 100%; padding: 12px; background: #607d8b; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; text-decoration: none; box-sizing: border-box; }
 </style>
 </head>
 <body>
 
 <div class="content-box">
-  <h2 id="displayTitle">解答入力</h2>
+  <h2>解答入力</h2>
   <div class="q-number" id="displayQNo">対象の資料: なし</div>
   
-  <div class="lock-icon-area">🔐</div>
-
-  <div class="input-row">
+  <div class="text-input-area" id="textUi">
     <input id="answerInput" type="text" placeholder="キーワードを入力">
-    <button class="ok-btn" onclick="checkAnswer()">OK</button>
+    <button class="ok-btn" onclick="checkTextAnswer()">OK</button>
   </div>
 
-  <button class="back-btn" onclick="goBackToQuestion()">元の資料に戻る</button>
+  <div class="drag-input-area" id="dragUi">
+    <div class="slots">
+      <div class="slot" data-idx="0"></div>
+      <div class="slot" data-idx="1"></div>
+      <div class="slot" data-idx="2"></div>
+      <div class="slot" data-idx="3"></div>
+      <div class="slot" data-idx="4"></div>
+    </div>
+    <div class="pool" id="ansPool">
+      <div class="chip">イノ</div><div class="chip">マチ</div><div class="chip">ハン</div><div class="chip">キタ</div><div class="chip">ライ</div>
+      <div class="chip">ママ</div><div class="chip">セイ</div><div class="chip">テマ</div><div class="chip">ケト</div><div class="chip">クツ</div>
+      <div class="chip">キー</div><div class="chip">アミ</div><div class="chip">ヒト</div><div class="chip">トカ</div><div class="chip">ニン</div>
+    </div>
+    <button class="submit-large-btn" id="dragSubmitBtn" onclick="checkDragAnswer()">この並びで回答する</button>
+  </div>
+
+  <button class="back-btn" onclick="location.href=lastPage">元の資料に戻る</button>
 </div>
 
 <script>
-// 各問題（資料）の正解を設定する辞書データ
-// 資料を増やす場合は、ここに「'question2.html': '正解の文字',」のように追加していけます
-const answerKey = {
-  'question1.html': '4965',
-  'question2.html': 'てがみ',
-  'question3.html': '777',
-  'question4.html': 'ひみつ',
-  'question5.html': 'open',
-  'question6.html': 'らすと'
-};
-
-// プレイヤーが直前に見ていた資料のページを取得（デフォルトはquestion1）
 const lastPage = localStorage.getItem("returnPage") || "question1.html";
 
-// 画面表示を現在解いている問題番号に合わせる（例: question1.html -> 資料_01）
+// 表示テキスト変更
 const qNoMatch = lastPage.match(/\d+/);
-const qNoStr = qNoMatch ? `資料_0${qNoMatch[0]}` : "資料";
-document.getElementById("displayQNo").innerText = `現在の対象：${qNoStr}`;
+document.getElementById("displayQNo").innerText = `現在の対象：資料_0${qNoMatch ? qNoMatch[0] : '?'}`;
 
-function checkAnswer() {
-  const userInput = document.getElementById('answerInput').value.trim();
-  
-  // 現在の問題に応じた正解を取得
-  const correctAns = answerKey[lastPage];
+// 謎2(question2)から来た場合のみ、ドラッグUIに切り替える
+if(lastPage === "question2.html") {
+  document.getElementById("textUi").style.display = "none";
+  document.getElementById("dragUi").style.display = "block";
+  document.getElementById("dragSubmitBtn").style.display = "block";
+}
 
-  if (!correctAns) {
-    alert("エラー：対象の謎が見つかりません。資料一覧からもう一度やり直してください。");
-    return;
-  }
-
-  if (userInput === correctAns) {
-    // 全クリア判定（最後の問題である question6.html をクリアした場合）
-    if (lastPage === "question6.html") {
-      location.href = "clear.html"; // 全クリア画面へ（元のソースのCASE CLOSEDの画面）
-    } else {
-      location.href = "back.html";  // 通常の正解画面へ
-    }
+// 【謎1などの通常の文字判定】
+function checkTextAnswer() {
+  const input = document.getElementById('answerInput').value.trim();
+  if (lastPage === "question1.html" && input === "4965") {
+    location.href = "back.html";
   } else {
-    location.href = "fail.html";    // 不正解画面へ
+    location.href = "fail.html";
   }
 }
 
-// 元の資料画面に戻るボタンの処理
-function goBackToQuestion() {
-  location.href = lastPage;
-}
-</script>
+// 【謎2専用のドラッグ並び順判定】
+function checkDragAnswer() {
+  const slots = document.querySelectorAll(".slots .slot");
+  let finalAns = "";
+  
+  slots.forEach(slot => {
+    if(slot.children.length > 0) {
+      finalAns += slot.children[0].innerText;
+    }
+  });
 
+  // 正解「セイ トカ イノ クツ キー」の結合文字
+  if(finalAns === "セイトカイノクツキー") {
+    location.href = "back.html"; // 正解画面へ
+  } else {
+    location.href = "fail.html"; // 不正解画面へ
+  }
+}
+
+// --- ドラッグ＆ドロップ制御（answer.html用） ---
+let dragged = null;
+document.addEventListener("dragstart", e => { if(e.target.classList.contains("chip")) { dragged = e.target; } });
+document.addEventListener("dragover", e => e.preventDefault());
+document.addEventListener("drop", e => {
+  e.preventDefault();
+  const slot = e.target.closest(".slot");
+  const pool = e.target.closest("#ansPool");
+  if(slot && slot.children.length === 0) slot.appendChild(dragged);
+  else if(pool) pool.appendChild(dragged);
+});
+
+// スマホタッチ
+document.addEventListener("touchstart", e => { if(e.target.classList.contains("chip")) dragged = e.target; }, {passive:true});
+document.addEventListener("touchend", e => {
+  if(!dragged) return;
+  const touch = e.changedTouches[0];
+  const target = document.elementFromPoint(touch.clientX, touch.clientY);
+  const slot = target ? target.closest(".slot") : null;
+  if(slot && slot.children.length === 0) slot.appendChild(dragged);
+  else document.getElementById("ansPool").appendChild(dragged);
+  dragged = null;
+});
+</script>
 </body>
 </html>
