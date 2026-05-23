@@ -24,20 +24,17 @@
     background: #d7ccc8; padding: 10px; border-radius: 10px; margin-bottom: 12px;
   }
   .slot {
-    height: 40px; background: rgba(255,255,255,0.6); border: 2px dashed #795548;
+    height: 45px; background: rgba(255,255,255,0.6); border: 2px dashed #795548;
     border-radius: 8px; display: flex; justify-content: center; align-items: center;
   }
 
-  /* 新設：解答入力エリアのスタイル */
-  .answer-input-area {
-    background: #f5f5f5; border: 2px solid #333; border-radius: 15px;
-    padding: 12px 10px; margin-bottom: 15px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+  /* 【新設】この並びで回答するボタンのスタイル */
+  .submit-large-btn {
+    width: 100%; padding: 12px; background: #2e7d32; color: white;
+    border: none; border-radius: 10px; font-weight: bold; font-size: 15px;
+    cursor: pointer; margin-bottom: 15px; box-shadow: 0 4px 0 #1b5e20;
   }
-  .input-label { font-size: 12px; font-weight: bold; color: #333; margin-bottom: 6px; text-align: left; padding-left: 5px; }
-  .input-row { display: flex; justify-content: center; gap: 8px; }
-  #answerInput { flex: 1; height: 40px; font-size: 16px; border: 2px solid #555; border-radius: 10px; text-align: center; outline: none; }
-  .ok-btn { width: 65px; height: 40px; background: #2e7d32; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 3px 0 #1b5e20; }
-  .ok-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #1b5e20; }
+  .submit-large-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #1b5e20; }
 
   /* チップ置き場 */
   .chip-pool {
@@ -47,8 +44,9 @@
 
   .chip {
     background: #fff; border: 2px solid #795548; border-radius: 8px;
-    padding: 8px 0; font-size: 12px; font-weight: bold; color: #3e2723;
+    padding: 10px 0; font-size: 12px; font-weight: bold; color: #3e2723;
     cursor: grab; box-shadow: 0 3px 0 #d7ccc8; touch-action: none; user-select: none;
+    text-align: center;
   }
   .chip.dragging { opacity: 0.4; }
 
@@ -71,21 +69,15 @@
   <div class="q-title">謎２</div>
   <div class="q-text">３人の共通点は？上の5つの枠へドラッグして並べてみよう。</div>
 
-  <div class="answer-slots">
-    <div class="slot" data-slot="0"></div>
-    <div class="slot" data-slot="1"></div>
-    <div class="slot" data-slot="2"></div>
-    <div class="slot" data-slot="3"></div>
-    <div class="slot" data-slot="4"></div>
+  <div class="answer-slots" id="slotsArea">
+    <div class="slot"></div>
+    <div class="slot"></div>
+    <div class="slot"></div>
+    <div class="slot"></div>
+    <div class="slot"></div>
   </div>
 
-  <div class="answer-input-area">
-    <div class="input-label">🔑 キーワードを入力（スペースなし）：</div>
-    <div class="input-row">
-      <input id="answerInput" type="text" placeholder="答えを入力">
-      <button class="ok-btn" onclick="checkAnswer()">OK</button>
-    </div>
-  </div>
+  <button class="submit-large-btn" onclick="checkDragAnswer()">この並びで回答する</button>
 
   <div class="chip-pool" id="pool">
     <div class="chip" draggable="true">イノ</div><div class="chip" draggable="true">マチ</div><div class="chip" draggable="true">ハン</div><div class="chip" draggable="true">キタ</div><div class="chip" draggable="true">ライ</div>
@@ -118,15 +110,20 @@
 <script>
 localStorage.setItem("returnPage", "question2.html");
 
-// 正解の文字列（プレイヤーが入力しやすいようにスペースなしでも判定できるようにします）
-const correctAns1 = "セイトカイノクツキー";
-const correctAns2 = "セイトカイノクツキー"; 
-
-function checkAnswer() {
-  // 入力された文字からスペースを除去し、大文字小文字（全角半角）を扱いやすくする処理
-  const input = document.getElementById('answerInput').value.replace(/\s+/g, "").trim();
+// 【新設】枠に入っているチップの文字を左から回収して判定する関数
+function checkDragAnswer() {
+  const slots = document.querySelectorAll("#slotsArea .slot");
+  let finalAns = "";
   
-  if (input === correctAns1 || input === "セイトカイノクツキー") {
+  // 5つの枠を順番に見て、中身（チップ）があればその文字を合体させる
+  slots.forEach(slot => {
+    if (slot.children.length > 0) {
+      finalAns += slot.children[0].innerText;
+    }
+  });
+
+  // 正誤判定
+  if (finalAns === "セイトカイノクツキー") {
     // 正解：進行度を「3」に設定してback.htmlへ
     localStorage.setItem("gameProgress", "3");
     location.href = "back.html";
