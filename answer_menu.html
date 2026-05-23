@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>問題一覧</title>
+<style>
+  html, body { margin: 0; padding: 0; min-height: 100%; font-family: sans-serif; background: #e0e0e0; }
+  body { background: url("haikei.jpg") no-repeat center top/cover; background-attachment: fixed; padding: 20px 10px; box-sizing: border-box; display: flex; justify-content: center; align-items: flex-start; }
+  
+  .container { width: 100%; max-width: 400px; background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 25px 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); box-sizing: border-box; text-align: center; }
+  h2 { color: #333; margin-top: 0; font-size: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 25px; }
+  
+  /* ボタンを2列に綺麗に並べるグリッド */
+  .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 25px; }
+  
+  /* ステージ選択ボタンの基本スタイル */
+  .q-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 90px; background: #fff; border: 2px solid #4caf50; border-radius: 15px; text-decoration: none; color: #333; box-shadow: 0 4px 0 #388e3c; transition: all 0.1s; position: relative; }
+  .q-btn:active:not(.locked) { transform: translateY(3px); box-shadow: 0 1px 0 #388e3c; }
+  
+  .q-num { font-size: 18px; font-weight: bold; color: #2e7d32; }
+  .q-status { font-size: 11px; color: #777; margin-top: 4px; }
+  
+  /* ロック（まだ解けない）状態のスタイル */
+  .locked { opacity: 0.5; background: #e0e0e0; border-color: #999; box-shadow: 0 4px 0 #777; pointer-events: none; /* タップできなくする */ }
+  .locked .q-num { color: #555; }
+  .lock-icon { position: absolute; top: 8px; right: 12px; font-size: 16px; }
+
+  .back-btn { display: block; width: 100%; padding: 14px; background: #333; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: bold; text-align: center; cursor: pointer; text-decoration: none; box-sizing: border-box; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>解答する問題を選択</h2>
+  
+  <div class="grid-container" id="stageGrid">
+    </div>
+
+  <button class="back-btn" onclick="location.href='index.html'">メニューに戻る</button>
+</div>
+
+<script>
+  // ゲームの進行度を取得（なければ自動で1）
+  const progress = parseInt(localStorage.getItem("gameProgress") || "1");
+  const stageGrid = document.getElementById("stageGrid");
+  let gridHtml = "";
+
+  // Q1からQ6までのボタンをループで作る
+  for (let i = 1; i <= 6; i++) {
+    // 現在の進行度（progress）より大きい数字の問題はロックする
+    const isLocked = i > progress;
+    
+    if (isLocked) {
+      // ロック状態のボタン
+      gridHtml += `
+        <div class="q-btn locked">
+          <span class="lock-icon">🔒</span>
+          <span class="q-num">Q 0${i}</span>
+          <span class="q-status">未解放</span>
+        </div>
+      `;
+    } else {
+      // タップできる状態のボタン
+      gridHtml += `
+        <a href="question${i}.html" class="q-btn">
+          <span class="q-num">Q 0${i}</span>
+          <span class="q-status">${i < progress ? '✅ クリア済' : '⚡ 挑戦中'}</span>
+        </a>
+      `;
+    }
+  }
+
+  stageGrid.innerHTML = gridHtml;
+</script>
+
+</body>
+</html>
