@@ -17,7 +17,7 @@
   h2 { color: #333; font-size: 18px; margin: 0 0 5px 0; }
   .q-number { font-size: 13px; color: #666; font-weight: bold; margin-bottom: 15px; }
 
-  /* 通常入力用UI */
+  /* 通常入力用UI（謎1、謎3用） */
   .text-input-area { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
   #answerInput { flex: 1; height: 45px; font-size: 18px; border: 2px solid #333; border-radius: 10px; text-align: center; outline: none; }
 
@@ -69,26 +69,32 @@
 </div>
 
 <script>
+// 直前に見ていた問題のページを取得
 const lastPage = localStorage.getItem("returnPage") || "question1.html";
 
-// 表示テキスト変更
+// 画面の「現在の対象：資料_0X」の表示を自動更新
 const qNoMatch = lastPage.match(/\d+/);
 document.getElementById("displayQNo").innerText = `現在の対象：資料_0${qNoMatch ? qNoMatch[0] : '?'}`;
 
-// 謎2(question2)から来た場合のみ、ドラッグUIに切り替える
+// ★【判定ロジック】資料2(question2)から来た場合のみ、ドラッグUIに自動で切り替える
 if(lastPage === "question2.html") {
   document.getElementById("textUi").style.display = "none";
   document.getElementById("dragUi").style.display = "block";
   document.getElementById("dragSubmitBtn").style.display = "block";
 }
 
-// 【謎1などの通常の文字判定】
+// 【謎1や謎3などの、通常の文字入力判定】
 function checkTextAnswer() {
   const input = document.getElementById('answerInput').value.trim();
+  
   if (lastPage === "question1.html" && input === "4965") {
     location.href = "back.html";
-  } else {
-    location.href = "fail.html";
+  } 
+  else if (lastPage === "question3.html" && input === "生徒会室") {
+    location.href = "back.html"; // 謎3の正解判定
+  } 
+  else {
+    location.href = "fail.html"; // 間違っていたら不正解画面へ
   }
 }
 
@@ -103,15 +109,14 @@ function checkDragAnswer() {
     }
   });
 
-  // 正解「セイ トカ イノ クツ キー」の結合文字
   if(finalAns === "セイトカイノクツキー") {
-    location.href = "back.html"; // 正解画面へ
+    location.href = "back.html";
   } else {
-    location.href = "fail.html"; // 不正解画面へ
+    location.href = "fail.html";
   }
 }
 
-// --- ドラッグ＆ドロップ制御（answer.html用） ---
+// --- ドラッグ＆ドロップ制御（PC） ---
 let dragged = null;
 document.addEventListener("dragstart", e => { if(e.target.classList.contains("chip")) { dragged = e.target; } });
 document.addEventListener("dragover", e => e.preventDefault());
@@ -123,7 +128,7 @@ document.addEventListener("drop", e => {
   else if(pool) pool.appendChild(dragged);
 });
 
-// スマホタッチ
+// --- タッチイベント制御（スマホ） ---
 document.addEventListener("touchstart", e => { if(e.target.classList.contains("chip")) dragged = e.target; }, {passive:true});
 document.addEventListener("touchend", e => {
   if(!dragged) return;
