@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>資料確認</title>
+<style>
+  html, body { margin: 0; padding: 0; min-height: 100%; font-family: sans-serif; }
+  body { background: url("haikei.jpg") no-repeat center top/cover; background-attachment: fixed; display: flex; justify-content: center; align-items: flex-start; padding: 20px 10px; box-sizing: border-box; }
+  
+  .content-box { 
+    width: 100%; max-width: 380px; background: rgba(255, 255, 255, 0.95); 
+    padding: 20px 15px; border-radius: 20px; text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3); box-sizing: border-box;
+  }
+
+  h2 { color: #333; font-size: 16px; margin: 0 0 15px 0; font-weight: bold; }
+
+  /* 画像表示エリア */
+  .image-container {
+    width: 100%;
+    background: #f5f5f5;
+    border-radius: 10px;
+    padding: 10px;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+  }
+  .target-img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    display: block;
+  }
+
+  /* 「元に戻る」ボタンのスタイル */
+  .back-docs-btn {
+    display: block; width: 100%; padding: 13px;
+    background: #2e7d32; color: white; border: none; border-radius: 10px;
+    font-size: 15px; font-weight: bold; cursor: pointer; text-decoration: none;
+    box-sizing: border-box; box-shadow: 0 3px 0 #1b5e20;
+  }
+  .back-docs-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #1b5e20; }
+</style>
+</head>
+<body>
+
+<div class="content-box">
+  <h2 id="docTitle">資料確認</h2>
+  
+  <div class="image-container">
+    <img id="mainImage" src="" class="target-img" alt="手がかり資料">
+  </div>
+
+  <button class="back-docs-btn" onclick="location.href='documents.html'">◀ 資料一覧に戻る</button>
+</div>
+
+<script>
+// URLから引き渡された画像名とタイトルを取得するロジック
+const urlParams = new URLSearchParams(window.location.search);
+const imgName = urlParams.get('img');
+const docTitle = urlParams.get('title');
+
+if (imgName) {
+  // 画像とタイトルを画面にセット
+  document.getElementById('mainImage').src = imgName;
+  if (docTitle) {
+    document.getElementById('docTitle').innerText = decodeURIComponent(docTitle);
+  }
+} else {
+  document.getElementById('docTitle').innerText = "エラー：資料が見つかりません";
+}
+</script>
+
+</body>
+</html>
