@@ -105,29 +105,49 @@
   
   <div class="warning-box">
     <div class="warning-title">⚠️ 必ずお読みください</div>
-    <p class="warning-text">
+    <p class="warning-text" id="warningText">
       ① ナゾが解けましたので、<span class="highlight-red">いったん本誌に戻って</span>物語を読み進めてください。<br><br>
       ② 新しく解放された資料は、<span class="highlight-red">本誌で次の謎ページに進むまで絶対に見てはいけません。</span>ネタバレに繋がる恐れがあります。
     </p>
   </div>
 
-  <button class="next-btn" onclick="goNext()">確認して資料一覧へ</button>
+  <button class="next-btn" id="nextBtn" onclick="goNext()">確認して資料一覧へ</button>
 </div>
 
 <script>
+// 直前にどの問題から来たかを取得
+const lastPage = localStorage.getItem("returnPage") || "question1.html";
+
+// 謎6から来た場合の表示カスタマイズ
+if (lastPage.includes("question6.html")) {
+  document.getElementById("warningText").innerHTML = 
+    `① ナゾが解けましたので、<span class="highlight-red">いったん本誌に戻って</span>物語を読み進めてください。<br><br>` +
+    `② 本誌の指示があるまで、<span class="highlight-red">次の最終試練のボタンは絶対に押さないでください。</span>`;
+  document.getElementById("nextBtn").innerText = "確認して最終試練へ";
+}
+
 function goNext() {
-  // 元のページ情報から現在の問題番号を抽出
-  const lastPage = localStorage.getItem("returnPage") || "question1.html";
   const currentQNo = parseInt(lastPage.replace(/[^0-9]/g, "")) || 1;
 
-  // 進行度を1進める（現在の問題以上の進行度にする）
-  let prog = parseInt(localStorage.getItem("gameProgress") || 1);
-  if (prog <= currentQNo) {
-    localStorage.setItem("gameProgress", currentQNo + 1);
+  // 謎4、謎6以外はここで通常通りゲーム進行度を更新
+  if (!lastPage.includes("question4.html") && !lastPage.includes("question6.html")) {
+    let prog = parseInt(localStorage.getItem("gameProgress") || 1);
+    if (prog <= currentQNo) {
+      localStorage.setItem("gameProgress", currentQNo + 1);
+    }
   }
 
-  // documents.html（資料一覧）へ戻る
-  location.href = "documents.html";
+  // 遷移先の条件分岐
+  if (lastPage.includes("question4.html")) {
+    // 謎4クリア時は資料9確認ページへ
+    location.href = "view_siryou9.html";
+  } else if (lastPage.includes("question6.html")) {
+    // 謎6クリア時は名前呼びミニゲームへ
+    location.href = "minigame.html";
+  } else {
+    // それ以外は通常の資料一覧へ
+    location.href = "documents.html";
+  }
 }
 </script>
 
