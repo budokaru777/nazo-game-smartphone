@@ -139,13 +139,21 @@ function goNext() {
 
   // 遷移先の条件分岐
   if (lastPage.includes("question4.html")) {
-    // 謎4クリア時は資料9確認ページへ
+    // ★重要：謎4クリアの進行度を先に進め、returnPageを上書きしてループを防止する
+    let prog = parseInt(localStorage.getItem("gameProgress") || 1);
+    if (prog <= 4) {
+      localStorage.setItem("gameProgress", 5); // 進行度を5（謎5）に進める
+    }
+    localStorage.setItem("returnPage", "clear_question4.html"); // フラグを書き換えて次回ここを通らないようにする
+
+    // 資料9確認ページへ
     location.href = "view_siryou9.html";
+
   } else if (lastPage.includes("question6.html")) {
     // 謎6クリア時は名前呼びミニゲームへ
     location.href = "minigame.html";
   } else {
-    // それ以外は通常の資料一覧へ
+    // それ以外（謎4通過後や通常時）は通常の資料一覧へ
     location.href = "documents.html";
   }
 }
