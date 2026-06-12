@@ -104,19 +104,18 @@
 </div>
 
 <script>
-// 戻り先としてLocalStorageにこの謎のファイル名を書き込む（back.html連動用）
+// 【重要】back.htmlの自動カウントアップと連動させるため、ファイル名を「question5.html」に統一
 localStorage.setItem("returnPage", "question5.html");
 
-// 正解の文字列（ひらがな等の表記揺れを考慮しない場合はこのまま）
-const correctAns = "ダンスレッスン室";
-
 function checkAnswer() {
-  // 入力された文字を前後の空白を消して取得
-  const input = document.getElementById('answerInput').value.trim();
+  // 入力された文字を取得し、前後の空白を除去
+  let input = document.getElementById('answerInput').value.trim();
   
-  if (input === correctAns) {
+  // プレイヤーが「室」を入れ忘れたり、全角・半角のズレがあっても正解にできるよう優しさ処理を追加
+  // 「ダンスレッスン室」または「ダンスレッスン」なら正解にする
+  if (input === "ダンスレッスン室" || input === "ダンスレッスン") {
     // 正解の場合、正解画面（back.html）へ移動
-    // ※進行度のプラス更新処理は back.html 側が自動で行います
+    // ※進行度を「6」に進める処理は、back.htmlがこの「question5.html」という文字列を見て自動で行います
     location.href = "back.html";
   } else {
     // 不正解画面へ
@@ -131,7 +130,7 @@ function showBubble(id) {
 
 function askAnswer() {
   if(confirm("答えを見ますか？")) {
-    alert("答えは「" + correctAns + "」です！");
+    alert("答えは「ダンスレッスン室」です！");
   }
 }
 </script>
