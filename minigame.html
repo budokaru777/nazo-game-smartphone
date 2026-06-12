@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>名前を呼べ！</title>
+<title>名前を呼び覚ませ！</title>
 <style>
   html, body { margin: 0; padding: 0; min-height: 100%; font-family: sans-serif; overflow: hidden; }
   body { background: url("haikei.jpg") no-repeat center top/cover; background-attachment: fixed; display: flex; justify-content: center; align-items: flex-start; padding: 20px 10px; box-sizing: border-box; }
@@ -36,7 +36,7 @@
     box-shadow: 0 3px 0 #10171a;
   }
   .hud-item span { color: #ffeb3b; font-size: 15px; }
-  #missLabel { color: #ff5252; }
+  #scoreLabel { color: #00e5ff; }
 
   /* ゲームステージ（4レーンの音ゲー筐体） */
   .game-stage {
@@ -83,13 +83,13 @@
     z-index: 3;
   }
 
-  /* レーン最下部のタップエリア（判定を広くするため高さを拡大） */
+  /* レーン最下部のタップエリア */
   .lane-trigger {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 100px; /* 【強化】タップ反応エリア自体を上部まで拡張 */
+    height: 100px; 
     background: rgba(255, 255, 255, 0.02);
     z-index: 4;
     cursor: pointer;
@@ -119,7 +119,7 @@
     text-shadow: 0 1px 2px rgba(0,0,0,0.6);
   }
 
-  /* 判定エフェクト（PERFECT / MISS） */
+  /* 各種判定エフェクトテキスト */
   .judgment-text {
     position: absolute;
     top: 55%;
@@ -132,8 +132,10 @@
     z-index: 10;
     opacity: 0;
   }
-  .judgment-text.perfect { color: #fff59d; text-shadow: 0 0 8px #ffeb3b, 0 0 15px #ffeb3b; animation: judAnim 0.3s ease-out forwards; }
-  .judgment-text.miss { color: #ff8a80; text-shadow: 0 0 8px #ff1744; animation: judAnim 0.3s ease-out forwards; }
+  .judgment-text.perfect { color: #fff59d; text-shadow: 0 0 8px #ffeb3b, 0 0 15px #ffeb3b; animation: judAnim 0.25s ease-out forwards; }
+  .judgment-text.great { color: #e1bee7; text-shadow: 0 0 8px #ba68c8; animation: judAnim 0.25s ease-out forwards; }
+  .judgment-text.good { color: #b2dfdb; text-shadow: 0 0 8px #4db6ac; animation: judAnim 0.25s ease-out forwards; }
+  .judgment-text.miss { color: #ff8a80; text-shadow: 0 0 8px #ff1744; animation: judAnim 0.25s ease-out forwards; }
 
   @keyframes judAnim {
     0% { transform: translate(-50%, -50%) scale(0.6); opacity: 0; }
@@ -170,28 +172,25 @@
 <body>
 
 <div class="content-box">
-  <h2>最終試練：美鈴の名前を呼んで！</h2>
+  <h2>⚠️ 最終試練：美鈴の名前を呼び覚ませ！</h2>
   <div class="game-status">
-    流れてくる<span style="color:#d32f2f;">「美鈴」</span>を押して！<br>
-    ミスは2回まで、140個完走でクリア！
+    【判定】Perf:3点 / Grt:2点 / Gd:1点<br>
+    全100個の「美鈴」が流れる間に<span style="color:#d32f2f;">210点以上</span>を叩き出せ！
   </div>
 
   <div class="hud-area">
-    <div class="hud-item">PROGRESS: <span id="progressLabel">0</span> / 140</div>
-    <div class="hud-item">MISS: <span id="missLabel">0</span> / 3</div>
+    <div class="hud-item">PROGRESS: <span id="progressLabel">0</span> / 100</div>
+    <div class="hud-item">SCORE: <span id="scoreLabel">0</span> / 210</div>
   </div>
 
   <div class="game-stage" id="gameStage">
-    <!-- カウントダウンエリア -->
     <div class="start-overlay" id="overlay">
       <button class="start-btn" id="startBtn" onclick="startGame()">試練に挑む</button>
       <div class="count-num" id="countText">3</div>
     </div>
 
-    <!-- 判定テキスト表示用 -->
     <div class="judgment-text" id="judText">PERFECT</div>
 
-    <!-- 4レーン構造 -->
     <div class="lanes-container">
       <div class="lane" id="lane0"><div class="lane-trigger" data-lane="0"></div></div>
       <div class="lane" id="lane1"><div class="lane-trigger" data-lane="1"></div></div>
@@ -199,7 +198,6 @@
       <div class="lane" id="lane3"><div class="lane-trigger" data-lane="3"></div></div>
     </div>
     
-    <!-- プロセカ風判定ライン -->
     <div class="judgment-line"></div>
   </div>
 </div>
@@ -207,19 +205,16 @@
 <script>
 let totalSpawned = 0; 
 let processedCount = 0; 
-let missCount = 0;     
-const MAX_MISS = 3;    
-const TOTAL_NOTES = 140; 
+let currentScore = 0;     
+const TARGET_SCORE = 210; // クリアに必要な最低スコア
+const TOTAL_NOTES = 100;  // ノーツ総数を100個に変更
 
 let isPlaying = false;
 let spawnInterval = null;
 let activeNotes = [];
 let animFrameId = null;
 
-// 判定線のY座標（ステージ最上部が0、最下部が400px）
 const JUDGE_LINE_Y = 346; 
-// 【強化】スマホで押しやすいように、当たり判定の広さを「2倍（35 ➔ 70）」に拡大！
-const HIT_WINDOW = 70;    
 
 function startGame() {
   document.getElementById("startBtn").style.display = "none";
@@ -247,13 +242,13 @@ function beginMainGame() {
   isPlaying = true;
   totalSpawned = 0;
   processedCount = 0;
-  missCount = 0;
+  currentScore = 0;
   activeNotes = [];
   
   document.getElementById("progressLabel").innerText = "0";
-  document.getElementById("missLabel").innerText = "0";
+  document.getElementById("scoreLabel").innerText = "0";
 
-  // 出現間隔は高速な230ミリ秒のまま維持
+  // 出現間隔は超高速（230ミリ秒ごと）
   spawnInterval = setInterval(() => {
     if (totalSpawned < TOTAL_NOTES) {
       spawnNote();
@@ -280,7 +275,7 @@ function spawnNote() {
   noteElement.style.top = `${yPos}px`;
   targetLane.appendChild(noteElement);
 
-  // 【強化】落下スピードを前回の 7.5 からさらに約1.5倍の「11.2」へ超スピードアップ！
+  // 落下スピードは超神速の「11.2」
   const speed = 11.2; 
 
   activeNotes.push({
@@ -299,12 +294,14 @@ function updateNotes() {
     note.y += note.speed;
     note.element.style.top = `${note.y}px`;
 
-    // 判定ラインを通り過ぎて最下部（400px）に完全に落ち切った場合のみ見逃しMISS
+    // 判定ラインを通り過ぎて完全に画面外に落ちた場合＝MISS
     if (note.y > 400) {
       note.element.remove();
       activeNotes.splice(i, 1);
       
-      addMiss();
+      showJudgment("MISS");
+      processedCount++;
+      document.getElementById("progressLabel").innerText = processedCount;
       checkGameEnd();
     }
   }
@@ -331,62 +328,72 @@ function judgeTap(laneIndex) {
     const note = activeNotes[targetNoteIndex];
     const diff = Math.abs(note.y - (JUDGE_LINE_Y - 13)); 
 
-    // 2倍に広がった判定幅（前後70px以内）にノーツがあれば即PERFECT判定
-    if (diff <= HIT_WINDOW) {
+    // 【新仕様】当たり判定の距離(最大70px)に応じて細かく点数を分岐
+    if (diff <= 24) {
+      // ドンピシャ：PERFECT (3点)
       note.element.remove();
       activeNotes.splice(targetNoteIndex, 1);
-
+      currentScore += 3;
       showJudgment("PERFECT");
-      processedCount++;
-      document.getElementById("progressLabel").innerText = processedCount;
-      checkGameEnd();
+      nextProgress();
+    } else if (diff <= 48) {
+      // ややズレ：GREAT (2点)
+      note.element.remove();
+      activeNotes.splice(targetNoteIndex, 1);
+      currentScore += 2;
+      showJudgment("GREAT");
+      nextProgress();
+    } else if (diff <= 70) {
+      // 大きくズレ：GOOD (1点)
+      note.element.remove();
+      activeNotes.splice(targetNoteIndex, 1);
+      currentScore += 1;
+      showJudgment("GOOD");
+      nextProgress();
     }
   }
 }
 
-function addMiss() {
-  missCount++;
+function nextProgress() {
   processedCount++;
-  document.getElementById("missLabel").innerText = missCount;
   document.getElementById("progressLabel").innerText = processedCount;
-  showJudgment("MISS");
-
-  if (missCount >= MAX_MISS) {
-    isPlaying = false;
-    clearInterval(spawnInterval);
-    cancelAnimationFrame(animFrameId);
-    
-    setTimeout(() => {
-      alert(`失敗…`);
-      location.reload();
-    }, 100);
-  }
+  document.getElementById("scoreLabel").innerText = currentScore;
+  checkGameEnd();
 }
 
 function checkGameEnd() {
   if (!isPlaying) return;
 
-  if (processedCount >= TOTAL_NOTES && missCount < MAX_MISS) {
+  // 100個すべてのノーツを流しきった（処理しきった）段階で最終スコア判定
+  if (processedCount >= TOTAL_NOTES) {
     isPlaying = false;
     clearInterval(spawnInterval);
     cancelAnimationFrame(animFrameId);
 
     setTimeout(() => {
-      alert(`ぬいぐるみから眩い光が溢れ出す！`);
-      location.href = "restore.html";
-    }, 100);
+      if (currentScore >= TARGET_SCORE) {
+        alert(`【試練突破!!】\n最終スコア: ${currentScore}点 / 210点\n最高精度のリズムで見事に名前を呼び覚ました！\n\n「美鈴……、美鈴っ！！」\n完璧に紡がれた名前の言霊が完全に響き渡り、ぬいぐるみから眩い光が溢れ出す！`);
+        location.href = "restore.html";
+      } else {
+        alert(`【試練失敗…】\n最終スコア: ${currentScore}点\nクリア基準の210点に届きませんでした（あと${TARGET_SCORE - currentScore}点）。\nより正確に中心を狙ってタップしましょう！`);
+        location.reload();
+      }
+    }, 150);
   }
 }
 
 function showJudgment(type) {
   const judText = document.getElementById("judText");
   judText.className = "judgment-text"; 
+  judText.innerText = type;
   
   if (type === "PERFECT") {
-    judText.innerText = "PERFECT";
     judText.classList.add("perfect");
+  } else if (type === "GREAT") {
+    judText.classList.add("great");
+  } else if (type === "GOOD") {
+    judText.classList.add("good");
   } else {
-    judText.innerText = "MISS";
     judText.classList.add("miss");
   }
 }
