@@ -170,7 +170,7 @@
 <body>
 
 <div class="content-box">
-  <h2>⚠️ 最終試練：美鈴の名前を呼んで！</h2>
+  <h2>最終試練：美鈴の名前を呼んで！</h2>
   <div class="game-status">
     流れてくる<span style="color:#d32f2f;">「美鈴」</span>を押して！<br>
     ミスは2回まで、140個完走でクリア！
@@ -357,7 +357,7 @@ function addMiss() {
     cancelAnimationFrame(animFrameId);
     
     setTimeout(() => {
-      alert(`【試練失敗…】\n光速の美鈴に対応できず、ミスが${missCount}回に達してしまった！\n判定は広くなっています！リズムを信じてタップしましょう！`);
+      alert(`失敗…`);
       location.reload();
     }, 100);
   }
@@ -372,7 +372,7 @@ function checkGameEnd() {
     cancelAnimationFrame(animFrameId);
 
     setTimeout(() => {
-      alert(`【試練突破!!】\nこの超光速譜面を見事に叩ききった！凄まじい反射神経です！\n\n「美鈴……、美鈴っ！！」\n強く、激しく紡がれた名前の言霊が完全に響き渡り、ぬいぐるみから眩い光が溢れ出す！`);
+      alert(`ぬいぐるみから眩い光が溢れ出す！`);
       location.href = "restore.html";
     }, 100);
   }
