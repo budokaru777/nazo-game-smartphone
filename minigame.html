@@ -36,6 +36,8 @@
     box-shadow: 0 3px 0 #10171a;
   }
   .hud-item span { color: #ffeb3b; font-size: 15px; }
+  /* 残りミスカウントの文字色強調 */
+  #missLabel { color: #ff5252; }
 
   /* ゲームステージ（4レーンの音ゲー筐体） */
   .game-stage {
@@ -72,7 +74,7 @@
   /* プロセカ風の判定ライン（最下部付近） */
   .judgment-line {
     position: absolute;
-    bottom: 50px; /* タップエリアの少し上 */
+    bottom: 50px;
     left: 0;
     width: 100%;
     height: 4px;
@@ -112,20 +114,11 @@
     box-sizing: border-box;
     z-index: 2;
     box-shadow: 0 3px 6px rgba(0,0,0,0.4);
-    pointer-events: none; /* ノーツ自体ではなくレーンを叩かせる */
-  }
-  /* 正解ノーツ（緑） */
-  .note.correct {
+    pointer-events: none;
     background: linear-gradient(135deg, #00e676, #00b0ff);
     border: 2px solid #fff;
     color: #fff;
     text-shadow: 0 1px 2px rgba(0,0,0,0.6);
-  }
-  /* 偽物ダミーノーツ（赤） */
-  .note.dummy {
-    background: linear-gradient(135deg, #ff1744, #f50057);
-    border: 2px solid #ff8a80;
-    color: #fff;
   }
 
   /* 判定エフェクト（PERFECT / MISS） */
@@ -135,7 +128,6 @@
     left: 50%;
     transform: translate(-50%, -50%) scale(0.5);
     font-size: 28px;
-    font-weight: uppercase;
     font-weight: 900;
     font-style: italic;
     pointer-events: none;
@@ -182,13 +174,13 @@
 <div class="content-box">
   <h2>⚠️ 最終試練：正しい名前を叩け！</h2>
   <div class="game-status">
-    4レーンを流れる<span style="color:#d32f2f;">「秦谷」「美鈴」</span>を判定線で叩け！<br>
-    20秒で140回成功でクリア！偽物はスルーせよ！
+    4レーンを流れる<span style="color:#d32f2f;">「秦谷」「美鈴」</span>をタイミングよく叩け！<br>
+    偽物は出現しません。ミスが3回未満で140個完走すればクリア！
   </div>
 
   <div class="hud-area">
-    <div class="hud-item">TIME: <span id="timeLabel">20.00</span>s</div>
-    <div class="hud-item">HIT: <span id="scoreLabel">0</span> / 140</div>
+    <div class="hud-item">PROGRESS: <span id="progressLabel">0</span> / 140</div>
+    <div class="hud-item">MISS: <span id="missLabel">0</span> / 3</div>
   </div>
 
   <div class="game-stage" id="gameStage">
@@ -211,19 +203,22 @@
 </div>
 
 <script>
-let score = 0;
-let timeLeft = 20.00;
+let totalSpawned = 0; // これまでに生成した合計ノーツ数
+let processedCount = 0; // 画面外に消えるか叩き終えた処理済みノーツ数
+let missCount = 0;     // 現在のミス数
+const MAX_MISS = 3;    // 許容される最大ミス数（3回目で即アウト）
+const TOTAL_NOTES = 140; // 総ノーツ数
+
 let isPlaying = false;
-let gameTimer = null;
 let spawnInterval = null;
 let activeNotes = [];
+let animFrameId = null;
 
-const correctNames = ["秦谷", "美鈴"];
-const dummyNames = ["泰谷", "秦の谷", "美寿々", "美鈴々", "ハタヤ", "ミスズ", "秦名", "三鈴"];
+const names = ["秦谷", "美鈴"];
 
-// 判定線のY座標に関する設定（ステージ最上部が0、最下部が400px）
-const JUDGE_LINE_Y = 346; // ノーツの下辺がここに重なる瞬間
-const HIT_WINDOW = 35;    // 前後何ピクセルまでPERFECTとするか
+// 判定線のY座標（ステージ最上部が0、最下部が400px）
+const JUDGE_LINE_Y = 346; 
+const HIT_WINDOW = 35;    
 
 function startGame() {
   document.getElementById("startBtn").style.display = "none";
@@ -249,66 +244,57 @@ function startGame() {
 
 function beginMainGame() {
   isPlaying = true;
-  score = 0;
-  timeLeft = 20.00;
+  totalSpawned = 0;
+  processedCount = 0;
+  missCount = 0;
   activeNotes = [];
+  
+  document.getElementById("progressLabel").innerText = "0";
+  document.getElementById("missLabel").innerText = "0";
 
-  const startTime = Date.now();
-  gameTimer = setInterval(() => {
-    const elapsed = (Date.now() - startTime) / 1000;
-    timeLeft = Math.max(0, 20.00 - elapsed);
-    document.getElementById("timeLabel").innerText = timeLeft.toFixed(2);
-    
-    if (timeLeft <= 0) {
-      endGame();
+  // ノーツを一定間隔（やや高速な400ミリ秒ごと）で140個になるまで生成
+  spawnInterval = setInterval(() => {
+    if (totalSpawned < TOTAL_NOTES) {
+      spawnNote();
+    } else {
+      // 140個生成しきったらインターバルをクリア（あとは画面上のノーツがなくなるのを待つ）
+      clearInterval(spawnInterval);
     }
-  }, 10);
+  }, 400);
 
-  // 20秒間で約150〜160個降らせるため、超高速（120ミリ秒ごと）にノーツを生成
-  spawnInterval = setInterval(spawnNote, 120);
-
-  // ノーツを動かすアニメーションループ
-  requestAnimationFrame(updateNotes);
+  // ノーツ移動のループ開始
+  animFrameId = requestAnimationFrame(updateNotes);
 }
 
 // ノーツ生成
 function spawnNote() {
   if (!isPlaying) return;
 
+  totalSpawned++;
   const laneIndex = Math.floor(Math.random() * 4);
   const targetLane = document.getElementById(`lane${laneIndex}`);
 
   const noteElement = document.createElement("div");
   noteElement.classList.add("note");
-
-  // 55%の確率で正解ノーツ、45%でダミーノーツ
-  const isCorrect = Math.random() < 0.55;
-  if (isCorrect) {
-    noteElement.classList.add("correct");
-    noteElement.innerText = correctNames[Math.floor(Math.random() * correctNames.length)];
-  } else {
-    noteElement.classList.add("dummy");
-    noteElement.innerText = dummyNames[Math.floor(Math.random() * dummyNames.length)];
-  }
+  noteElement.innerText = names[Math.floor(Math.random() * names.length)];
 
   // 初期位置（画面上部外側）
   let yPos = -30;
   noteElement.style.top = `${yPos}px`;
   targetLane.appendChild(noteElement);
 
-  // 速度（プロセカのノーツスピード調整。約1秒弱で下まで届く速度）
-  const speed = 5.2; 
+  // スピード（落下速度）
+  const speed = 4.8; 
 
   activeNotes.push({
     element: noteElement,
     lane: laneIndex,
-    isCorrect: isCorrect,
     y: yPos,
     speed: speed
   });
 }
 
-// ノーツの落下・移動と自動ミス処理
+// ノーツの落下・移動と見逃しミス処理
 function updateNotes() {
   if (!isPlaying) return;
 
@@ -317,29 +303,29 @@ function updateNotes() {
     note.y += note.speed;
     note.element.style.top = `${note.y}px`;
 
-    // 判定ラインを完全に通り過ぎて画面外（最下部400px）に落ちた場合
+    // 判定ラインを通り過ぎて最下部（400px）に落ちた場合＝見逃しMISS
     if (note.y > 400) {
       note.element.remove();
       activeNotes.splice(i, 1);
-
-      // 正解ノーツだった場合はスルーしたら「MISS」
-      if (note.isCorrect) {
-        showJudgment("MISS");
-      }
-      // 偽物ノーツはスルーするのが正解なのでペナルティなし
+      
+      addMiss();
+      checkGameEnd();
     }
   }
-  requestAnimationFrame(updateNotes);
+  
+  if (isPlaying) {
+    animFrameId = requestAnimationFrame(updateNotes);
+  }
 }
 
 // レーンタップ時の判定処理
 function judgeTap(laneIndex) {
   if (!isPlaying) return;
 
-  // タップされたレーンにあるノーツの中で、一番下（判定線に近いもの）を探す
   let targetNoteIndex = -1;
   let maxY = -999;
 
+  // タップされたレーンで一番下にあるノーツを特定
   for (let i = 0; i < activeNotes.length; i++) {
     if (activeNotes[i].lane === laneIndex && activeNotes[i].y > maxY) {
       maxY = activeNotes[i].y;
@@ -347,25 +333,58 @@ function judgeTap(laneIndex) {
     }
   }
 
-  // レーン内にノーツが存在した場合
   if (targetNoteIndex !== -1) {
     const note = activeNotes[targetNoteIndex];
-    const diff = Math.abs(note.y - (JUDGE_LINE_Y - 13)); // ノーツ中心点と判定線の差
+    const diff = Math.abs(note.y - (JUDGE_LINE_Y - 13)); // 判定線との距離
 
     if (diff <= HIT_WINDOW) {
-      // タイミングバッチリの場合
+      // 判定範囲内のため PERFECT クリア
       note.element.remove();
       activeNotes.splice(targetNoteIndex, 1);
 
-      if (note.isCorrect) {
-        score++;
-        document.getElementById("scoreLabel").innerText = score;
-        showJudgment("PERFECT");
-      } else {
-        // 偽物ブロックを叩いた場合はお邪魔ペナルティでMISS扱い
-        showJudgment("MISS");
-      }
+      showJudgment("PERFECT");
+      processedCount++;
+      document.getElementById("progressLabel").innerText = processedCount;
+      checkGameEnd();
     }
+  }
+}
+
+// ミス加算処理
+function addMiss() {
+  missCount++;
+  processedCount++;
+  document.getElementById("missLabel").innerText = missCount;
+  document.getElementById("progressLabel").innerText = processedCount;
+  showJudgment("MISS");
+
+  // 3回ミスした瞬間に即ゲームオーバー
+  if (missCount >= MAX_MISS) {
+    isPlaying = false;
+    clearInterval(spawnInterval);
+    cancelAnimationFrame(animFrameId);
+    
+    setTimeout(() => {
+      alert(`【試練失敗…】\nミスが合計${missCount}回に達し、呪いの防壁に弾かれてしまった！\nもう一度挑戦して、ミスを2回以内に抑えましょう！`);
+      location.reload();
+    }, 100);
+  }
+}
+
+// ゲームクリア・終了のチェック
+function checkGameEnd() {
+  if (!isPlaying) return;
+
+  // 140個全てのノーツが処理（叩く or 落ちる）され、かつミスが3回未満ならクリア
+  if (processedCount >= TOTAL_NOTES && missCount < MAX_MISS) {
+    isPlaying = false;
+    clearInterval(spawnInterval);
+    cancelAnimationFrame(animFrameId);
+
+    setTimeout(() => {
+      alert(`【試練突破!!】\nミスを僅か${missCount}回に抑え、140個の言霊を繋ぎきった！\n\n「……、……っ！！」\n完璧に紡がれた名前の言霊が響き渡り、ぬいぐるみが眩しく光りだした！`);
+      location.href = "restore.html";
+    }, 100);
   }
 }
 
@@ -383,7 +402,7 @@ function showJudgment(type) {
   }
 }
 
-// イベントリスナー設定（4つのレーンへのマルチタッチ・クリック仕込み）
+// イベントリスナー設定（マルチタッチ対応）
 document.querySelectorAll(".lane-trigger").forEach(trigger => {
   const laneIndex = parseInt(trigger.dataset.lane);
 
@@ -397,27 +416,6 @@ document.querySelectorAll(".lane-trigger").forEach(trigger => {
   trigger.addEventListener("touchstart", handler, { passive: false });
   trigger.addEventListener("mousedown", handler);
 });
-
-// ゲーム終了処理
-function endGame() {
-  isPlaying = false;
-  clearInterval(gameTimer);
-  clearInterval(spawnInterval);
-
-  // 残ったノーツの全消去
-  activeNotes.forEach(n => n.element.remove());
-  activeNotes = [];
-
-  setTimeout(() => {
-    if (score >= 140) {
-      alert(`【試練突破!!】\n記録: ${score}回パーフェクト！\n\n「……、……っ！！」\n完璧なリズムの言霊が響き渡り、ぬいぐるみが眩しく光りだした！`);
-      location.href = "restore.html";
-    } else {
-      alert(`【タイムアップ…】\nクリア判定数: ${score}回\n\nリズムが乱れて呪いを解除できなかった！140回まであと${140 - score}回足りません！\nもう一度挑戦しましょう！`);
-      location.reload();
-    }
-  }, 100);
-}
 </script>
 
 </body>
