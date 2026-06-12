@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>GAME CLEAR!!</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   html, body { margin: 0; padding: 0; min-height: 100%; font-family: sans-serif; }
   body { 
@@ -27,7 +28,6 @@
     border: 3px solid #ffb300; /* 金色の豪華な枠線 */
   }
 
-  /* お祝いのタイトルアニメーション */
   h1 { 
     color: #ff9100; 
     font-size: 24px; 
@@ -49,7 +49,6 @@
     font-weight: bold; 
   }
 
-  /* クリア記念画像（fin.png）の表示エリア */
   .fin-image-container {
     width: 100%;
     background: #fff;
@@ -71,32 +70,49 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* タイトルに戻る（リセット）ボタン */
-  .restart-btn {
+  /* ボタン共通スタイル */
+  .btn-base {
     display: block; 
     width: 100%; 
     padding: 14px;
-    background: linear-gradient(135deg, #ffb300, #ff6f00); 
+    font-size: 15px; 
+    font-weight: bold; 
     color: white; 
     border: none; 
     border-radius: 12px;
-    font-size: 15px; 
-    font-weight: bold; 
     cursor: pointer; 
     text-decoration: none;
     box-sizing: border-box; 
+    transition: all 0.1s;
+    outline: none;
+  }
+  .btn-base:active { 
+    transform: translateY(2px); 
+  }
+
+  /* X（旧Twitter）共有ボタン */
+  .x-btn {
+    background: #000000;
+    box-shadow: 0 4px 0 #333333;
+    margin-bottom: 12px;
+  }
+  .x-btn:active {
+    box-shadow: 0 2px 0 #333333;
+  }
+
+  /* タイトルに戻るボタン */
+  .restart-btn {
+    background: linear-gradient(135deg, #ffb300, #ff6f00); 
     box-shadow: 0 4px 0 #b35c00;
-    transition: background 0.2s;
   }
   .restart-btn:active { 
-    transform: translateY(2px); 
     box-shadow: 0 2px 0 #b35c00; 
   }
 </style>
 </head>
 <body>
 
-<div class="content-box">
+<div class="content-box" id="clearCaptureArea">
   <h1>🎉 GAME CLEAR !! 🎉</h1>
   
   <div class="thank-text">
@@ -109,13 +125,45 @@
     <img src="fin.png" class="fin-img" alt="THANK YOU FOR PLAYING!!">
   </div>
 
-  <button class="restart-btn" onclick="resetAndGoHome()">タイトルメニューに戻る</button>
+  <button class="btn-base x-btn" onclick="shareClearOnX()">クリア画面を保存してXにポストする</button>
+
+  <button class="btn-base restart-btn" onclick="resetAndGoHome()">タイトルメニューに戻る</button>
 </div>
 
 <script>
+// ★ クリア画面を画像化して保存し、Xのポスト画面を開く処理
+function shareClearOnX() {
+  const target = document.getElementById("clearCaptureArea");
+  
+  // キャプチャ時にボタンが写らないように一時的に非表示
+  const buttons = target.querySelectorAll('.btn-base');
+  buttons.forEach(btn => btn.style.visibility = 'hidden');
+
+  html2canvas(target, { scale: 2 }).then(canvas => {
+    // キャプチャ完了後にボタンを再表示
+    buttons.forEach(btn => btn.style.visibility = 'visible');
+
+    // 端末へPNG画像をダウンロード
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL("image/png");
+    link.download = "game_clear.png";
+    link.click();
+
+    // Xの投稿文（ハッシュタグやテキストは好みに合わせて変更OKです）
+    const tweetText = encodeURIComponent("すべての謎を解き明かしてゲームクリアしました！呪いは解けた！ #謎解きゲームクリア");
+    const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
+
+    // アラートを出してXを別タブで起動
+    alert("クリア記念画像を保存しました！\nこのあと開くXの投稿画面で、今保存した画像を添付してリポスト（ポスト）してください！");
+    window.open(tweetUrl, "_blank");
+  }).catch(err => {
+    buttons.forEach(btn => btn.style.visibility = 'visible');
+    alert("画像の自動保存に失敗しました。お手数ですがスクリーンショット等でご対応ください。");
+  });
+}
+
 function resetAndGoHome() {
   if (confirm("ゲームをクリア状態からリセットして、最初から遊び直しますか？")) {
-    // 進行度を初期状態に戻してindex.htmlへ
     localStorage.setItem("gameProgress", "1");
     location.href = "index.html";
   }
