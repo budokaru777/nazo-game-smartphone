@@ -3,190 +3,135 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>資料5</title>
+<title>謎05</title>
 <style>
-  html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; position: fixed; font-family: sans-serif; }
-  body { background: url("haikei.jpg") no-repeat center -95px/cover; display: flex; justify-content: center; align-items: flex-start; }
+  html, body { margin: 0; padding: 0; min-height: 100%; font-family: sans-serif; }
+  body { background: url("haikei.jpg") no-repeat center -95px/cover; background-attachment: fixed; display: flex; justify-content: center; align-items: flex-start; padding: 20px 10px; box-sizing: border-box; }
   
   .content-box { 
-    width: 90%; 
-    max-width: 380px; 
-    background: rgba(255, 255, 255, 0.95); 
-    padding: 20px 15px; 
-    border-radius: 20px; 
-    text-align: center; 
-    margin-top: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    width: 100%; max-width: 380px; background: rgba(255, 255, 255, 0.95); 
+    padding: 20px 15px; border-radius: 20px; text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3); box-sizing: border-box;
   }
 
-  .hako-img { width: 100%; max-width: 280px; height: auto; margin-bottom: 15px; }
-
-  /* 入力欄とOKボタンの横並び */
-  .input-row { 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    gap: 10px; 
-    margin-bottom: 25px; 
-  }
-  #a { 
-    flex: 1; 
-    max-width: 180px; 
-    height: 45px; 
-    font-size: 20px; 
-    border: 2px solid #333; 
-    border-radius: 10px; 
-    text-align: center; 
-  }
-  .ok-btn { 
-    width: 60px; 
-    height: 45px; 
-    background: #333; 
-    color: white; 
-    border: none; 
-    border-radius: 10px; 
-    font-weight: bold; 
-    cursor: pointer; 
+  /* 問題文エリア */
+  .question-box {
+    background: #fff;
+    border: 2px dashed #333;
+    border-radius: 12px;
+    padding: 15px 10px;
+    margin-bottom: 20px;
+    font-size: 15px;
+    font-weight: bold;
+    color: #222;
+    line-height: 1.6;
   }
 
-  /* ヒントエリア */
-  .hint-section { 
-    display: flex; 
-    flex-direction: column; 
-    gap: 12px; 
-    text-align: left;
+  /* 解答入力エリアのスタイル */
+  .answer-input-area {
+    background: #f5f5f5; border: 2px solid #333; border-radius: 15px;
+    padding: 15px 10px; margin-bottom: 20px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
   }
+  .input-label { font-size: 13px; font-weight: bold; color: #333; margin-bottom: 8px; text-align: left; padding-left: 5px; }
+  .input-row { display: flex; justify-content: center; gap: 8px; }
+  #answerInput { flex: 1; height: 45px; font-size: 16px; border: 2px solid #555; border-radius: 10px; text-align: center; outline: none; }
+  .ok-btn { width: 70px; height: 45px; background: #2e7d32; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; box-shadow: 0 3px 0 #1b5e20; }
+  .ok-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #1b5e20; }
 
-  .hint-row { 
-    display: flex; 
-    align-items: center; 
-    gap: 10px; 
-    position: relative;
-  }
+  /* ヒントセクション */
+  .hint-section { display: flex; flex-direction: column; gap: 12px; text-align: right; }
+  .hint-row { display: flex; flex-direction: row-reverse; align-items: center; gap: 10px; justify-content: flex-start; }
 
-  /* キャラクターアイコン枠 */
-  .hint-icon { 
-    width: 45px; 
-    height: 45px; 
-    border-radius: 50%; 
-    background: #fff; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    flex-shrink: 0;
-    border: 1px solid #ccc;
-    overflow: hidden;
-  }
-  .hint-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+  .hint-icon { width: 45px; height: 45px; border-radius: 50%; background: #fff; display: flex; justify-content: center; align-items: center; flex-shrink: 0; border: 1px solid #ccc; overflow: hidden; }
+  .hint-icon img { width: 100%; height: 100%; object-fit: cover; }
 
-  /* ヒントを見るボタン */
-  .hint-btn { 
-    flex: 1; 
-    max-width: 140px;
-    padding: 10px; 
-    border: 2px solid #607d8b; 
-    border-radius: 8px; 
-    background: white; 
-    color: #607d8b; 
-    font-size: 13px; 
-    font-weight: bold; 
-    cursor: pointer; 
-  }
+  .hint-btn { flex: 1; max-width: 140px; padding: 10px; border: 2px solid #607d8b; border-radius: 8px; background: white; color: #607d8b; font-size: 13px; font-weight: bold; cursor: pointer; }
 
-  /* LINE風吹き出し */
-  .bubble-msg { 
-    display: none; 
-    background: #75ef66; 
-    padding: 8px 12px; 
-    border-radius: 12px; 
-    font-size: 12px; 
-    color: #000; 
-    position: relative; 
-    max-width: 120px;
-    line-height: 1.3;
-  }
-  .bubble-msg::before {
-    content: ""; position: absolute; left: -10px; top: 12px;
-    border: 5px solid transparent; border-right: 10px solid #75ef66;
-  }
+  .bubble-msg { display: none; background: #75ef66; padding: 8px 12px; border-radius: 12px; font-size: 12px; color: #000; position: relative; max-width: 160px; line-height: 1.4; text-align: left; }
+  .bubble-msg::before { content: ""; position: absolute; right: -10px; top: 12px; border: 5px solid transparent; border-left: 10px solid #75ef66; }
 
   .ans-row { margin-top: 5px; }
-  .ans-btn { width: 100%; background: #d32f2f !important; color: white !important; border: none !important; padding: 12px; }
+  .ans-btn { width: 100%; background: #d32f2f !important; color: white !important; border: none !important; padding: 12px; border-radius: 8px; }
 
+  .back-menu-btn { display: block; width: 100%; padding: 12px; margin-top: 15px; background: #333; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; text-decoration: none; box-sizing: border-box; }
 </style>
 </head>
 <body>
 
 <div class="content-box">
-  <!-- 問題の画像（必要に応じて画像名を変更してください） -->
-  <img src="hako.png" class="hako-img">
-
-  <!-- 入力欄とOKボタン -->
-  <div class="input-row">
-    <input id="a" type="text" placeholder="入力...">
-    <button class="ok-btn" onclick="check()">OK</button>
+  
+  <!-- 謎5 問題文エリア -->
+  <div class="question-box">
+    問題：倉本千奈と花海佑芽は今どこにいる？
   </div>
 
-  <!-- ヒントエリア -->
+  <div class="answer-input-area">
+    <div class="input-label">🔑 キーワードを入力：</div>
+    <div class="input-row">
+      <input id="answerInput" type="text" placeholder="答えを入力">
+      <button class="ok-btn" onclick="checkAnswer()">OK</button>
+    </div>
+  </div>
+
   <div class="hint-section">
-    <!-- ヒント1 -->
+    <!-- ヒント1：莉波 -->
     <div class="hint-row">
-      <div class="hint-icon"><img src="riha.png" alt="riha"></div>
+      <div class="hint-icon"><img src="riha.png" alt="莉波"></div>
       <button class="hint-btn" onclick="showBubble('h1')">ヒント1を見る</button>
-      <div id="h1" class="bubble-msg">これまでの資料を読み返してみて！</div>
+      <div id="h1" class="bubble-msg">千奈ちゃんも佑芽ちゃんも生徒会の一員で大切な後輩だよ</div>
     </div>
 
-    <!-- ヒント2 -->
+    <!-- ヒント2：星南 -->
     <div class="hint-row">
-      <div class="hint-icon"><img src="hiro.png" alt="hiro"></div>
+      <div class="hint-icon"><img src="seinan.png" alt="星南"></div>
       <button class="hint-btn" onclick="showBubble('h2')">ヒント2を見る</button>
-      <div id="h2" class="bubble-msg">色がついた文字に注目だよ。</div>
+      <div id="h2" class="bubble-msg">生徒会メンバーの居場所を確認する方法がどこかになかったかしら？</div>
     </div>
 
-    <!-- ヒント3 -->
+    <!-- ヒント3：広 -->
     <div class="hint-row">
-      <div class="hint-icon"><img src="seinan.png" alt="seinan"></div>
+      <div class="hint-icon"><img src="hiro.png" alt="広"></div>
       <button class="hint-btn" onclick="showBubble('h3')">ヒント3を見る</button>
-      <div id="h3" class="bubble-msg">最後の文字を並び替えてごらん！</div>
+      <div id="h3" class="bubble-msg">今の時刻を確認しよう。さっき莉波はなんて言ってた？</div>
     </div>
 
-    <!-- 答えを見る -->
     <div class="ans-row">
       <button class="hint-btn ans-btn" onclick="askAnswer()">答えを見る</button>
     </div>
   </div>
+
+  <button class="back-menu-btn" onclick="location.href='index.html'">メニューに戻る</button>
 </div>
 
 <script>
-// 第5問の正解キーワード（仮で「5555」にしています。自由に変更してください）
-const correctAns = "5555"; 
+// 戻り先としてLocalStorageにこの謎のファイル名を書き込む（back.html連動用）
+localStorage.setItem("returnPage", "question5.html");
 
-function check() {
-  const val = document.getElementById('a').value;
-  if(val === correctAns) {
-    // 正解フラグや次のページ情報を保存して back.html へ
-    localStorage.setItem("returnPage", "question5.html");
-    localStorage.setItem("nextPage", "documents.html");
+// 正解の文字列（ひらがな等の表記揺れを考慮しない場合はこのまま）
+const correctAns = "ダンスレッスン室";
+
+function checkAnswer() {
+  // 入力された文字を前後の空白を消して取得
+  const input = document.getElementById('answerInput').value.trim();
+  
+  if (input === correctAns) {
+    // 正解の場合、正解画面（back.html）へ移動
+    // ※進行度のプラス更新処理は back.html 側が自動で行います
     location.href = "back.html";
   } else {
+    // 不正解画面へ
     location.href = "fail.html";
   }
 }
 
-// 吹き出しの制御
 function showBubble(id) {
   document.querySelectorAll('.bubble-msg').forEach(b => b.style.display = 'none');
   document.getElementById(id).style.display = 'block';
 }
 
-// 答えの確認
 function askAnswer() {
   if(confirm("答えを見ますか？")) {
-    alert("答えは " + correctAns + " です！");
+    alert("答えは「" + correctAns + "」です！");
   }
 }
 </script>
