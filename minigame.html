@@ -18,163 +18,276 @@
   h2 { color: #d32f2f; font-size: 16px; margin: 0 0 5px 0; font-weight: bold; }
   .game-status { font-size: 12px; color: #333; margin-bottom: 10px; line-height: 1.4; background: #ffebee; padding: 6px; border-radius: 8px; font-weight: bold; }
   
-  /* カウンター表示 */
-  .counter-display { font-size: 20px; color: #ffb300; margin: 5px 0; letter-spacing: 3px; font-weight: bold; }
+  /* タイムとコンボのメーター情報 */
+  .hud-area {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+  .hud-item {
+    background: #263238;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    flex: 1;
+    margin: 0 4px;
+    box-shadow: 0 3px 0 #10171a;
+  }
+  .hud-item span { color: #ffeb3b; font-size: 16px; }
 
-  /* ゲーム画面（名前が流れるエリア） */
+  /* ゲームステージ */
   .game-stage {
     width: 100%;
     height: 350px;
-    background: #111122;
+    background: #0d0d1a;
     border: 3px solid #d32f2f;
     border-radius: 12px;
     position: relative;
     overflow: hidden;
-    box-shadow: inset 0 0 20px rgba(211,47,47,0.5);
+    box-shadow: inset 0 0 25px rgba(211,47,47,0.4);
     margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 
-  /* 流れてくる名前のオブジェクト */
-  .falling-name {
-    position: absolute;
-    padding: 6px 12px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 2px solid #333;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: bold;
-    color: #000;
+  /* 音ゲー風コア・ターゲット（連打ボタン） */
+  .music-pad {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff1744, #d500f9);
+    border: 6px solid #fff;
+    box-shadow: 0 0 20px rgba(215, 0, 249, 0.6), 0 8px 0 #8e00a3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
     cursor: pointer;
-    white-space: nowrap;
     user-select: none;
     touch-action: none;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    transition: transform 0.05s;
+    position: relative;
+    z-index: 5;
+  }
+  
+  /* タップした瞬間の縮み込み演出 */
+  .music-pad:active {
+    transform: scale(0.92) translateY(4px);
+    box-shadow: 0 0 10px rgba(215, 0, 249, 0.4), 0 2px 0 #8e00a3;
   }
 
-  /* 正解をタップしたときのエフェクト */
-  @keyframes hitEffect {
-    0% { transform: scale(1); opacity: 1; background: #75ef66; }
-    100% { transform: scale(1.5); opacity: 0; }
+  .pad-title { font-size: 20px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+  .pad-sub { font-size: 11px; margin-top: 4px; opacity: 0.9; font-weight: bold; }
+
+  /* リズムサークル（外側から縮んでくるガイドリング） */
+  .rhythm-ring {
+    position: absolute;
+    border: 3px solid #00e5ff;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 1;
   }
-  .hit { animation: hitEffect 0.3s forwards; pointer-events: none; }
+  @keyframes shrinkRing {
+    0% { width: 300px; height: 300px; opacity: 0.8; }
+    100% { width: 160px; height: 160px; opacity: 0.2; }
+  }
+
+  /* 画面を叩いた時のポップアップエフェクトテキスト */
+  .tap-effect {
+    position: absolute;
+    color: #75ef66;
+    font-size: 18px;
+    font-weight: bold;
+    pointer-events: none;
+    animation: effectUp 0.4s ease-out forwards;
+    text-shadow: 0 0 4px #000;
+    z-index: 10;
+  }
+  @keyframes effectUp {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-40px) scale(1.3); opacity: 0; }
+  }
+
+  /* 開始前カウントダウンマスク */
+  .start-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+    border-radius: 9px;
+  }
+  .start-btn {
+    padding: 15px 40px;
+    background: #4caf50;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    border: none;
+    border-radius: 50px;
+    box-shadow: 0 5px 0 #2e7d32;
+    cursor: pointer;
+  }
+  .start-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #2e7d32; }
+  .count-num { color: #fff; font-size: 60px; font-weight: bold; display: none; }
 </style>
 </head>
 <body>
 
 <div class="content-box">
-  <h2>⚠️ 最終試練：正しい名前を撃破せよ！</h2>
+  <h2>⚠️ 最終試練：名前を呼び覚ませ！</h2>
   <div class="game-status">
-    流れてくる名前から<span style="color:#d32f2f;">「秦谷」「美鈴」</span>だけを狙って<br>【連続5回】正しくタップしてください！偽物はスルー！
+    言霊のコアを猛連打せよ！<br>
+    制限時間内に呪いの防壁を突破するのだ！
   </div>
 
-  <div class="counter-display" id="starCounter">☆☆☆☆☆</div>
+  <div class="hud-area">
+    <div class="hud-item">TIME: <span id="timeLabel">20.00</span>s</div>
+    <div class="hud-item">TAP: <span id="scoreLabel">0</span> / 140</div>
+  </div>
 
-  <div class="game-stage" id="gameStage"></div>
+  <div class="game-stage" id="gameStage">
+    <div class="start-overlay" id="overlay">
+      <button class="start-btn" id="startBtn" onclick="startGame()">試練に挑む</button>
+      <div class="count-num" id="countText">3</div>
+    </div>
+
+    <div class="music-pad" id="tapPad">
+      <div class="pad-title">秦谷 美鈴</div>
+      <div class="pad-sub">!! TAP !!</div>
+    </div>
+  </div>
 </div>
 
 <script>
-let callCount = 0;
+let clickCount = 0;
+let timeLeft = 20.00;
+let isPlaying = false;
+let gameTimer = null;
+let ringInterval = null;
+
+const pad = document.getElementById("tapPad");
 const stage = document.getElementById("gameStage");
-let gameInterval;
-let isGameOver = false;
 
-// 出現させる名前のリスト
-const correctNames = ["秦谷", "美鈴"];
-const dummyNames = ["泰谷", "秦の谷", "美寿々", "美鈴々", "ハタヤ", "ミスズ", "秦名", "三鈴"];
-
-// 名前オブジェクトを生成して降らせる関数
-function createFallingName() {
-  if (isGameOver) return;
-
-  const nameObj = document.createElement("div");
-  nameObj.classList.add("falling-name");
-
-  // 正解かダミーかをランダムで決定（50%の確率）
-  const isCorrect = Math.random() < 0.5;
-  if (isCorrect) {
-    nameObj.innerText = correctNames[Math.floor(Math.random() * correctNames.length)];
-    nameObj.dataset.correct = "true";
-    nameObj.style.borderColor = "#2e7d32"; // 正解はうっすら緑枠
-  } else {
-    nameObj.innerText = dummyNames[Math.floor(Math.random() * dummyNames.length)];
-    nameObj.dataset.correct = "false";
-    nameObj.style.borderColor = "#c62828"; // ダミーはうっすら赤枠
-  }
-
-  // 出現時の横位置をランダムに設定（はみ出さないように調整）
-  stage.appendChild(nameObj);
-  const stageWidth = stage.clientWidth;
-  const objWidth = nameObj.clientWidth || 60;
-  const randomX = Math.random() * (stageWidth - objWidth - 10) + 5;
-  nameObj.style.left = `${randomX}px`;
-
-  // 初期位置（上端の外側）とランダムな落下速度
-  let currentY = -40;
-  nameObj.style.top = `${currentY}px`;
-  const speed = Math.random() * 2 + 2; // 落ちる速さ
-
-  // タッチ・クリック時のイベント
-  const handleTap = (e) => {
-    e.preventDefault();
-    if (isGameOver) return;
-
-    if (nameObj.dataset.correct === "true") {
-      // 正解をタップした場合
-      callCount++;
-      nameObj.classList.add("hit");
-      updateStars();
-
-      if (callCount >= 5) {
-        isGameOver = true;
-        clearInterval(gameInterval);
-        setTimeout(() => {
-          alert("「……、……っ！！」\n正しい名前の言霊が響き渡り、ぬいぐるみが光りだした！");
-          location.href = "restore.html"; // 演出ページへ
-        }, 400);
-      }
+// ゲーム開始処理（カウントダウン）
+function startGame() {
+  document.getElementById("startBtn").style.display = "none";
+  const countText = document.getElementById("countText");
+  countText.style.display = "block";
+  
+  let count = 3;
+  countText.innerText = count;
+  
+  const cd = setInterval(() => {
+    count--;
+    if (count > 0) {
+      countText.innerText = count;
+    } else if (count === 0) {
+      countText.innerText = "START!!";
     } else {
-      // 偽物をタップしてしまった場合
-      alert("「うわっ！」偽物の名前に惑わされて呪いの力が逆流した！\n(カウントがリセットされます)");
-      callCount = 0;
-      updateStars();
-      nameObj.remove();
+      clearInterval(cd);
+      document.getElementById("overlay").style.display = "none";
+      beginMainGame();
     }
-  };
-
-  nameObj.addEventListener("mousedown", handleTap);
-  nameObj.addEventListener("touchstart", handleTap, {passive: false});
-
-  // 落下のアニメーションループ
-  function moveDown() {
-    if (isGameOver) {
-      nameObj.remove();
-      return;
-    }
-    currentY += speed;
-    nameObj.style.top = `${currentY}px`;
-
-    // 画面の一番下まで落ちた場合
-    if (currentY > stage.clientHeight) {
-      // 正解スルー時はペナルティなし（見送るのが正解）、そのまま消去
-      nameObj.remove();
-    } else {
-      requestAnimationFrame(moveDown);
-    }
-  }
-  requestAnimationFrame(moveDown);
+  }, 800);
 }
 
-// 星カウンターの表示更新
-function updateStars() {
-  let stars = "";
-  for (let i = 0; i < 5; i++) {
-    stars += (i < callCount) ? "★" : "☆";
-  }
-  document.getElementById("starCounter").innerText = stars;
+// 本戦スタート
+function beginMainGame() {
+  isPlaying = true;
+  clickCount = 0;
+  timeLeft = 20.00;
+  
+  // 10ミリ秒ごとに時間を減らす高精度タイマー
+  const startTime = Date.now();
+  gameTimer = setInterval(() => {
+    const elapsed = (Date.now() - startTime) / 1000;
+    timeLeft = Math.max(0, 20.00 - elapsed);
+    document.getElementById("timeLabel").innerText = timeLeft.toFixed(2);
+    
+    if (timeLeft <= 0) {
+      endGame();
+    }
+  }, 10);
+
+  // 音ゲー風に定期的に収縮するサークルリングを発生させるビジュアル演出
+  ringInterval = setInterval(createRhythmRing, 400);
 }
 
-// 0.8秒ごとに新しい名前を上から降らせる
-gameInterval = setInterval(createFallingName, 800);
+// 連打タップイベントの仕込み（マルチタッチを考慮しmousedownとtouchstart両対応）
+const handleHit = (e) => {
+  e.preventDefault();
+  if (!isPlaying) return;
+
+  clickCount++;
+  document.getElementById("scoreLabel").innerText = clickCount;
+
+  // 画面上に「+1」や「秦谷!」「美鈴!」などの弾ける文字演出を発生
+  createTapEffect();
+};
+
+pad.addEventListener("mousedown", handleHit);
+pad.addEventListener("touchstart", handleHit, { passive: false });
+
+// タップ時のポップアップ文字エフェクト
+function createTapEffect() {
+  const eff = document.createElement("div");
+  eff.classList.add("tap-effect");
+  
+  // 出現メッセージをランダムにして飽きさせない演出
+  const words = ["+1", "秦谷!!", "美鈴!!", "呼ぶ!!", "言霊!!"];
+  eff.innerText = words[Math.floor(Math.random() * words.length)];
+  
+  // パッドの周囲にランダムに散らす
+  const rx = Math.random() * 80 - 40 + (stage.clientWidth / 2) - 30;
+  const ry = Math.random() * 80 - 40 + (stage.clientHeight / 2) - 20;
+  
+  eff.style.left = `${rx}px`;
+  eff.style.top = `${ry}px`;
+  
+  stage.appendChild(eff);
+  setTimeout(() => eff.remove(), 400);
+}
+
+// 音ゲー風の収縮するリングを生成
+function createRhythmRing() {
+  if (!isPlaying) return;
+  const ring = document.createElement("div");
+  ring.classList.add("rhythm-ring");
+  ring.style.animation = "shrinkRing 0.8s linear forwards";
+  
+  // ステージ中央に配置
+  ring.style.left = `calc(50% - 150px)`;
+  ring.style.top = `calc(50% - 150px)`;
+  
+  stage.appendChild(ring);
+  setTimeout(() => ring.remove(), 800);
+}
+
+// 終了とクリア判定
+function endGame() {
+  isPlaying = false;
+  clearInterval(gameTimer);
+  clearInterval(ringInterval);
+
+  setTimeout(() => {
+    if (clickCount >= 140) {
+      alert(`【試練突破!!】\n記録: 20秒間で${clickCount}回呼び覚ました！\n\n「……、……っ！！」\n正しい名前の言霊が完全に響き渡り、ぬいぐるみが眩しく光りだした！`);
+      location.href = "restore.html"; // 演出ページ（クリア後ページ）へ移動
+    } else {
+      alert(`【タイムアップ…】\n記録: ${clickCount}回\n\n呪いの防壁を壊しきれなかった！140回まであと${140 - clickCount}回足りません！\nもう一度挑戦しましょう！`);
+      location.reload(); // ページをリロードして再挑戦
+    }
+  }, 100);
+}
 </script>
 
 </body>
