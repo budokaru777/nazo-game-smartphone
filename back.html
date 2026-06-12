@@ -129,8 +129,8 @@ if (lastPage.includes("question6.html")) {
 function goNext() {
   const currentQNo = parseInt(lastPage.replace(/[^0-9]/g, "")) || 1;
 
-  // 謎4、謎6以外はここで通常通りゲーム進行度を更新
-  if (!lastPage.includes("question4.html") && !lastPage.includes("question6.html")) {
+  // 謎6以外はここで通常通りゲーム進行度を更新（謎4のときもここで進行度が5に進みます）
+  if (!lastPage.includes("question6.html")) {
     let prog = parseInt(localStorage.getItem("gameProgress") || 1);
     if (prog <= currentQNo) {
       localStorage.setItem("gameProgress", currentQNo + 1);
@@ -138,22 +138,11 @@ function goNext() {
   }
 
   // 遷移先の条件分岐
-  if (lastPage.includes("question4.html")) {
-    // ★重要：謎4クリアの進行度を先に進め、returnPageを上書きしてループを防止する
-    let prog = parseInt(localStorage.getItem("gameProgress") || 1);
-    if (prog <= 4) {
-      localStorage.setItem("gameProgress", 5); // 進行度を5（謎5）に進める
-    }
-    localStorage.setItem("returnPage", "clear_question4.html"); // フラグを書き換えて次回ここを通らないようにする
-
-    // 資料9確認ページへ
-    location.href = "view_siryou9.html";
-
-  } else if (lastPage.includes("question6.html")) {
+  if (lastPage.includes("question6.html")) {
     // 謎6クリア時は名前呼びミニゲームへ
     location.href = "minigame.html";
   } else {
-    // それ以外（謎4通過後や通常時）は通常の資料一覧へ
+    // 謎4を含め、それ以外の通常問題はすべて「資料一覧」へ戻る
     location.href = "documents.html";
   }
 }
