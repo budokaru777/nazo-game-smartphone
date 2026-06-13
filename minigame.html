@@ -412,7 +412,7 @@ function executeLaneTap(laneIndex) {
         const note = activeNotes[targetIndex];
         
         // ⚡ 速度0.025において、ブロックが一番きれいに重なって見えるよう中心点を「+ 25」に微小補正
-        const diff = Math.abs((note.y + 21) - stageHeight); 
+        const diff = Math.abs((note.y + 25) - stageHeight); 
 
         if (diff <= HIT_WINDOW_RANGE) {
             note.element.remove();
