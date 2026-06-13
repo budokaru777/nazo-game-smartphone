@@ -223,7 +223,6 @@
 
     <div class="stage-wrapper">
         <div class="game-stage" id="mainStage">
-            
             <div class="judgment-text" id="judText">HIT!</div>
 
             <div class="lanes-container">
@@ -249,7 +248,9 @@
     <div id="welcome" class="SHADE">
         <div class="game-title"> 最終試練：美鈴を呼んで！</div>
         <div class="game-desc">
-           このゲームは必ず横画面でプレイしてください。 <br><br>
+            【判定最適化 ＆ 1ミス即終了モード】<br><br>
+            流れるブロックの速度を<span style="color:#00f5ff; font-weight:bold;">「0.028」</span>に固定！<br>
+            流れてくるブロックをタイミングよく押して！<br><br>
             全100個を<span style="color:#fef002; font-weight:bold;">押せばクリア！</span><br>
             ただし<span style="color:#ff1744; font-weight:bold;">1回でも間違えたら即ゲームオーバー</span>。
         </div>
@@ -293,12 +294,11 @@ let animFrameId = null;
 
 let stageHeight = 0;
 
-// ⚡ 速度0.025のゆったりした動きに合わせ、判定の有効幅を「140」に微増させてジャスト感を向上
-const HIT_WINDOW_RANGE = 140; 
+// ⚡ 速度0.028に合わせて当たり判定幅を「132」に最適化
+const HIT_WINDOW_RANGE = 132; 
 
 function tapStart() {
     document.getElementById('welcome').style.display = 'none';
-    stageHeight = document.getElementById('mainStage').clientHeight;
     startCountdown();
 }
 
@@ -323,6 +323,9 @@ function startCountdown() {
 }
 
 function beginGamePlay() {
+    // 💡 速度ブレを無くす対策：画面レイアウトが完全に確定した「ここ」で正確な高さを取得する
+    stageHeight = document.getElementById('mainStage').clientHeight;
+
     isPlaying = true;
     totalSpawned = 0;
     processedCount = 0;
@@ -333,13 +336,14 @@ function beginGamePlay() {
     document.getElementById("progressValue").innerText = "0";
     document.getElementById("lifeValue").innerText = "❤️";
 
+    // ⚡ 速度0.028に合わせてノーツ生成間隔を460msに変更
     spawnInterval = setInterval(() => {
         if (totalSpawned < TOTAL_NOTES && isPlaying) {
             spawnNote();
         } else {
             clearInterval(spawnInterval);
         }
-    }, 500);
+    }, 460);
 
     animFrameId = requestAnimationFrame(updateNotes);
 }
@@ -355,9 +359,11 @@ function spawnNote() {
     noteElement.classList.add("note");
     noteElement.innerText = "美鈴";
     noteElement.style.top = "-50px"; 
+
     targetLane.appendChild(noteElement);
 
-    const speed = stageHeight * 0.025; 
+    // ⚡ 速度を「0.028」に固定
+    const speed = stageHeight * 0.028; 
 
     activeNotes.push({
         element: noteElement,
@@ -375,11 +381,9 @@ function updateNotes() {
         note.y += note.speed;
         note.element.style.top = note.y + "px";
 
-        // 横線を越えて画面外へ漏れたら即MISS
         if (note.y > stageHeight + 80) {
             note.element.remove();
             activeNotes.splice(i, 1);
-            
             triggerMiss();
         }
     }
@@ -411,8 +415,8 @@ function executeLaneTap(laneIndex) {
     if (targetIndex !== -1) {
         const note = activeNotes[targetIndex];
         
-        // ⚡ 速度0.025において、ブロックが一番きれいに重なって見えるよう中心点を「+ 25」に微小補正
-        const diff = Math.abs((note.y + 25) - stageHeight); 
+        // ⚡ 速度0.028で、ネオン判定線（中心）と視覚的に完全に重なる補正値「+ 22」を設定
+        const diff = Math.abs((note.y + 22) - stageHeight); 
 
         if (diff <= HIT_WINDOW_RANGE) {
             note.element.remove();
