@@ -249,7 +249,7 @@
     <div id="welcome" class="SHADE">
         <div class="game-title"> 最終試練：美鈴を呼んで！</div>
         <div class="game-desc">
-            【判定最適化 ＆ 1ミス即終了モード】<br><br>
+            <br><br>
             <span style="color:#00f5ff; font-weight:bold;"></span><br>
             流れてくるブロックをタイミングよく押して！<br><br>
             全100個を<span style="color:#fef002; font-weight:bold;">押せばクリア！</span><br>
@@ -296,7 +296,7 @@ let animFrameId = null;
 let stageHeight = 0;
 
 // ⚡ 速度0.025のゆったりした動きに合わせ、判定の有効幅を「140」に微増させてジャスト感を向上
-const HIT_WINDOW_RANGE = 190; 
+const HIT_WINDOW_RANGE = 130; 
 
 function tapStart() {
     document.getElementById('welcome').style.display = 'none';
