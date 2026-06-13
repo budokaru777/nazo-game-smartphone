@@ -24,7 +24,7 @@
             box-sizing: border-box;
         }
 
-        /* 📊 上部HUD：ライフと進捗を大きく、分かりやすく */
+        /* 上部HUD */
         .hud-area {
             display: flex;
             justify-content: space-between;
@@ -50,7 +50,6 @@
         .hud-label { font-size: 10px; color: #8a99ad; font-weight: bold; margin-right: 6px; }
         .hud-value { font-size: 14px; font-family: monospace; font-weight: 900; color: #fff; }
         
-        /* ❤️ ライフ表示用スタイリング */
         #lifeValue { font-size: 16px; letter-spacing: 2px; color: #ff1744; text-shadow: 0 0 8px rgba(255,23,68,0.6); }
 
         /* メイン演奏ステージ */
@@ -90,7 +89,7 @@
             position: absolute; 
             width: 94%; 
             left: 3%; 
-            height: 36px; /* 縦幅を約3倍以上に大幅巨大化！ */
+            height: 38px; 
             border-radius: 6px; 
             box-sizing: border-box; 
             z-index: 2; 
@@ -99,7 +98,6 @@
             box-shadow: 0 0 12px rgba(0, 245, 255, 0.8), inset 0 0 6px #fff;
             border: 2px solid #fff;
             
-            /* 文字をブロック中央に完全に配置 */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -124,7 +122,7 @@
         .touch-control-panel {
             display: flex;
             width: 100%;
-            height: 80px; 
+            height: 85px; 
             background: rgba(12, 6, 28, 0.95);
             border-top: 2px solid rgba(255, 255, 255, 0.15);
             z-index: 10;
@@ -140,7 +138,7 @@
             -webkit-tap-highlight-color: rgba(0, 245, 255, 0.2);
         }
         .tap-button:last-child { border-right: none; }
-        .tap-button:active { background: rgba(0, 245, 255, 0.12); }
+        .tap-button:active { background: rgba(0, 245, 255, 0.15); }
 
         /* 判定演出 */
         .judgment-text {
@@ -188,6 +186,7 @@
 <body>
 
 <div id="gameContainer">
+    <!-- 上部ヘッダー -->
     <div class="hud-area">
         <div class="hud-title-mini">美鈴の試練 - PERFECT MODE -</div>
         <div class="hud-cards">
@@ -202,11 +201,13 @@
         </div>
     </div>
 
+    <!-- 3D演奏ステージ -->
     <div class="stage-wrapper">
         <div class="game-stage" id="mainStage">
             
             <div class="judgment-text" id="judText">HIT!</div>
 
+            <!-- 4つのレーン -->
             <div class="lanes-container">
                 <div class="lane" id="lane0"><div class="lane-flash" id="flash0"></div></div>
                 <div class="lane" id="lane1"><div class="lane-flash" id="flash1"></div></div>
@@ -214,10 +215,12 @@
                 <div class="lane" id="lane3"><div class="lane-flash" id="flash3"></div></div>
             </div>
 
+            <!-- ネオン判定横線 -->
             <div class="judgment-wire-line"></div>
         </div>
     </div>
 
+    <!-- 横線より下の高感度当たり判定エリア -->
     <div class="touch-control-panel">
         <div class="tap-button" data-lane="0"></div>
         <div class="tap-button" data-lane="1"></div>
@@ -225,8 +228,10 @@
         <div class="tap-button" data-lane="3"></div>
     </div>
 
+    <!-- カウントダウン -->
     <div id="countText">3</div>
 
+    <!-- タイトル画面 -->
     <div id="welcome" class="SHADE">
         <div class="game-title">⚠️ 最終試練：美鈴の言霊をすべて紡げ！</div>
         <div class="game-desc">
@@ -239,6 +244,7 @@
         <button class="btn-phone btn-primary" onclick="tapStart()">試練を開始する</button>
     </div>
 
+    <!-- 結果・ゲームオーバー画面 -->
     <div id="GameScoreLayer" class="SHADE">
         <div class="game-title" id="resTitle">STAGE CLEAR</div>
         <div class="game-desc" id="resComment">お見事です！</div>
@@ -268,8 +274,8 @@ let animFrameId = null;
 
 let stageHeight = 0;
 
-// ブロック巨大化に伴い、スマホで最高に快適に拾えるよう判定の遊び（幅）を大幅に拡大！
-const HIT_WINDOW_RANGE = 55; 
+// 【最重要修正】判定の遊びを最大級に拡大。横線前後100ピクセルの超広範囲でヒットを拾います
+const HIT_WINDOW_RANGE = 100; 
 
 function tapStart() {
     document.getElementById('welcome').style.display = 'none';
@@ -308,14 +314,14 @@ function beginGamePlay() {
     document.getElementById("progressValue").innerText = "0";
     updateLifeDisplay();
 
-    // 流れてくるスピードを少しだけマイルドにし、文字をしっかり視認して叩ける速度に調整
+    // 視認しやすく、落ち着いて叩けるよう生成速度をマイルドに維持
     spawnInterval = setInterval(() => {
         if (totalSpawned < TOTAL_NOTES && isPlaying) {
             spawnNote();
         } else {
             clearInterval(spawnInterval);
         }
-    }, 380);
+    }, 420);
 
     animFrameId = requestAnimationFrame(updateNotes);
 }
@@ -329,16 +335,16 @@ function spawnNote() {
 
     const noteElement = document.createElement("div");
     noteElement.classList.add("note");
-    noteElement.innerText = "美鈴"; // ブロックの中央に文字を注入
-    noteElement.style.top = "-40px"; // 巨大化したため初期位置を調整
+    noteElement.innerText = "美鈴";
+    noteElement.style.top = "-50px"; 
     targetLane.appendChild(noteElement);
 
-    const speed = stageHeight * 0.024; 
+    const speed = stageHeight * 0.022; 
 
     activeNotes.push({
         element: noteElement,
         lane: laneIndex,
-        y: -40,
+        y: -50,
         speed: speed
     });
 }
@@ -351,8 +357,9 @@ function updateNotes() {
         note.y += note.speed;
         note.element.style.top = note.y + "px";
 
-        // ブロックの下部が完全に横線を通り過ぎたら自動的にMISS判定
-        if (note.y > stageHeight + 10) {
+        // 【バグ修正】横線を越えた瞬間ではなく、画面下（stageHeight + 80px）に完全に沈むまで判定を残す！
+        // これにより、叩く前にプログラム側が勝手に消去するのを完璧に防ぎます。
+        if (note.y > stageHeight + 80) {
             note.element.remove();
             activeNotes.splice(i, 1);
             
@@ -365,10 +372,11 @@ function updateNotes() {
     }
 }
 
-// 横線より下のエリアが押された時の判定
+// 🛑 横線より下のエリアが押された時の確定判定エンジン
 function executeLaneTap(laneIndex) {
     if (!isPlaying) return;
 
+    // レーンを光らせる視覚演出
     const flash = document.getElementById(`flash${laneIndex}`);
     flash.classList.remove("active");
     void flash.offsetWidth;
@@ -378,7 +386,7 @@ function executeLaneTap(laneIndex) {
     let targetIndex = -1;
     let maxNoteY = -999;
 
-    // レーン内で最も手前（下）にある美鈴ブロックを探す
+    // そのレーンで「今いちばん下まで降りてきているブロック」を探す
     for (let i = 0; i < activeNotes.length; i++) {
         if (activeNotes[i].lane === laneIndex && activeNotes[i].y > maxNoteY) {
             maxNoteY = activeNotes[i].y;
@@ -386,13 +394,15 @@ function executeLaneTap(laneIndex) {
         }
     }
 
+    // ブロックが存在していれば確実に判定を通す
     if (targetIndex !== -1) {
         const note = activeNotes[targetIndex];
-        // 巨大化したブロックの中心付近が横線(stageHeight)に近いかジャッジ
-        const diff = Math.abs((note.y + 18) - stageHeight); 
+        
+        // 横線（stageHeight）と、美鈴ブロックの中心位置との距離を計測
+        const diff = Math.abs((note.y + 19) - stageHeight); 
 
+        // 非常に広い判定幅（HIT_WINDOW_RANGE）の中にさえいれば、すべて「HIT!」にする
         if (diff <= HIT_WINDOW_RANGE) {
-            // 判定成功！
             note.element.remove();
             activeNotes.splice(targetIndex, 1);
             
@@ -402,18 +412,17 @@ function executeLaneTap(laneIndex) {
             showJudgment("HIT");
             checkGameEnd();
         } else {
-            // 範囲外で叩いてしまった（空振り・早すぎ・遅すぎ）場合はMISS
+            // あまりにも早すぎる空振りの場合のみミス
             note.element.remove();
             activeNotes.splice(targetIndex, 1);
             triggerMiss();
         }
     } else {
-        // ノーツが無いのに叩いた場合もミス扱い（ペナルティ）
+        // レーンに何も美鈴ブロックがいない時に叩いた場合もミス
         triggerMiss();
     }
 }
 
-// ミスが起きた時の共通処理
 function triggerMiss() {
     missCount++;
     processedCount++;
@@ -421,7 +430,6 @@ function triggerMiss() {
     showJudgment("MISS");
     updateLifeDisplay();
 
-    // 2回ミスしたらその場でゲームオーバー
     if (missCount >= 2) {
         endGame(false);
     } else {
@@ -456,7 +464,6 @@ function endGame(isSuccess) {
     clearInterval(spawnInterval);
     cancelAnimationFrame(animFrameId);
 
-    // 画面上の残ったブロックをきれいに掃除
     activeNotes.forEach(n => n.element.remove());
     activeNotes = [];
 
@@ -486,7 +493,7 @@ function tapReplay() {
     startCountdown();
 }
 
-// 下部判定ボタンへイベント接続
+// ボタンへのタッチイベントアタッチ
 document.querySelectorAll(".tap-button").forEach(btn => {
     const laneIndex = parseInt(btn.dataset.lane);
     
