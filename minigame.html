@@ -294,7 +294,7 @@ let animFrameId = null;
 let stageHeight = 0;
 
 // ⚡ 速度0.025のゆったりした動きに合わせ、判定の有効幅を「140」に微増させてジャスト感を向上
-const HIT_WINDOW_RANGE = 130; 
+const HIT_WINDOW_RANGE = 140; 
 
 function tapStart() {
     document.getElementById('welcome').style.display = 'none';
@@ -357,7 +357,7 @@ function spawnNote() {
     noteElement.style.top = "-50px"; 
     targetLane.appendChild(noteElement);
 
-    const speed = stageHeight * 0.029; 
+    const speed = stageHeight * 0.025; 
 
     activeNotes.push({
         element: noteElement,
