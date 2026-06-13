@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>美鈴の試練 - ULTRA FAST MODE -</title>
+    <title>美鈴の試練 - BALANCED MODE -</title>
     <style>
         html, body { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
@@ -23,7 +23,6 @@
             display: flex;
             flex-direction: column;
             box-sizing: border-box;
-            /* 📱 ここでもズーム動作を二重に禁止 */
             touch-action: none;
         }
 
@@ -130,7 +129,6 @@
             border-top: 2px solid rgba(255, 255, 255, 0.15);
             z-index: 10;
             box-sizing: border-box;
-            /* 📱 ボタンエリアでの連打によるズームをブラウザへ完全に禁止させる命令 */
             touch-action: manipulation;
         }
         .tap-button {
@@ -141,7 +139,6 @@
             background: rgba(0, 245, 255, 0.01);
             cursor: pointer;
             -webkit-tap-highlight-color: rgba(0, 245, 255, 0.2);
-            /* 📱 ダブルタップのズーム抑制 */
             touch-action: manipulation;
         }
         .tap-button:last-child { border-right: none; }
@@ -214,7 +211,7 @@
 
 <div id="gameContainer">
     <div class="hud-area">
-        <div class="hud-title-mini">美鈴の試練 - GOD SPEED -</div>
+        <div class="hud-title-mini">美鈴の試練 - BALANCED CHALLENGE -</div>
         <div class="hud-cards">
             <div class="hud-card">
                 <div class="hud-label">LIFE</div>
@@ -255,8 +252,8 @@
     <div id="welcome" class="SHADE">
         <div class="game-title">⚠️ 最終試練：美鈴の言霊をすべて紡げ！</div>
         <div class="game-desc">
-            【神速：スピード3倍速 ＆ 連打ズーム対策完了】<br><br>
-            流れるブロックの速度が<span style="color:#ff00ff; font-weight:bold;">前回のさらに1.5倍（初期の3倍速）</span>へと超絶進化！<br>
+            【絶妙スピード ＆ 連打ズーム対策完了版】<br><br>
+            心地よい緊張感を楽しめる、<span style="color:#00f5ff; font-weight:bold;">スピード0.035</span>の絶妙チューニング！<br>
             どれだけ激しく画面の下を連打しても、拡大ズームすることはありません！<br><br>
             全100個を<span style="color:#fef002; font-weight:bold;">ノーミスで叩ききれば完全クリア！</span><br>
             ただし、空振り・見逃し問わず、<span style="color:#ff1744; font-weight:bold;">1回でも間違えたら即ゲームオーバー</span>。
@@ -265,7 +262,7 @@
     </div>
 
     <div id="EvolutionLayer" class="SHADE">
-        <div class="game-title" style="color:#00f5ff; font-size:22px;" id="evoTitle">試練突破、速度を超えた覚醒――</div>
+        <div class="game-title" style="color:#00f5ff; font-size:22px;" id="evoTitle">試練突破、そして覚醒――</div>
         <div class="game-desc" id="evoText">「美鈴……、美鈴っ！！」言霊がぬいぐるみに魂を宿す！</div>
         <div class="evo-img-container">
             <img src="misuzunui.png" id="misuzuTargetImg" class="evo-img" alt="美鈴の姿">
@@ -275,7 +272,7 @@
 
     <div id="GameScoreLayer" class="SHADE">
         <div class="game-title" id="resTitle" style="color:#ff8a80;">❌ 試練失敗 (GAME OVER)</div>
-        <div class="game-desc">瞬きすら許されない超神速の世界……！諦めずに再挑戦だ！</div>
+        <div class="game-desc">惜しい！リズムに乗って、流れる「美鈴」をタイミングよく迎え撃ちましょう！</div>
         
         <div class="result-stats-container">
             <div class="result-row">叩いた数<span id="finalScore" style="color:#ff1744;">0</span></div>
@@ -301,8 +298,8 @@ let animFrameId = null;
 
 let stageHeight = 0;
 
-// 超高速に対応するため判定幅（奥行き）をさらに拡張し、理不尽なすり抜けを完全防止
-const HIT_WINDOW_RANGE = 140; 
+// スピードに合わせて、快適に拾える最適な判定の深さに調整（120px）
+const HIT_WINDOW_RANGE = 120; 
 
 function tapStart() {
     document.getElementById('welcome').style.display = 'none';
@@ -341,14 +338,14 @@ function beginGamePlay() {
     document.getElementById("progressValue").innerText = "0";
     document.getElementById("lifeValue").innerText = "❤️";
 
-    // ⚡ スピード3倍速に伴い、詰まりすぎない超光速間隔（190ms）にチューニング！
+    // ⚡ スピード0.035に合わせて、ブロックが美しく連なる間隔（320ms）に最適化！
     spawnInterval = setInterval(() => {
         if (totalSpawned < TOTAL_NOTES && isPlaying) {
             spawnNote();
         } else {
             clearInterval(spawnInterval);
         }
-    }, 190);
+    }, 320);
 
     animFrameId = requestAnimationFrame(updateNotes);
 }
@@ -366,8 +363,8 @@ function spawnNote() {
     noteElement.style.top = "-50px"; 
     targetLane.appendChild(noteElement);
 
-    // ⚡ 移動スピードをさらに1.5倍化（元の0.044から0.066＝初期の約3倍速）へ極限強化！
-    const speed = stageHeight * 0.050; 
+    // ⚡ ご要望の「0.035」の絶妙スピードに設定！
+    const speed = stageHeight * 0.035; 
 
     activeNotes.push({
         element: noteElement,
@@ -508,12 +505,12 @@ function tapReplay() {
     startCountdown();
 }
 
-// 📱 【ダブルタップズーム対策の最重要ポイント】 すべてのブラウザ標準動作を遮断
+// 📱 ダブルタップズーム対策：すべてのブラウザ標準動作を遮断
 document.querySelectorAll(".tap-button").forEach(btn => {
     const laneIndex = parseInt(btn.dataset.lane);
     
     btn.addEventListener("touchstart", (e) => {
-        e.preventDefault(); // これによりダブルタップでの拡大動作をブラウザが検知できなくなります
+        e.preventDefault(); 
         executeLaneTap(laneIndex);
     }, { passive: false });
 
@@ -523,7 +520,6 @@ document.querySelectorAll(".tap-button").forEach(btn => {
     });
 });
 
-// システム全体でダブルタップの拡大ジェスチャーが万が一にも動かないようにガード
 document.addEventListener('touchstart', function (e) {
     if (e.touches.length > 1) {
         e.preventDefault();
