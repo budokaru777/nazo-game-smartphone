@@ -2,108 +2,96 @@
 <html lang="ja">
 <head>
     <meta charset="utf-8" />
-    <!-- スマホでの拡大ズレを徹底防止するメタタグ -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>美鈴の試練 - VERTICAL STAGE -</title>
+    <title>美鈴の試練 - SMARTPHONE FIXED -</title>
     <style>
-        /* スマホ縦画面専用のベースリセット */
+        /* 画面全体の絶対固定（スクロールやバウンスを強制禁止） */
         html, body { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
             overflow: hidden; background: #05020a;
             user-select: none; -webkit-user-select: none;
-            touch-action: none; /* ダブルタップズームなどを強制無効 */
+            touch-action: none;
         }
         
-        /* スマホの画面いっぱいに広がるゲームコンテナ */
+        /* スマホの画面の高さ(100vh)に絶対に100%収めるコンテナ */
         #gameContainer {
             position: relative;
             width: 100%;
-            height: 100%;
-            max-width: 480px; /* 大画面スマホでも崩れない限界幅 */
+            height: 100vh;
+            max-width: 450px;
             margin: 0 auto;
             background: radial-gradient(circle at center, #160a2b 0%, #05020a 100%);
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            box-sizing: border-box;
         }
 
-        /* 📊 スッキリまとめた上部HUD（ノーツに被らない設計） */
+        /* 上部HUD（コンパクト化して高さを抑える） */
         .hud-area {
             display: flex;
             justify-content: space-between;
-            padding: calc(10px + env(safe-area-inset-top)) 15px 10px 15px;
+            padding: 10px 10px 5px 10px;
             z-index: 15;
-            background: linear-gradient(to bottom, rgba(5,2,10,0.8), rgba(5,2,10,0));
+            height: 50px;
+            box-sizing: border-box;
         }
         .hud-card {
-            background: rgba(25, 15, 45, 0.7);
+            background: rgba(25, 15, 45, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 6px 12px;
+            border-radius: 8px;
+            padding: 2px 8px;
             text-align: center;
             flex: 1;
-            margin: 0 5px;
-            backdrop-filter: blur(4px);
+            margin: 0 4px;
         }
-        .hud-label { font-size: 10px; color: #8a99ad; font-weight: bold; margin-bottom: 2px; }
-        .hud-value { font-size: 16px; font-family: monospace; font-weight: 900; color: #fff; }
-        #scoreValue { color: #00ffff; text-shadow: 0 0 8px rgba(0,255,255,0.6); }
+        .hud-label { font-size: 9px; color: #8a99ad; font-weight: bold; }
+        .hud-value { font-size: 14px; font-family: monospace; font-weight: 900; color: #fff; }
+        #scoreValue { color: #00ffff; }
 
-        /* 🌌 メイン：スマホ縦画面用の3D遠近感レーン */
+        /* 3D遠近感ステージ（画面中央から下部にかけて綺麗に配置） */
         .stage-wrapper {
             flex: 1;
             position: relative;
             width: 100%;
-            /* スマホの視点に合わせたパースペクティブ（160px） */
-            perspective: 160px;
-            perspective-origin: 50% 25%;
+            perspective: 150px;
+            perspective-origin: 50% 20%;
+            box-sizing: border-box;
         }
 
         .game-stage {
             width: 100%;
             height: 100%;
-            /* 奥に傾斜をつけることでプロセカの奥行きを完全再現 */
             transform: rotateX(20deg);
             transform-origin: top center;
             position: relative;
-            border-left: 2px solid rgba(0, 245, 255, 0.5);
-            border-right: 2px solid rgba(0, 245, 255, 0.5);
-            background: linear-gradient(to bottom, rgba(5,2,15,0.9) 0%, rgba(15,8,35,0.6) 60%, rgba(35,12,70,0.3) 100%);
-            box-shadow: inset 0 0 40px rgba(0, 245, 255, 0.1);
+            border-left: 2px solid rgba(0, 245, 255, 0.4);
+            border-right: 2px solid rgba(0, 245, 255, 0.4);
+            background: linear-gradient(to bottom, rgba(5,2,15,0.95) 0%, rgba(15,8,35,0.7) 60%, rgba(35,12,70,0.4) 100%);
         }
 
-        /* 4レーンガイド */
+        /* レーンガイド */
         .lanes-container { display: flex; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
         .lane { flex: 1; height: 100%; position: relative; border-right: 1px dashed rgba(0, 245, 255, 0.15); }
         .lane:last-child { border-right: none; }
 
-        /* タップ時にレーンが吸い込まれるように光るエフェクト */
+        /* レーン発光エフェクト */
         .lane-flash {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(to top, rgba(0, 245, 255, 0.3) 0%, rgba(0, 245, 255, 0) 80%);
             opacity: 0; pointer-events: none; z-index: 1;
-            transition: opacity 0.08s ease-out;
         }
-        .lane-flash.active { opacity: 1; transition: none; }
+        .lane-flash.active { opacity: 1; }
 
-        /* 3D判定ライン（スマホの親指の高さにジャストフィット） */
+        /* 固定配置される3D判定ライン */
         .judgment-line {
             position: absolute;
-            bottom: 90px; /* 親指で画面を隠さない絶妙な高さ */
+            bottom: 80px; /* 下部ボタンの上にジャスト配置 */
             left: 0; width: 100%; height: 4px;
             background: linear-gradient(90deg, #00f5ff, #ff00ff, #00f5ff);
-            box-shadow: 0 0 15px #00f5ff, 0 0 25px #ff00ff;
+            box-shadow: 0 0 15px #00f5ff;
             pointer-events: none; z-index: 3;
-        }
-
-        /* 📱 親指で叩きやすい超大型マルチタッチエリア */
-        .lane-trigger {
-            position: absolute;
-            bottom: 0; left: 0; width: 100%; height: 160px;
-            background: transparent; z-index: 4;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
         }
 
         /* 💎 プロセカ風の細長サイバーノーツ */
@@ -115,58 +103,74 @@
             border: 1px solid #fff;
         }
 
-        /* 判定ポップアップテキスト */
+        /* 🛑 一番重要：画面最下部に固定された「確実につぶせる」超高感度独立タップエリア */
+        .touch-control-panel {
+            display: flex;
+            width: 100%;
+            height: 110px; /* 親指で叩きやすいしっかりとした高さ */
+            background: rgba(10, 5, 25, 0.85);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            z-index: 10;
+        }
+        .tap-button {
+            flex: 1;
+            height: 100%;
+            border-right: 1px solid rgba(255,255,255,0.05);
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.01); /* 完全に透明 */
+            cursor: pointer;
+            -webkit-tap-highlight-color: rgba(0, 245, 255, 0.1); /* スマホで叩いた時に一瞬光る */
+        }
+        .tap-button:last-child { border-right: none; }
+
+        /* 判定テキスト演出 */
         .judgment-text {
-            position: absolute; top: 42%; left: 50%;
+            position: absolute; top: 40%; left: 50%;
             transform: translate(-50%, -50%);
             font-size: 36px; font-weight: 900; font-family: 'Impact', sans-serif;
-            letter-spacing: 2px; pointer-events: none; z-index: 10; opacity: 0;
+            letter-spacing: 2px; pointer-events: none; z-index: 12; opacity: 0;
         }
-        .judgment-text.perfect { color: #fff59d; text-shadow: 0 0 8px #ffeb3b, 0 0 20px #ff9800; animation: judAnim 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        .judgment-text.great { color: #e1bee7; text-shadow: 0 0 8px #ba68c8, 0 0 20px #9c27b0; animation: judAnim 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        .judgment-text.good { color: #b2dfdb; text-shadow: 0 0 8px #4db6ac; animation: judAnim 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        .judgment-text.miss { color: #ff8a80; text-shadow: 0 0 8px #ff1744; animation: judAnim 0.22s ease-in forwards; }
+        .judgment-text.perfect { color: #fff59d; text-shadow: 0 0 8px #ffeb3b, 0 0 15px #ff9800; animation: jAnim 0.2s ease-out forwards; }
+        .judgment-text.great { color: #e1bee7; text-shadow: 0 0 8px #ba68c8, 0 0 15px #9c27b0; animation: jAnim 0.2s ease-out forwards; }
+        .judgment-text.good { color: #b2dfdb; text-shadow: 0 0 8px #4db6ac; animation: jAnim 0.2s ease-out forwards; }
+        .judgment-text.miss { color: #ff8a80; text-shadow: 0 0 8px #ff1744; animation: jAnim 0.2s ease-out forwards; }
 
-        @keyframes judAnim {
-            0% { transform: translate(-50%, -50%) scale(0.5) rotate(-4deg); opacity: 0; }
-            40% { transform: translate(-50%, -50%) scale(1.1) rotate(2deg); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(1.0) rotate(0deg); opacity: 0; }
+        @keyframes jAnim {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.0); opacity: 0; }
         }
 
-        /* 📱 フルスクリーンスクリーンマスク（SHADE） */
+        /* 全画面スクリーンマスク（SHADE） */
         .SHADE {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 20; padding: 25px; box-sizing: border-box;
-            backdrop-filter: blur(8px);
+            z-index: 20; padding: 20px; box-sizing: border-box;
+            background: rgba(8, 4, 18, 0.98);
         }
-        #welcome { background: rgba(8, 4, 18, 0.96); }
-        #GameScoreLayer { background: rgba(5, 2, 12, 0.97); display: none; }
+        #GameScoreLayer { display: none; }
 
-        /* スマホ用プレミアムUIデザイン */
-        .game-title { font-size: 20px; color: #fef002; font-weight: 900; margin-bottom: 15px; text-shadow: 0 0 10px rgba(254,240,2,0.4); text-align: center; line-height: 1.4; }
-        .game-desc { font-size: 13px; color: #ccc; line-height: 1.6; margin-bottom: 30px; background: rgba(255,255,255,0.04); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); text-align: center; width: 100%; box-sizing: border-box; }
+        /* ボタンUI */
+        .game-title { font-size: 18px; color: #fef002; font-weight: 900; margin-bottom: 12px; text-shadow: 0 0 10px rgba(254,240,2,0.4); text-align: center; }
+        .game-desc { font-size: 12px; color: #ccc; line-height: 1.5; margin-bottom: 20px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; text-align: center; width: 100%; box-sizing: border-box; }
         
         .btn-phone {
-            width: 85%; padding: 14px; margin: 8px 0;
-            font-size: 16px; font-weight: bold; color: #fff; border: none; border-radius: 30px;
+            width: 80%; padding: 12px; margin: 6px 0;
+            font-size: 15px; font-weight: bold; color: #fff; border: none; border-radius: 25px;
             cursor: pointer; box-sizing: border-box; text-align: center;
         }
-        .btn-primary { background: linear-gradient(135deg, #00f5ff, #0077ff); box-shadow: 0 0 15px rgba(0,245,255,0.4); }
-        .btn-secondary { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.15); }
+        .btn-primary { background: linear-gradient(135deg, #00f5ff, #0077ff); box-shadow: 0 0 12px rgba(0,245,255,0.4); }
+        .btn-secondary { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.15); }
         
-        /* スコア統計表示 */
-        .result-row { display: flex; justify-content: space-between; width: 80%; margin: 8px 0; font-size: 16px; color: #aaa; font-weight: bold; }
-        .result-row span { color: #fff; font-family: monospace; font-size: 18px; }
+        .result-row { display: flex; justify-content: space-between; width: 75%; margin: 6px 0; font-size: 15px; color: #aaa; font-weight: bold; }
+        .result-row span { color: #fff; font-family: monospace; font-size: 16px; }
 
-        /* 3・2·1 カウントダウン */
-        #countText { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); font-size: 70px; font-weight: 900; color: #00f5ff; text-shadow: 0 0 20px #00f5ff; z-index: 18; display: none; }
+        #countText { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 60px; font-weight: 900; color: #00f5ff; text-shadow: 0 0 15px #00f5ff; z-index: 18; display: none; }
     </style>
 </head>
 <body>
 
 <div id="gameContainer">
-    <!-- 上部HUD表示エリア -->
     <div class="hud-area">
         <div class="hud-card">
             <div class="hud-label">PROGRESS</div>
@@ -178,54 +182,42 @@
         </div>
     </div>
 
-    <!-- 縦画面専用・3D遠近感ステージ -->
     <div class="stage-wrapper">
         <div class="game-stage" id="mainStage">
             
-            <!-- 判定エフェクト位置 -->
             <div class="judgment-text" id="judText">PERFECT</div>
 
-            <!-- 4レーンライン＆大型スマホトリガー -->
             <div class="lanes-container">
-                <div class="lane" id="lane0">
-                    <div class="lane-flash" id="flash0"></div>
-                    <div class="lane-trigger" data-lane="0"></div>
-                </div>
-                <div class="lane" id="lane1">
-                    <div class="lane-flash" id="flash1"></div>
-                    <div class="lane-trigger" data-lane="1"></div>
-                </div>
-                <div class="lane" id="lane2">
-                    <div class="lane-flash" id="flash2"></div>
-                    <div class="lane-trigger" data-lane="2"></div>
-                </div>
-                <div class="lane" id="lane3">
-                    <div class="lane-flash" id="flash3"></div>
-                    <div class="lane-trigger" data-lane="3"></div>
-                </div>
+                <div class="lane" id="lane0"><div class="lane-flash" id="flash0"></div></div>
+                <div class="lane" id="lane1"><div class="lane-flash" id="flash1"></div></div>
+                <div class="lane" id="lane2"><div class="lane-flash" id="flash2"></div></div>
+                <div class="lane" id="lane3"><div class="lane-flash" id="flash3"></div></div>
             </div>
 
-            <!-- 3D判定ライン -->
             <div class="judgment-line" id="jLine"></div>
         </div>
     </div>
 
-    <!-- 大型カウントダウン -->
+    <div class="touch-control-panel">
+        <div class="tap-button" data-lane="0"></div>
+        <div class="tap-button" data-lane="1"></div>
+        <div class="tap-button" data-lane="2"></div>
+        <div class="tap-button" data-lane="3"></div>
+    </div>
+
     <div id="countText">3</div>
 
-    <!-- スタート画面 -->
     <div id="welcome" class="SHADE">
         <div class="game-title">⚠️ 最終試練<br>美鈴の名前を呼び覚ませ！</div>
         <div class="game-desc">
-            【スマートフォン縦画面最適化】<br><br>
-            奥から迫りくる100個の「美鈴の言霊」を<br>手前の判定線に合わせてタップせよ！<br><br>
+            【画面サイズ固定化＆超高感度タップ版】<br><br>
+            画面最下部の4つのレーン領域を<br>リズムに合わせてタップしてください！<br><br>
             <span style="color:#00f5ff;">Perf:3点 / Grt:2点 / Gd:1点</span><br>
             クリア目標：<span style="color:#fef002; font-weight:bold;">210点以上</span>
         </div>
         <button class="btn-phone btn-primary" onclick="tapStart()">試練を開始する</button>
     </div>
 
-    <!-- リザルト画面 -->
     <div id="GameScoreLayer" class="SHADE">
         <div class="game-title" id="resTitle">STAGE CLEAR</div>
         <div class="game-desc" id="resComment">素晴らしいリズム精度です！</div>
@@ -234,7 +226,7 @@
         <div class="result-row">クリア基準: <span>210</span></div>
         <div class="result-row">自己ベスト: <span id="bestScore">0</span></div>
 
-        <button class="btn-phone btn-primary" onclick="tapReplay()" style="margin-top:25px;">もう一度挑む</button>
+        <button class="btn-phone btn-primary" onclick="tapReplay()" style="margin-top:20px;">もう一度挑む</button>
         <button class="btn-phone btn-secondary" onclick="window.location.reload()">タイトルへ戻る</button>
     </div>
 </div>
@@ -252,20 +244,13 @@ let activeNotes = [];
 let spawnInterval = null;
 let animFrameId = null;
 
-// 縦画面スマホ用に最適化したスクロールスピードと絶対判定座標
-let stageHeight = 0;
-let judgeLineY = 0;
-const HIT_WINDOW = 65; 
+// CSS固定により、画面比率に関わらず正確に同期する内部位置座標
+const STAGE_MAX_HEIGHT = window.innerHeight - 160; // 全体からHUDとタップエリアを引いた実質高
+const JUDGE_POSITION_Y = STAGE_MAX_HEIGHT - 35;   // 判定ラインの固定Y座標
+const HIT_WINDOW = 60; 
 
 function tapStart() {
     document.getElementById('welcome').style.display = 'none';
-    
-    // スマホの画面サイズにあわせてリアルタイムに判定ラインの位置（px値）を取得
-    const stage = document.getElementById('mainStage');
-    const jLine = document.getElementById('jLine');
-    stageHeight = stage.clientHeight;
-    judgeLineY = jLine.offsetTop; 
-
     startCountdown();
 }
 
@@ -286,7 +271,7 @@ function startCountdown() {
             countText.style.display = "none";
             beginGamePlay();
         }
-    }, 700);
+    }, 600);
 }
 
 function beginGamePlay() {
@@ -299,7 +284,7 @@ function beginGamePlay() {
     document.getElementById("progressValue").innerText = "0";
     document.getElementById("scoreValue").innerText = "0";
 
-    // スマホで最高に気持ちいい密度のラッシュ（230ms間隔）
+    // プロセカ風のハイスピードラッシュ生成
     spawnInterval = setInterval(() => {
         if (totalSpawned < TOTAL_NOTES) {
             spawnNote();
@@ -323,8 +308,8 @@ function spawnNote() {
     noteElement.style.top = "-15px";
     targetLane.appendChild(noteElement);
 
-    // スマホ縦画面での快適な反応速度にチューニング（秒速フレーム追従）
-    const speed = stageHeight * 0.024; 
+    // どのスマホでも一定の快適な速度になるよう固定値を設定
+    const speed = 12.0; 
 
     activeNotes.push({
         element: noteElement,
@@ -342,8 +327,8 @@ function updateNotes() {
         note.y += note.speed;
         note.element.style.top = note.y + "px";
 
-        // 画面外に完全に抜けた場合＝MISS
-        if (note.y > stageHeight) {
+        // 判定線を完全にスルーして下まで落ちた場合＝MISS
+        if (note.y > STAGE_MAX_HEIGHT) {
             note.element.remove();
             activeNotes.splice(i, 1);
             
@@ -359,21 +344,21 @@ function updateNotes() {
     }
 }
 
-// 親指マルチタッチに超反応する判定ロジック
-function triggerTap(laneIndex) {
+// ボタンが押された時の即時判定処理（マルチタッチ＆マウスクリック共通）
+function executeLaneTap(laneIndex) {
     if (!isPlaying) return;
 
-    // 即座にレーンを発光させる（タップの視覚的気持ちよさ）
+    // レーン発光
     const flash = document.getElementById(`flash${laneIndex}`);
     flash.classList.remove("active");
     void flash.offsetWidth;
     flash.classList.add("active");
-    setTimeout(() => { flash.classList.remove("active"); }, 80);
+    setTimeout(() => { flash.classList.remove("active"); }, 70);
 
     let targetIndex = -1;
     let maxNoteY = -999;
 
-    // 対象レーンの中で最も手前（下部）にあるノーツを見つける
+    // 該当レーンの一番手前にあるノーツを特定
     for (let i = 0; i < activeNotes.length; i++) {
         if (activeNotes[i].lane === laneIndex && activeNotes[i].y > maxNoteY) {
             maxNoteY = activeNotes[i].y;
@@ -383,16 +368,16 @@ function triggerTap(laneIndex) {
 
     if (targetIndex !== -1) {
         const note = activeNotes[targetIndex];
-        const diff = Math.abs(note.y - judgeLineY);
+        const diff = Math.abs(note.y - JUDGE_POSITION_Y);
 
-        // スマホの親指タップのブレを考慮した3段階判定
-        if (diff <= 22) {
+        // ミリ秒・ピクセルズレの許容範囲をスマホ用に最適化
+        if (diff <= 25) {
             note.element.remove();
             activeNotes.splice(targetIndex, 1);
             currentScore += 3;
             showJudgment("PERFECT");
             pushProgress();
-        } else if (diff <= 45) {
+        } else if (diff <= 48) {
             note.element.remove();
             activeNotes.splice(targetIndex, 1);
             currentScore += 2;
@@ -423,10 +408,10 @@ function checkGameEnd() {
         clearInterval(spawnInterval);
         cancelAnimationFrame(animFrameId);
 
-        let localBest = localStorage.getItem("misuzu_3d_best") || 0;
+        let localBest = localStorage.getItem("misuzu_fixed_best") || 0;
         if (currentScore > localBest) {
             localBest = currentScore;
-            localStorage.setItem("misuzu_3d_best", localBest);
+            localStorage.setItem("misuzu_fixed_best", localBest);
         }
 
         setTimeout(() => {
@@ -440,11 +425,11 @@ function checkGameEnd() {
             if (currentScore >= TARGET_SCORE) {
                 title.innerText = "🎉 試練突破 !!";
                 title.style.color = "#00f5ff";
-                comment.innerHTML = "「美鈴……、美鈴っ！！」<br>完全にシンクロした言霊が響き渡り、ぬいぐるみから眩い光が溢れ出す！";
+                comment.innerHTML = "「美鈴……、美鈴っ！！」<br>完全に響き渡った言霊の光が、世界を満たしていく！";
             } else {
                 title.innerText = "❌ 試練失敗";
                 title.style.color = "#ff8a80";
-                comment.innerText = "クリア基準（210点）に届きませんでした。判定線にしっかり引きつけて叩きましょう！";
+                comment.innerText = "クリア基準（210点）に届きませんでした。最下部のエリアをタイミングよく叩きましょう！";
             }
 
             scoreLayer.style.display = "flex";
@@ -468,25 +453,22 @@ function tapReplay() {
     startCountdown();
 }
 
-// 📱 スマホのタッチラグ（300ms遅延）を完全につぶす最速タッチイベント
-document.querySelectorAll(".lane-trigger").forEach(trigger => {
-    const laneIndex = parseInt(trigger.dataset.lane);
+// 📱 スマホのブラウザ遅延を完全に殺すイベントリスナー登録
+document.querySelectorAll(".tap-button").forEach(btn => {
+    const laneIndex = parseInt(btn.dataset.lane);
     
-    trigger.addEventListener("touchstart", (e) => {
-        e.preventDefault(); // スクロールやバウンスなどの余計な挙動を完全にシャットアウト
-        triggerTemplate(laneIndex);
+    // タッチした瞬間に反応（スマホ用）
+    btn.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        executeLaneTap(laneIndex);
     }, { passive: false });
 
-    // PCでのテスト用クリックイベントも残備
-    trigger.addEventListener("mousedown", (e) => {
+    // クリックした瞬間に反応（PC開発環境・マウステスト用）
+    btn.addEventListener("mousedown", (e) => {
         e.preventDefault();
-        triggerTemplate(laneIndex);
+        executeLaneTap(laneIndex);
     });
 });
-
-function triggerTemplate(idx) {
-    triggerTap(idx);
-}
 </script>
 
 </body>
