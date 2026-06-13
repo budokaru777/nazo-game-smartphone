@@ -3,13 +3,14 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>美鈴の試練 - SUDDEN DEATH MODE -</title>
+    <title>美鈴の試練 - ULTRA FAST MODE -</title>
     <style>
         html, body { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
             font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
             overflow: hidden; background: #05020a;
             user-select: none; -webkit-user-select: none;
+            /* 📱 ブラウザ固有のダブルタップズームやジェスチャーを強制無効化 */
             touch-action: none;
         }
         
@@ -22,6 +23,8 @@
             display: flex;
             flex-direction: column;
             box-sizing: border-box;
+            /* 📱 ここでもズーム動作を二重に禁止 */
+            touch-action: none;
         }
 
         /* 上部HUD */
@@ -127,6 +130,8 @@
             border-top: 2px solid rgba(255, 255, 255, 0.15);
             z-index: 10;
             box-sizing: border-box;
+            /* 📱 ボタンエリアでの連打によるズームをブラウザへ完全に禁止させる命令 */
+            touch-action: manipulation;
         }
         .tap-button {
             flex: 1;
@@ -136,6 +141,8 @@
             background: rgba(0, 245, 255, 0.01);
             cursor: pointer;
             -webkit-tap-highlight-color: rgba(0, 245, 255, 0.2);
+            /* 📱 ダブルタップのズーム抑制 */
+            touch-action: manipulation;
         }
         .tap-button:last-child { border-right: none; }
         .tap-button:active { background: rgba(0, 245, 255, 0.15); }
@@ -165,7 +172,7 @@
         }
         #GameScoreLayer, #EvolutionLayer { display: none; }
 
-        /* 👑 クリア時専用：美鈴画像進化演出レイヤー */
+        /* クリア時専用：美鈴画像進化演出レイヤー */
         .evo-img-container {
             position: relative; width: 220px; height: 220px;
             display: flex; justify-content: center; align-items: center;
@@ -176,7 +183,6 @@
             border-radius: 12px; transition: all 0.5s ease-in-out;
             box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
         }
-        /* 進化の瞬間の輝きエフェクト */
         .flash-bang {
             position: absolute; width: 100%; height: 100%; background: #fff;
             border-radius: 12px; opacity: 0; pointer-events: none;
@@ -208,7 +214,7 @@
 
 <div id="gameContainer">
     <div class="hud-area">
-        <div class="hud-title-mini">美鈴の試練 - SUDDEN DEATH -</div>
+        <div class="hud-title-mini">美鈴の試練 - GOD SPEED -</div>
         <div class="hud-cards">
             <div class="hud-card">
                 <div class="hud-label">LIFE</div>
@@ -249,17 +255,17 @@
     <div id="welcome" class="SHADE">
         <div class="game-title">⚠️ 最終試練：美鈴の言霊をすべて紡げ！</div>
         <div class="game-desc">
-            【スピード2倍 ＆ 1ミス即終了モード】<br><br>
-            流れるブロックの速度が<span style="color:#ff00ff; font-weight:bold;">これまでの「2倍」</span>に超強化！<br>
-            ネオン横線に重なる瞬間、真下のボタンエリアを死守せよ！<br><br>
-            全100個を<span style="color:#fef002; font-weight:bold;">すべてパーフェクトに叩けばクリア！</span><br>
+            【神速：スピード3倍速 ＆ 連打ズーム対策完了】<br><br>
+            流れるブロックの速度が<span style="color:#ff00ff; font-weight:bold;">前回のさらに1.5倍（初期の3倍速）</span>へと超絶進化！<br>
+            どれだけ激しく画面の下を連打しても、拡大ズームすることはありません！<br><br>
+            全100個を<span style="color:#fef002; font-weight:bold;">ノーミスで叩ききれば完全クリア！</span><br>
             ただし、空振り・見逃し問わず、<span style="color:#ff1744; font-weight:bold;">1回でも間違えたら即ゲームオーバー</span>。
         </div>
         <button class="btn-phone btn-primary" onclick="tapStart()">試練を開始する</button>
     </div>
 
     <div id="EvolutionLayer" class="SHADE">
-        <div class="game-title" style="color:#00f5ff; font-size:22px;" id="evoTitle">試練突破、そして覚醒――</div>
+        <div class="game-title" style="color:#00f5ff; font-size:22px;" id="evoTitle">試練突破、速度を超えた覚醒――</div>
         <div class="game-desc" id="evoText">「美鈴……、美鈴っ！！」言霊がぬいぐるみに魂を宿す！</div>
         <div class="evo-img-container">
             <img src="misuzunui.png" id="misuzuTargetImg" class="evo-img" alt="美鈴の姿">
@@ -269,7 +275,7 @@
 
     <div id="GameScoreLayer" class="SHADE">
         <div class="game-title" id="resTitle" style="color:#ff8a80;">❌ 試練失敗 (GAME OVER)</div>
-        <div class="game-desc">一瞬の迷いが命取りに……！魂を研ぎ澄まして再挑戦してください。</div>
+        <div class="game-desc">瞬きすら許されない超神速の世界……！諦めずに再挑戦だ！</div>
         
         <div class="result-stats-container">
             <div class="result-row">叩いた数<span id="finalScore" style="color:#ff1744;">0</span></div>
@@ -295,8 +301,8 @@ let animFrameId = null;
 
 let stageHeight = 0;
 
-// スピード2倍に対応するため、判定の奥行きをしっかり拾う設計に調整
-const HIT_WINDOW_RANGE = 120; 
+// 超高速に対応するため判定幅（奥行き）をさらに拡張し、理不尽なすり抜けを完全防止
+const HIT_WINDOW_RANGE = 140; 
 
 function tapStart() {
     document.getElementById('welcome').style.display = 'none';
@@ -335,14 +341,14 @@ function beginGamePlay() {
     document.getElementById("progressValue").innerText = "0";
     document.getElementById("lifeValue").innerText = "❤️";
 
-    // ⚡ スピード2倍に伴い、ブロックが重なりすぎないよう絶妙な間隔（280ms）に最適化
+    // ⚡ スピード3倍速に伴い、詰まりすぎない超光速間隔（190ms）にチューニング！
     spawnInterval = setInterval(() => {
         if (totalSpawned < TOTAL_NOTES && isPlaying) {
             spawnNote();
         } else {
             clearInterval(spawnInterval);
         }
-    }, 280);
+    }, 190);
 
     animFrameId = requestAnimationFrame(updateNotes);
 }
@@ -360,8 +366,8 @@ function spawnNote() {
     noteElement.style.top = "-50px"; 
     targetLane.appendChild(noteElement);
 
-    // ⚡ 移動スピードを「今の2倍（元の0.022から0.044）」へと極大強化！
-    const speed = stageHeight * 0.044; 
+    // ⚡ 移動スピードをさらに1.5倍化（元の0.044から0.066＝初期の約3倍速）へ極限強化！
+    const speed = stageHeight * 0.066; 
 
     activeNotes.push({
         element: noteElement,
@@ -379,7 +385,7 @@ function updateNotes() {
         note.y += note.speed;
         note.element.style.top = note.y + "px";
 
-        // 横線を越えて画面外へ漏れたら即MISS（サドンデス発動）
+        // 横線を越えて画面外へ漏れたら即MISS（サドンデス）
         if (note.y > stageHeight + 80) {
             note.element.remove();
             activeNotes.splice(i, 1);
@@ -426,18 +432,15 @@ function executeLaneTap(laneIndex) {
             showJudgment("HIT");
             checkGameEnd();
         } else {
-            // タイミングを外して叩いた＝1発アウト
             note.element.remove();
             activeNotes.splice(targetIndex, 1);
             triggerMiss();
         }
     } else {
-        // 空振りした＝1発アウト
         triggerMiss();
     }
 }
 
-// ⚠️ 1ミス即死判定
 function triggerMiss() {
     isPlaying = false;
     missCount = 1;
@@ -472,23 +475,21 @@ function endGame(isSuccess) {
 
     setTimeout(() => {
         if (isSuccess) {
-            // 🎉 クリア時：復活した画像進化 ＆ fin.html 自動遷移ルート
             const evoLayer = document.getElementById("EvolutionLayer");
             const targetImg = document.getElementById("misuzuTargetImg");
             const flash = document.getElementById("evoFlash");
             
-            // まずは「ぬいぐるみの画像」で演出開始
             targetImg.src = "misuzunui.png";
             evoLayer.style.display = "flex";
 
-            // 1. 3秒後にまばゆいフラッシュと共に、美鈴本来の姿（misuzu.png）へ進化！
+            // 1. 3秒後にまばゆいフラッシュと共に、美鈴本来の姿（misuzu.png）へ進化
             setTimeout(() => {
                 flash.style.animation = "flashEffect 0.6s ease-out forwards";
                 targetImg.src = "misuzu.png";
                 document.getElementById("evoTitle").innerText = "✨ 美鈴、完全復活 !! ✨";
                 document.getElementById("evoText").innerText = "眩い光のなか、美鈴が優しく微笑んだ。";
 
-                // 2. その感動の2秒後（クリアから計5秒後）、fin.htmlへ自動ジャンプ！
+                // 2. その2秒後、fin.htmlへ自動ジャンプ
                 setTimeout(() => {
                     window.location.href = "fin.html";
                 }, 2000);
@@ -496,7 +497,6 @@ function endGame(isSuccess) {
             }, 3000);
 
         } else {
-            // ❌ ゲームオーバー時：リザルトパネル展開
             document.getElementById("finalScore").innerText = hitCount;
             document.getElementById("GameScoreLayer").style.display = "flex";
         }
@@ -508,12 +508,12 @@ function tapReplay() {
     startCountdown();
 }
 
-// ボタンのタッチ・クリック登録
+// 📱 【ダブルタップズーム対策の最重要ポイント】 すべてのブラウザ標準動作を遮断
 document.querySelectorAll(".tap-button").forEach(btn => {
     const laneIndex = parseInt(btn.dataset.lane);
     
     btn.addEventListener("touchstart", (e) => {
-        e.preventDefault();
+        e.preventDefault(); // これによりダブルタップでの拡大動作をブラウザが検知できなくなります
         executeLaneTap(laneIndex);
     }, { passive: false });
 
@@ -522,6 +522,13 @@ document.querySelectorAll(".tap-button").forEach(btn => {
         executeLaneTap(laneIndex);
     });
 });
+
+// システム全体でダブルタップの拡大ジェスチャーが万が一にも動かないようにガード
+document.addEventListener('touchstart', function (e) {
+    if (e.touches.length > 1) {
+        e.preventDefault();
+    }
+}, { passive: false });
 </script>
 
 </body>
