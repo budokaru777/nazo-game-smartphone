@@ -249,8 +249,8 @@
     <div id="welcome" class="SHADE">
         <div class="game-title">⚠️ 最終試練：美鈴の言霊をすべて紡げ！</div>
         <div class="game-desc">
-            【スピード調整 ＆ 1ミス即終了モード】<br><br>
-            流れるブロックの速度を<span style="color:#00f5ff; font-weight:bold;">「0.025」</span>に最適化！<br>
+            【判定最適化 ＆ 1ミス即終了モード】<br><br>
+            流れるブロックの速度を<span style="color:#00f5ff; font-weight:bold;">「0.025」</span>に固定！<br>
             ネオン横線に重なる瞬間、真下のボタンエリアを死守せよ！<br><br>
             全100個を<span style="color:#fef002; font-weight:bold;">すべてパーフェクトに叩けばクリア！</span><br>
             ただし、空振り・見逃し問わず、<span style="color:#ff1744; font-weight:bold;">1回でも間違えたら即ゲームオーバー</span>。
@@ -295,8 +295,8 @@ let animFrameId = null;
 
 let stageHeight = 0;
 
-// スピード調整に伴い、心地よい判定範囲（120）を維持
-const HIT_WINDOW_RANGE = 120; 
+// ⚡ 速度0.025のゆったりした動きに合わせ、判定の有効幅を「140」に微増させてジャスト感を向上
+const HIT_WINDOW_RANGE = 140; 
 
 function tapStart() {
     document.getElementById('welcome').style.display = 'none';
@@ -335,7 +335,6 @@ function beginGamePlay() {
     document.getElementById("progressValue").innerText = "0";
     document.getElementById("lifeValue").innerText = "❤️";
 
-    // ⚡ スピード 0.025 に合わせ、ノーツ同士が重ならない適度な間隔（500ms）に調整
     spawnInterval = setInterval(() => {
         if (totalSpawned < TOTAL_NOTES && isPlaying) {
             spawnNote();
@@ -360,7 +359,6 @@ function spawnNote() {
     noteElement.style.top = "-50px"; 
     targetLane.appendChild(noteElement);
 
-    // ⚡ 移動スピードを「0.025」へ調整！
     const speed = stageHeight * 0.025; 
 
     activeNotes.push({
@@ -379,7 +377,7 @@ function updateNotes() {
         note.y += note.speed;
         note.element.style.top = note.y + "px";
 
-        // 横線を越えて画面外へ漏れたら即MISS（サドンデス発動）
+        // 横線を越えて画面外へ漏れたら即MISS
         if (note.y > stageHeight + 80) {
             note.element.remove();
             activeNotes.splice(i, 1);
@@ -414,7 +412,9 @@ function executeLaneTap(laneIndex) {
 
     if (targetIndex !== -1) {
         const note = activeNotes[targetIndex];
-        const diff = Math.abs((note.y + 19) - stageHeight); 
+        
+        // ⚡ 速度0.025において、ブロックが一番きれいに重なって見えるよう中心点を「+ 25」に微小補正
+        const diff = Math.abs((note.y + 25) - stageHeight); 
 
         if (diff <= HIT_WINDOW_RANGE) {
             note.element.remove();
@@ -426,18 +426,15 @@ function executeLaneTap(laneIndex) {
             showJudgment("HIT");
             checkGameEnd();
         } else {
-            // タイミングを外して叩いた＝1発アウト
             note.element.remove();
             activeNotes.splice(targetIndex, 1);
             triggerMiss();
         }
     } else {
-        // 空振りした＝1発アウト
         triggerMiss();
     }
 }
 
-// ⚠️ 1ミス即死判定
 function triggerMiss() {
     isPlaying = false;
     missCount = 1;
@@ -472,23 +469,19 @@ function endGame(isSuccess) {
 
     setTimeout(() => {
         if (isSuccess) {
-            // 🎉 クリア時：復活した画像進化 ＆ fin.html 自動遷移ルート
             const evoLayer = document.getElementById("EvolutionLayer");
             const targetImg = document.getElementById("misuzuTargetImg");
             const flash = document.getElementById("evoFlash");
             
-            // まずは「ぬいぐるみの画像」で演出開始
             targetImg.src = "misuzunui.png";
             evoLayer.style.display = "flex";
 
-            // 1. 3秒後にまばゆいフラッシュと共に、美鈴本来の姿（misuzu.png）へ進化！
             setTimeout(() => {
                 flash.style.animation = "flashEffect 0.6s ease-out forwards";
                 targetImg.src = "misuzu.png";
                 document.getElementById("evoTitle").innerText = "✨ 美鈴、完全復活 !! ✨";
                 document.getElementById("evoText").innerText = "眩い光のなか、美鈴が優しく微笑んだ。";
 
-                // 2. その感動の2秒後（クリアから計5秒後）、fin.htmlへ自動ジャンプ！
                 setTimeout(() => {
                     window.location.href = "fin.html";
                 }, 2000);
@@ -496,7 +489,6 @@ function endGame(isSuccess) {
             }, 3000);
 
         } else {
-            // ❌ ゲームオーバー時：リザルトパネル展開
             document.getElementById("finalScore").innerText = hitCount;
             document.getElementById("GameScoreLayer").style.display = "flex";
         }
@@ -508,7 +500,6 @@ function tapReplay() {
     startCountdown();
 }
 
-// ボタンのタッチ・クリック登録
 document.querySelectorAll(".tap-button").forEach(btn => {
     const laneIndex = parseInt(btn.dataset.lane);
     
