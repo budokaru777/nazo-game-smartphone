@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>美鈴の試練 - FIXED TOUCH MODE -</title>
+    <title>美鈴の試練 - SUDDEN DEATH MODE -</title>
     <style>
         html, body { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
@@ -22,7 +22,6 @@
             display: flex;
             flex-direction: column;
             box-sizing: border-box;
-            touch-action: none;
         }
 
         /* 上部HUD */
@@ -119,16 +118,15 @@
             pointer-events: none; z-index: 5;
         }
 
-        /* 👑 横線より下の高感度当たり判定エリア (最前面に固定してタッチを絶対逃がさない) */
+        /* 横線より下の高感度当たり判定エリア */
         .touch-control-panel {
             display: flex;
             width: 100%;
             height: 85px; 
             background: rgba(12, 6, 28, 0.95);
             border-top: 2px solid rgba(255, 255, 255, 0.15);
-            z-index: 9999; 
+            z-index: 10;
             box-sizing: border-box;
-            touch-action: none;
         }
         .tap-button {
             flex: 1;
@@ -138,7 +136,6 @@
             background: rgba(0, 245, 255, 0.01);
             cursor: pointer;
             -webkit-tap-highlight-color: rgba(0, 245, 255, 0.2);
-            touch-action: none;
         }
         .tap-button:last-child { border-right: none; }
         .tap-button:active { background: rgba(0, 245, 255, 0.15); }
@@ -163,12 +160,12 @@
         .SHADE {
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 50; padding: 15px; box-sizing: border-box;
+            z-index: 20; padding: 15px; box-sizing: border-box;
             background: rgba(8, 4, 18, 0.98);
         }
         #GameScoreLayer, #EvolutionLayer { display: none; }
 
-        /* クリア時専用：美鈴画像進化演出レイヤー */
+        /* 👑 クリア時専用：美鈴画像進化演出レイヤー */
         .evo-img-container {
             position: relative; width: 220px; height: 220px;
             display: flex; justify-content: center; align-items: center;
@@ -179,6 +176,7 @@
             border-radius: 12px; transition: all 0.5s ease-in-out;
             box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
         }
+        /* 進化の瞬間の輝きエフェクト */
         .flash-bang {
             position: absolute; width: 100%; height: 100%; background: #fff;
             border-radius: 12px; opacity: 0; pointer-events: none;
@@ -196,7 +194,6 @@
             width: 60%; max-width: 260px; padding: 10px; margin: 4px 0;
             font-size: 14px; font-weight: bold; color: #fff; border: none; border-radius: 20px;
             cursor: pointer; box-sizing: border-box; text-align: center;
-            z-index: 100;
         }
         .btn-primary { background: linear-gradient(135deg, #00f5ff, #0077ff); box-shadow: 0 0 10px rgba(0,245,255,0.4); }
         
@@ -211,7 +208,7 @@
 
 <div id="gameContainer">
     <div class="hud-area">
-        <div class="hud-title-mini">美鈴の試練 - HIGH TOUCH SENSITIVE -</div>
+        <div class="hud-title-mini">美鈴の試練 - SUDDEN DEATH -</div>
         <div class="hud-cards">
             <div class="hud-card">
                 <div class="hud-label">LIFE</div>
@@ -252,10 +249,10 @@
     <div id="welcome" class="SHADE">
         <div class="game-title">⚠️ 最終試練：美鈴の言霊をすべて紡げ！</div>
         <div class="game-desc">
-            【感度MAX ＆ 速度0.035絶妙版】<br><br>
-            タップが反応しない不具合を完全修正！超高感度になりました！<br>
-            どれだけ激しく画面の下を連打しても、拡大ズームすることはありません！<br><br>
-            全100個を<span style="color:#fef002; font-weight:bold;">ノーミスで叩ききれば完全クリア！</span><br>
+            【スピード2倍 ＆ 1ミス即終了モード】<br><br>
+            流れるブロックの速度が<span style="color:#ff00ff; font-weight:bold;">これまでの「2倍」</span>に超強化！<br>
+            ネオン横線に重なる瞬間、真下のボタンエリアを死守せよ！<br><br>
+            全100個を<span style="color:#fef002; font-weight:bold;">すべてパーフェクトに叩けばクリア！</span><br>
             ただし、空振り・見逃し問わず、<span style="color:#ff1744; font-weight:bold;">1回でも間違えたら即ゲームオーバー</span>。
         </div>
         <button class="btn-phone btn-primary" onclick="tapStart()">試練を開始する</button>
@@ -272,7 +269,7 @@
 
     <div id="GameScoreLayer" class="SHADE">
         <div class="game-title" id="resTitle" style="color:#ff8a80;">❌ 試練失敗 (GAME OVER)</div>
-        <div class="game-desc">リズムに乗って、流れる「美鈴」をタイミングよく迎え撃ちましょう！</div>
+        <div class="game-desc">一瞬の迷いが命取りに……！魂を研ぎ澄まして再挑戦してください。</div>
         
         <div class="result-stats-container">
             <div class="result-row">叩いた数<span id="finalScore" style="color:#ff1744;">0</span></div>
@@ -298,8 +295,8 @@ let animFrameId = null;
 
 let stageHeight = 0;
 
-// 判定幅を引き込みやすく調整（130px）
-const HIT_WINDOW_RANGE = 130; 
+// スピード2倍に対応するため、判定の奥行きをしっかり拾う設計に調整
+const HIT_WINDOW_RANGE = 120; 
 
 function tapStart() {
     document.getElementById('welcome').style.display = 'none';
@@ -338,14 +335,14 @@ function beginGamePlay() {
     document.getElementById("progressValue").innerText = "0";
     document.getElementById("lifeValue").innerText = "❤️";
 
-    // スピード0.035に合わせた最適なノーツ生成間隔（320ms）
+    // ⚡ スピード2倍に伴い、ブロックが重なりすぎないよう絶妙な間隔（280ms）に最適化
     spawnInterval = setInterval(() => {
         if (totalSpawned < TOTAL_NOTES && isPlaying) {
             spawnNote();
         } else {
             clearInterval(spawnInterval);
         }
-    }, 320);
+    }, 280);
 
     animFrameId = requestAnimationFrame(updateNotes);
 }
@@ -363,8 +360,8 @@ function spawnNote() {
     noteElement.style.top = "-50px"; 
     targetLane.appendChild(noteElement);
 
-    // ご要望通りの絶妙スピード「0.035」
-    const speed = stageHeight * 0.035; 
+    // ⚡ 移動スピードを「今の2倍（元の0.022から0.044）」へと極大強化！
+    const speed = stageHeight * 0.044; 
 
     activeNotes.push({
         element: noteElement,
@@ -382,7 +379,7 @@ function updateNotes() {
         note.y += note.speed;
         note.element.style.top = note.y + "px";
 
-        // 横線を越えて画面外へ漏れたら即MISS（サドンデス）
+        // 横線を越えて画面外へ漏れたら即MISS（サドンデス発動）
         if (note.y > stageHeight + 80) {
             note.element.remove();
             activeNotes.splice(i, 1);
@@ -429,15 +426,18 @@ function executeLaneTap(laneIndex) {
             showJudgment("HIT");
             checkGameEnd();
         } else {
+            // タイミングを外して叩いた＝1発アウト
             note.element.remove();
             activeNotes.splice(targetIndex, 1);
             triggerMiss();
         }
     } else {
+        // 空振りした＝1発アウト
         triggerMiss();
     }
 }
 
+// ⚠️ 1ミス即死判定
 function triggerMiss() {
     isPlaying = false;
     missCount = 1;
@@ -472,21 +472,23 @@ function endGame(isSuccess) {
 
     setTimeout(() => {
         if (isSuccess) {
+            // 🎉 クリア時：復活した画像進化 ＆ fin.html 自動遷移ルート
             const evoLayer = document.getElementById("EvolutionLayer");
             const targetImg = document.getElementById("misuzuTargetImg");
             const flash = document.getElementById("evoFlash");
             
+            // まずは「ぬいぐるみの画像」で演出開始
             targetImg.src = "misuzunui.png";
             evoLayer.style.display = "flex";
 
-            // 1. 3秒後にフラッシュと共に、美鈴本来の姿（misuzu.png）へ進化
+            // 1. 3秒後にまばゆいフラッシュと共に、美鈴本来の姿（misuzu.png）へ進化！
             setTimeout(() => {
                 flash.style.animation = "flashEffect 0.6s ease-out forwards";
                 targetImg.src = "misuzu.png";
                 document.getElementById("evoTitle").innerText = "✨ 美鈴、完全復活 !! ✨";
                 document.getElementById("evoText").innerText = "眩い光のなか、美鈴が優しく微笑んだ。";
 
-                // 2. その2秒後、fin.htmlへ自動ジャンプ
+                // 2. その感動の2秒後（クリアから計5秒後）、fin.htmlへ自動ジャンプ！
                 setTimeout(() => {
                     window.location.href = "fin.html";
                 }, 2000);
@@ -494,6 +496,7 @@ function endGame(isSuccess) {
             }, 3000);
 
         } else {
+            // ❌ ゲームオーバー時：リザルトパネル展開
             document.getElementById("finalScore").innerText = hitCount;
             document.getElementById("GameScoreLayer").style.display = "flex";
         }
@@ -505,30 +508,20 @@ function tapReplay() {
     startCountdown();
 }
 
-// 👑 タッチイベントを最優先かつ即座に実行する構造へ再編成
+// ボタンのタッチ・クリック登録
 document.querySelectorAll(".tap-button").forEach(btn => {
     const laneIndex = parseInt(btn.dataset.lane);
     
-    // スマホ用（最速反応・ブラウザ標準のズームやジェスチャーを完全上書き）
     btn.addEventListener("touchstart", (e) => {
-        e.preventDefault(); 
-        e.stopPropagation(); // 親要素へのバブリングを止めて確実に即時実行
+        e.preventDefault();
         executeLaneTap(laneIndex);
     }, { passive: false });
 
-    // PCマウス用
     btn.addEventListener("mousedown", (e) => {
         e.preventDefault();
         executeLaneTap(laneIndex);
     });
 });
-
-// システム全体での余計なマルチタッチズームを完全遮断
-document.addEventListener('touchstart', function (e) {
-    if (e.touches.length > 1) {
-        e.preventDefault();
-    }
-}, { passive: false });
 </script>
 
 </body>
