@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>美鈴の試練 - SUDDEN DEATH MODE -</title>
+    <title>最終試練</title>
     <style>
         html, body { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
@@ -84,7 +84,7 @@
         }
         .lane-flash.active { opacity: 1; }
 
-        /* 美鈴ブロック */
+        /* 美鈴ブロック（巨大サイズ維持） */
         .note {
             position: absolute; 
             width: 94%; 
@@ -118,7 +118,7 @@
             pointer-events: none; z-index: 5;
         }
 
-        /* タップコントロールパネル */
+        /* 横線より下の高感度当たり判定エリア */
         .touch-control-panel {
             display: flex;
             width: 100%;
@@ -165,6 +165,7 @@
         }
         #GameScoreLayer, #EvolutionLayer { display: none; }
 
+        /* クリア時専用：美鈴画像進化演出レイヤー */
         .evo-img-container {
             position: relative; width: 220px; height: 220px;
             display: flex; justify-content: center; align-items: center;
@@ -175,6 +176,7 @@
             border-radius: 12px; transition: all 0.5s ease-in-out;
             box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
         }
+        /* 進化の瞬間の輝きエフェクト */
         .flash-bang {
             position: absolute; width: 100%; height: 100%; background: #fff;
             border-radius: 12px; opacity: 0; pointer-events: none;
@@ -206,7 +208,7 @@
 
 <div id="gameContainer">
     <div class="hud-area">
-        <div class="hud-title-mini">美鈴の試練 - SUDDEN DEATH -</div>
+        <div class="hud-title-mini">最終試練</div>
         <div class="hud-cards">
             <div class="hud-card">
                 <div class="hud-label">LIFE</div>
@@ -221,13 +223,16 @@
 
     <div class="stage-wrapper">
         <div class="game-stage" id="mainStage">
+            
             <div class="judgment-text" id="judText">HIT!</div>
+
             <div class="lanes-container">
                 <div class="lane" id="lane0"><div class="lane-flash" id="flash0"></div></div>
                 <div class="lane" id="lane1"><div class="lane-flash" id="flash1"></div></div>
                 <div class="lane" id="lane2"><div class="lane-flash" id="flash2"></div></div>
                 <div class="lane" id="lane3"><div class="lane-flash" id="flash3"></div></div>
             </div>
+
             <div class="judgment-wire-line"></div>
         </div>
     </div>
@@ -242,20 +247,18 @@
     <div id="countText">3</div>
 
     <div id="welcome" class="SHADE">
-        <div class="game-title">⚠️ 最終試練：美鈴の言霊をすべて紡げ！</div>
+        <div class="game-title"> 最終試練：美鈴を呼んで！</div>
         <div class="game-desc">
-            【判定最適化 ＆ 1ミス即終了モード】<br><br>
-            流れるブロックの速度を<span style="color:#00f5ff; font-weight:bold;">「0.028」</span>に固定！<br>
-            ネオン横線に重なる瞬間、真下のボタンエリアを死守せよ！<br><br>
-            全100個を<span style="color:#fef002; font-weight:bold;">すべてパーフェクトに叩けばクリア！</span><br>
-            ただし、空振り・見逃し問わず、<span style="color:#ff1744; font-weight:bold;">1回でも間違えたら即ゲームオーバー</span>。
+            流れてくるブロックをタイミングよく押して！<br><br>
+            全100個を<span style="color:#fef002; font-weight:bold;">押せばクリア！</span><br>
+            ただし<span style="color:#ff1744; font-weight:bold;">1回でも間違えたら即ゲームオーバー</span>。
         </div>
         <button class="btn-phone btn-primary" onclick="tapStart()">試練を開始する</button>
     </div>
 
     <div id="EvolutionLayer" class="SHADE">
-        <div class="game-title" style="color:#00f5ff; font-size:22px;" id="evoTitle">試練突破、そして覚醒――</div>
-        <div class="game-desc" id="evoText">「美鈴……、美鈴っ！！」言霊がぬいぐるみに魂を宿す！</div>
+        <div class="game-title" style="color:#00f5ff; font-size:22px;" id="evoTitle">呪いが解けた！</div>
+        <div class="game-desc" id="evoText">復元完了</div>
         <div class="evo-img-container">
             <img src="misuzunui.png" id="misuzuTargetImg" class="evo-img" alt="美鈴の姿">
             <div id="evoFlash" class="flash-bang"></div>
@@ -264,7 +267,7 @@
 
     <div id="GameScoreLayer" class="SHADE">
         <div class="game-title" id="resTitle" style="color:#ff8a80;">❌ 試練失敗 (GAME OVER)</div>
-        <div class="game-desc">一瞬の迷いが命取りに……！魂を研ぎ澄まして再挑戦してください。</div>
+        <div class="game-desc">再挑戦してね！</div>
         
         <div class="result-stats-container">
             <div class="result-row">叩いた数<span id="finalScore" style="color:#ff1744;">0</span></div>
@@ -290,8 +293,8 @@ let animFrameId = null;
 
 let stageHeight = 0;
 
-// ⚡ 0.028のスピードに合わせて、許容幅を「132」に調整（無駄な空振りを防ぐジャスト調整）
-const HIT_WINDOW_RANGE = 132; 
+// ⚡ 速度0.025のゆったりした動きに合わせ、判定の有効幅を「140」に微増させてジャスト感を向上
+const HIT_WINDOW_RANGE = 140; 
 
 function tapStart() {
     document.getElementById('welcome').style.display = 'none';
@@ -330,14 +333,13 @@ function beginGamePlay() {
     document.getElementById("progressValue").innerText = "0";
     document.getElementById("lifeValue").innerText = "❤️";
 
-    // ⚡ 速度0.028に合わせて、ノーツが適度な感覚で流れるように生成間隔を460msに変更
     spawnInterval = setInterval(() => {
         if (totalSpawned < TOTAL_NOTES && isPlaying) {
             spawnNote();
         } else {
             clearInterval(spawnInterval);
         }
-    }, 460);
+    }, 500);
 
     animFrameId = requestAnimationFrame(updateNotes);
 }
@@ -355,8 +357,7 @@ function spawnNote() {
     noteElement.style.top = "-50px"; 
     targetLane.appendChild(noteElement);
 
-    // ⚡ 速度を「0.028」へ変更
-    const speed = stageHeight * 0.028; 
+    const speed = stageHeight * 0.025; 
 
     activeNotes.push({
         element: noteElement,
@@ -374,9 +375,11 @@ function updateNotes() {
         note.y += note.speed;
         note.element.style.top = note.y + "px";
 
+        // 横線を越えて画面外へ漏れたら即MISS
         if (note.y > stageHeight + 80) {
             note.element.remove();
             activeNotes.splice(i, 1);
+            
             triggerMiss();
         }
     }
@@ -408,8 +411,8 @@ function executeLaneTap(laneIndex) {
     if (targetIndex !== -1) {
         const note = activeNotes[targetIndex];
         
-        // ⚡ 速度0.028で、ネオン判定線（中心）と視覚的に完全に重なる補正値「+ 22」を設定
-        const diff = Math.abs((note.y + 22) - stageHeight); 
+        // ⚡ 速度0.025において、ブロックが一番きれいに重なって見えるよう中心点を「+ 25」に微小補正
+        const diff = Math.abs((note.y + 25) - stageHeight); 
 
         if (diff <= HIT_WINDOW_RANGE) {
             note.element.remove();
@@ -435,6 +438,7 @@ function triggerMiss() {
     missCount = 1;
     document.getElementById("lifeValue").innerText = "❌";
     showJudgment("MISS");
+    
     endGame(false);
 }
 
@@ -473,11 +477,11 @@ function endGame(isSuccess) {
             setTimeout(() => {
                 flash.style.animation = "flashEffect 0.6s ease-out forwards";
                 targetImg.src = "misuzu.png";
-                document.getElementById("evoTitle").innerText = "✨ 美鈴、完全復活 !! ✨";
-                document.getElementById("evoText").innerText = "眩い光のなか、美鈴が優しく微笑んだ。";
+                document.getElementById("evoTitle").innerText = "呪いが解けた";
+                document.getElementById("evoText").innerText = "復元完了";
 
                 setTimeout(() => {
-                    window.location.href = "fin.html";
+                    window.location.href = "clear.html";
                 }, 2000);
 
             }, 3000);
