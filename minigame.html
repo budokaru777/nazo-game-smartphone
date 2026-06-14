@@ -84,7 +84,7 @@
         }
         .lane-flash.active { opacity: 1; }
 
-        /* 美鈴ブロック（巨大サイズ維持） */
+        /* 秦・谷・美・鈴 ブロック */
         .note {
             position: absolute; 
             width: 94%; 
@@ -216,7 +216,7 @@
             </div>
             <div class="hud-card">
                 <div class="hud-label">BLOCK</div>
-                <div class="hud-value"><span id="progressValue">0</span> / 100</div>
+                <div class="hud-value"><span id="progressValue">0</span> / 20</div>
             </div>
         </div>
     </div>
@@ -246,11 +246,11 @@
     <div id="countText">3</div>
 
     <div id="welcome" class="SHADE">
-        <div class="game-title"> 最終試練：美鈴を呼んで！</div>
+        <div class="game-title"> 最終試練：秦・谷・美・鈴</div>
         <div class="game-desc">
             画面を必ず<span style="color:#00f5ff; font-weight:bold;">横</span>に固定してください！<br>
-            流れてくるブロックをタイミングよく押して！<br><br>
-            全100個を<span style="color:#fef002; font-weight:bold;">押せばクリア！</span><br>
+            左から順に「秦」「谷」「美」「鈴」のブロックが降ってきます。<br><br>
+            各文字5回ずつ、<span style="color:#fef002; font-weight:bold;">合計20回すべて叩けばクリア！</span><br>
             ただし<span style="color:#ff1744; font-weight:bold;">1回でも間違えたら即ゲームオーバー</span>。
         </div>
         <button class="btn-phone btn-primary" onclick="tapStart()">試練を開始する</button>
@@ -271,7 +271,7 @@
         
         <div class="result-stats-container">
             <div class="result-row">叩いた数<span id="finalScore" style="color:#ff1744;">0</span></div>
-            <div class="result-row">目標数<span>100</span></div>
+            <div class="result-row">目標数<span>20</span></div>
         </div>
 
         <button class="btn-phone btn-primary" onclick="tapReplay()">もう一度挑む</button>
@@ -279,7 +279,9 @@
 </div>
 
 <script>
-const TOTAL_NOTES = 100;
+const TOTAL_NOTES = 20;
+// レーンに対応する文字の定義
+const LANE_CHARS = ["秦", "谷", "美", "鈴"];
 
 let totalSpawned = 0;
 let processedCount = 0;
@@ -292,6 +294,7 @@ let spawnInterval = null;
 let animFrameId = null;
 
 let stageHeight = 0;
+let spawnQueue = []; // 出現するレーンの順番を管理する配列
 
 // ⚡ 速度0.028に合わせて当たり判定幅を「132」に最適化
 const HIT_WINDOW_RANGE = 132; 
@@ -321,8 +324,23 @@ function startCountdown() {
     }, 600);
 }
 
+// 出現パターンを生成（各レーン0〜3を5回ずつ合計20回にしてシャッフル）
+function buildSpawnQueue() {
+    let queue = [];
+    for (let lane = 0; lane < 4; lane++) {
+        for (let i = 0; i < 5; i++) {
+            queue.push(lane);
+        }
+    }
+    // フィッシャー–イェーツのシャッフルでランダム順にする
+    for (let i = queue.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [queue[i], queue[j]] = [queue[j], queue[i]];
+    }
+    return queue;
+}
+
 function beginGamePlay() {
-    // 💡 速度ブレを無くす対策：画面レイアウトが完全に確定した「ここ」で正確な高さを取得する
     stageHeight = document.getElementById('mainStage').clientHeight;
 
     isPlaying = true;
@@ -331,11 +349,14 @@ function beginGamePlay() {
     hitCount = 0;
     missCount = 0;
     activeNotes = [];
+    
+    // 出現予定のキューをリセット＆生成
+    spawnQueue = buildSpawnQueue();
 
     document.getElementById("progressValue").innerText = "0";
     document.getElementById("lifeValue").innerText = "❤️";
 
-    // ⚡ 速度0.028に合わせてノーツ生成間隔を460msに変更
+    // ノーツ生成間隔を460msに変更
     spawnInterval = setInterval(() => {
         if (totalSpawned < TOTAL_NOTES && isPlaying) {
             spawnNote();
@@ -350,18 +371,20 @@ function beginGamePlay() {
 function spawnNote() {
     if (!isPlaying) return;
 
+    // キューから次のレーンインデックスを取り出す
+    const laneIndex = spawnQueue[totalSpawned];
     totalSpawned++;
-    const laneIndex = Math.floor(Math.random() * 4);
+    
     const targetLane = document.getElementById(`lane${laneIndex}`);
 
     const noteElement = document.createElement("div");
     noteElement.classList.add("note");
-    noteElement.innerText = "美鈴";
+    // 左からのレーンに対応した一文字をセット
+    noteElement.innerText = LANE_CHARS[laneIndex];
     noteElement.style.top = "-50px"; 
 
     targetLane.appendChild(noteElement);
 
-    // ⚡ 速度を「0.028」に固定
     const speed = stageHeight * 0.028; 
 
     activeNotes.push({
@@ -413,8 +436,6 @@ function executeLaneTap(laneIndex) {
 
     if (targetIndex !== -1) {
         const note = activeNotes[targetIndex];
-        
-        // ⚡ 速度0.028で、ネオン判定線（中心）と視覚的に完全に重なる補正値「+ 22」を設定
         const diff = Math.abs((note.y + 22) - stageHeight); 
 
         if (diff <= HIT_WINDOW_RANGE) {
