@@ -60,6 +60,20 @@
 </div>
 
 <script>
+// 🌐 【追加】QRコードから渡されたパラメータ（?p=数値）を処理する
+(function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const pParam = urlParams.get('p');
+
+  if (pParam) {
+    const targetProgress = parseInt(pParam);
+    // 進行度が1〜7の正常な数値であれば、localStorageを上書きして保存する
+    if (!isNaN(targetProgress) && targetProgress >= 1 && targetProgress <= 7) {
+      localStorage.setItem("gameProgress", targetProgress.toString());
+    }
+  }
+})();
+
 // Google検索を実行する関数
 function doSearch(event) {
   event.preventDefault();
