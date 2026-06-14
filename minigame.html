@@ -8,7 +8,9 @@
     <title>最終試練</title>
     <style>
         html, body { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
+            margin: 0; padding: 0; width: 100%; 
+            height: 100vh;
+            height: 100dvh; /* 動的ビューポートでツールバーを考慮 */
             font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
             overflow: hidden; background: #05020a;
             user-select: none; -webkit-user-select: none;
@@ -19,6 +21,7 @@
             position: relative;
             width: 100vw;
             height: 100vh;
+            height: 100dvh;
             background: radial-gradient(circle at center, #160a2b 0%, #05020a 100%);
             overflow: hidden;
             display: flex;
@@ -160,12 +163,13 @@
 
         /* 全画面スクリーンマスク */
         .SHADE {
-            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 20; padding: 15px; box-sizing: border-box;
             background: rgba(8, 4, 18, 0.98);
+            overflow-y: auto; /* 長文対策 */
         }
-        #GameScoreLayer, #EvolutionLayer { display: none; }
+        #GameScoreLayer, #EvolutionLayer, #barExplanation { display: none; }
 
         /* クリア時専用：美鈴画像進化演出レイヤー */
         .evo-img-container {
@@ -178,7 +182,6 @@
             border-radius: 12px; transition: all 0.5s ease-in-out;
             box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
         }
-        /* 進化の瞬間の輝きエフェクト */
         .flash-bang {
             position: absolute; width: 100%; height: 100%; background: #fff;
             border-radius: 12px; opacity: 0; pointer-events: none;
@@ -190,14 +193,23 @@
         }
 
         .game-title { font-size: 18px; color: #fef002; font-weight: 900; margin-bottom: 8px; text-shadow: 0 0 8px rgba(254,240,2,0.4); text-align: center; }
-        .game-desc { font-size: 12px; color: #ccc; line-height: 1.5; margin-bottom: 15px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; text-align: center; width: 85%; box-sizing: border-box; }
+        .game-desc { font-size: 12px; color: #ccc; line-height: 1.5; margin-bottom: 15px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; text-align: center; width: 85%; max-width: 450px; box-sizing: border-box; }
         
+        /* バー非表示説明用の装飾スタイル */
+        .guide-box {
+            text-align: left; width: 90%; max-width: 420px; background: rgba(0, 245, 255, 0.05);
+            border: 1px solid rgba(0, 245, 255, 0.3); padding: 12px; border-radius: 10px; margin-bottom: 15px;
+        }
+        .guide-title { font-size: 13px; color: #00f5ff; font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid rgba(0,245,255,0.2); padding-bottom: 3px;}
+        .guide-text { font-size: 11px; color: #e0e0e0; line-height: 1.6; margin: 0; padding-left: 5px; }
+
         .btn-phone {
             width: 60%; max-width: 260px; padding: 10px; margin: 4px 0;
             font-size: 14px; font-weight: bold; color: #fff; border: none; border-radius: 20px;
             cursor: pointer; box-sizing: border-box; text-align: center;
         }
         .btn-primary { background: linear-gradient(135deg, #00f5ff, #0077ff); box-shadow: 0 0 10px rgba(0,245,255,0.4); }
+        .btn-success { background: linear-gradient(135deg, #00e676, #00b0ff); box-shadow: 0 0 10px rgba(0,230,118,0.4); }
         
         .result-stats-container { display: flex; width: 50%; justify-content: space-between; margin-bottom: 15px; }
         .result-row { font-size: 14px; color: #aaa; font-weight: bold; text-align: center; }
@@ -255,7 +267,34 @@
             各文字5回ずつ、<span style="color:#fef002; font-weight:bold;">合計20回すべて叩けばクリア！</span><br>
             ただし<span style="color:#ff1744; font-weight:bold;">1回でも間違えたら即ゲームオーバー</span>。
         </div>
-        <button class="btn-phone btn-primary" onclick="tapStart()">試練を開始する</button>
+        <button class="btn-phone btn-primary" onclick="goToExplanation()">試練を開始する</button>
+    </div>
+
+    <div id="barExplanation" class="SHADE">
+        <div class="game-title" style="color:#00f5ff;">⚠️ 快適にプレイするための重要なお願い</div>
+        <div class="game-desc" style="font-size:11px; margin-bottom:10px;">
+            ブラウザのメニューバーやタスクバーが表示されたままだと、誤タップでゲームが中断したり、画面がズレて失敗する原因になります。以下の設定を強く推奨します！
+        </div>
+
+        <div class="guide-box">
+            <div class="guide-title">📱 iPhone (Safari) の方</div>
+            <p class="guide-text">
+                ブラウザ下の<strong>「共有ボタン（四角から上矢印のアイコン）」</strong>をタップし、メニューから<strong>「ホーム画面に追加」</strong>を選んでデスクトップから再起動すると、完全にバーが消えて全画面アプリとして遊べます！
+            </p>
+        </div>
+
+        <div class="guide-box">
+            <div class="guide-title">🤖 Android (Chrome) の方</div>
+            <p class="guide-text">
+                ブラウザ右上の<strong>「メニュー（縦の点3つ）」</strong>から<strong>「ホーム画面に追加」</strong>または「アプリをインストール」を選択して起動すると、全画面で快適にプレイ可能です。
+            </p>
+        </div>
+
+        <div class="game-desc" style="border:none; background:none; font-size:10px; color:#aaa; margin-bottom:5px;">
+            ※そのままブラウザで遊ぶ場合は、下のボタンを押した際に全画面化（バー非表示）を要求します。
+        </div>
+
+        <button class="btn-phone btn-success" onclick="tapStart()">準備OK！試練へ進む</button>
     </div>
 
     <div id="EvolutionLayer" class="SHADE">
@@ -311,9 +350,15 @@ function requestFullScreen() {
     }
 }
 
-function tapStart() {
-    requestFullScreen(); // 開始ボタンタップ時にフルスクリーン化
+// 最初のボタンから説明画面へ切り替える関数
+function goToExplanation() {
     document.getElementById('welcome').style.display = 'none';
+    document.getElementById('barExplanation').style.display = 'flex';
+}
+
+function tapStart() {
+    requestFullScreen(); // 開始ボタンタップ時にフルスクリーン化を強力に要求
+    document.getElementById('barExplanation').style.display = 'none';
     startCountdown();
 }
 
@@ -535,7 +580,7 @@ document.querySelectorAll(".tap-button").forEach(btn => {
     
     btn.addEventListener("touchstart", (e) => {
         e.preventDefault();
-        requestFullScreen(); // プレイ中タップ時も安全のために追従
+        requestFullScreen(); // プレイ中タップ時も安全のためにフルスクリーン要求を追従
         executeLaneTap(laneIndex);
     }, { passive: false });
 
