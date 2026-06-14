@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>最終試練</title>
     <style>
         html, body { 
@@ -246,7 +248,7 @@
     <div id="countText">3</div>
 
     <div id="welcome" class="SHADE">
-        <div class="game-title"> 最終試練：秦・谷・美・鈴</div>
+        <div class="game-title"> 最終試練：名前を呼んで！</div>
         <div class="game-desc">
             画面を必ず<span style="color:#00f5ff; font-weight:bold;">横</span>に固定してください！<br>
             左から順に「秦」「谷」「美」「鈴」のブロックが降ってきます。<br><br>
@@ -280,7 +282,6 @@
 
 <script>
 const TOTAL_NOTES = 20;
-// レーンに対応する文字の定義
 const LANE_CHARS = ["秦", "谷", "美", "鈴"];
 
 let totalSpawned = 0;
@@ -294,12 +295,24 @@ let spawnInterval = null;
 let animFrameId = null;
 
 let stageHeight = 0;
-let spawnQueue = []; // 出現するレーンの順番を管理する配列
+let spawnQueue = [];
 
-// ⚡ 速度0.028に合わせて当たり判定幅を「132」に最適化
 const HIT_WINDOW_RANGE = 132; 
 
+// 🌐 ツールバー非表示（フルスクリーン化）要求用共通関数
+function requestFullScreen() {
+    const el = document.documentElement;
+    if (document.fullscreenElement || document.webkitFullscreenElement) return;
+
+    if (el.requestFullscreen) {
+        el.requestFullscreen();
+    } else if (el.webkitRequestFullscreen) { // iOS Safari対応
+        el.webkitRequestFullscreen();
+    }
+}
+
 function tapStart() {
+    requestFullScreen(); // 開始ボタンタップ時にフルスクリーン化
     document.getElementById('welcome').style.display = 'none';
     startCountdown();
 }
@@ -324,7 +337,6 @@ function startCountdown() {
     }, 600);
 }
 
-// 出現パターンを生成（各レーン0〜3を5回ずつ合計20回にしてシャッフル）
 function buildSpawnQueue() {
     let queue = [];
     for (let lane = 0; lane < 4; lane++) {
@@ -332,7 +344,6 @@ function buildSpawnQueue() {
             queue.push(lane);
         }
     }
-    // フィッシャー–イェーツのシャッフルでランダム順にする
     for (let i = queue.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [queue[i], queue[j]] = [queue[j], queue[i]];
@@ -350,13 +361,11 @@ function beginGamePlay() {
     missCount = 0;
     activeNotes = [];
     
-    // 出現予定のキューをリセット＆生成
     spawnQueue = buildSpawnQueue();
 
     document.getElementById("progressValue").innerText = "0";
     document.getElementById("lifeValue").innerText = "❤️";
 
-    // ノーツ生成間隔を460msに変更
     spawnInterval = setInterval(() => {
         if (totalSpawned < TOTAL_NOTES && isPlaying) {
             spawnNote();
@@ -371,7 +380,6 @@ function beginGamePlay() {
 function spawnNote() {
     if (!isPlaying) return;
 
-    // キューから次のレーンインデックスを取り出す
     const laneIndex = spawnQueue[totalSpawned];
     totalSpawned++;
     
@@ -379,7 +387,6 @@ function spawnNote() {
 
     const noteElement = document.createElement("div");
     noteElement.classList.add("note");
-    // 左からのレーンに対応した一文字をセット
     noteElement.innerText = LANE_CHARS[laneIndex];
     noteElement.style.top = "-50px"; 
 
@@ -518,6 +525,7 @@ function endGame(isSuccess) {
 }
 
 function tapReplay() {
+    requestFullScreen(); // リプレイボタンタップ時にも再要求
     document.getElementById("GameScoreLayer").style.display = "none";
     startCountdown();
 }
@@ -527,11 +535,13 @@ document.querySelectorAll(".tap-button").forEach(btn => {
     
     btn.addEventListener("touchstart", (e) => {
         e.preventDefault();
+        requestFullScreen(); // プレイ中タップ時も安全のために追従
         executeLaneTap(laneIndex);
     }, { passive: false });
 
     btn.addEventListener("mousedown", (e) => {
         e.preventDefault();
+        requestFullScreen();
         executeLaneTap(laneIndex);
     });
 });
